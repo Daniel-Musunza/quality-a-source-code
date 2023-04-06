@@ -1,0 +1,39 @@
+[debug] [2023-04-04T18:53:01.430Z] ----------------------------------------------------------------------
+[debug] [2023-04-04T18:53:01.432Z] Command:       /home/festo/.nvm/versions/node/v14.18.0/bin/node /home/festo/.nvm/versions/node/v14.18.0/bin/firebase deploy --only functions
+[debug] [2023-04-04T18:53:01.433Z] CLI Version:   11.25.2
+[debug] [2023-04-04T18:53:01.433Z] Platform:      linux
+[debug] [2023-04-04T18:53:01.433Z] Node Version:  v14.18.0
+[debug] [2023-04-04T18:53:01.434Z] Time:          Tue Apr 04 2023 21:53:01 GMT+0300 (East Africa Time)
+[debug] [2023-04-04T18:53:01.434Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2023-04-04T18:53:01.547Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-04-04T18:53:01.548Z] > authorizing via signed-in user (qualityafreelancers@gmail.com)
+[debug] [2023-04-04T18:53:01.548Z] [iam] checking project qualitya-3dfd2 for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]
+[debug] [2023-04-04T18:53:01.551Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/qualitya-3dfd2:testIamPermissions [none]
+[debug] [2023-04-04T18:53:01.551Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/qualitya-3dfd2:testIamPermissions x-goog-quota-user=projects/qualitya-3dfd2
+[debug] [2023-04-04T18:53:01.552Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/qualitya-3dfd2:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2023-04-04T18:53:03.513Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/qualitya-3dfd2:testIamPermissions 200
+[debug] [2023-04-04T18:53:03.513Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/qualitya-3dfd2:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2023-04-04T18:53:03.515Z] >>> [apiv2][query] POST https://iam.googleapis.com/v1/projects/qualitya-3dfd2/serviceAccounts/qualitya-3dfd2@appspot.gserviceaccount.com:testIamPermissions [none]
+[debug] [2023-04-04T18:53:03.516Z] >>> [apiv2][body] POST https://iam.googleapis.com/v1/projects/qualitya-3dfd2/serviceAccounts/qualitya-3dfd2@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2023-04-04T18:53:05.149Z] <<< [apiv2][status] POST https://iam.googleapis.com/v1/projects/qualitya-3dfd2/serviceAccounts/qualitya-3dfd2@appspot.gserviceaccount.com:testIamPermissions 200
+[debug] [2023-04-04T18:53:05.150Z] <<< [apiv2][body] POST https://iam.googleapis.com/v1/projects/qualitya-3dfd2/serviceAccounts/qualitya-3dfd2@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[info] 
+[info] === Deploying to 'qualitya-3dfd2'...
+[info] 
+[info] i  deploying functions 
+[debug] [2023-04-04T18:53:05.165Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/qualitya-3dfd2 [none]
+[debug] [2023-04-04T18:53:05.900Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/qualitya-3dfd2 200
+[debug] [2023-04-04T18:53:05.901Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/qualitya-3dfd2 {"projectId":"qualitya-3dfd2","projectNumber":"280023372293","displayName":"qualityA","name":"projects/qualitya-3dfd2","resources":{"hostingSite":"qualitya-3dfd2","storageBucket":"qualitya-3dfd2.appspot.com","locationId":"europe-west"},"state":"ACTIVE","etag":"1_83a5c285-0401-4db2-bb6b-d542deee3818"}
+[info] i  functions: preparing codebase default for deployment 
+[info] i  functions: ensuring required API cloudfunctions.googleapis.com is enabled... 
+[info] i  functions: ensuring required API cloudbuild.googleapis.com is enabled... 
+[info] i  artifactregistry: ensuring required API artifactregistry.googleapis.com is enabled... 
+[debug] [2023-04-04T18:53:05.909Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/qualitya-3dfd2/services/cloudfunctions.googleapis.com [none]
+[debug] [2023-04-04T18:53:05.909Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/qualitya-3dfd2/services/cloudfunctions.googleapis.com x-goog-quota-user=projects/qualitya-3dfd2
+[debug] [2023-04-04T18:53:05.914Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/qualitya-3dfd2/services/runtimeconfig.googleapis.com [none]
+[debug] [2023-04-04T18:53:05.914Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/qualitya-3dfd2/services/runtimeconfig.googleapis.com x-goog-quota-user=projects/qualitya-3dfd2
+[debug] [2023-04-04T18:53:05.917Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/qualitya-3dfd2/services/cloudbuild.googleapis.com [none]
+[debug] [2023-04-04T18:53:05.918Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/qualitya-3dfd2/services/cloudbuild.googleapis.com x-goog-quota-user=projects/qualitya-3dfd2
+[debug] [2023-04-04T18:53:05.923Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/qualitya-3dfd2/services/artifactregistry.googleapis.com [none]
+[debug] [2023-04-04T18:53:05.924Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/qualitya-3dfd2/services/artifactregistry.googleapis.com x-goog-quota-user=projects/qualitya-3dfd2
