@@ -81,13 +81,9 @@ export default {
     --color-dark:#02060b;
     --text-grey:#999999;
 }
-* {
-    padding:0;
-    margin: 0;
-    box-sizing: border-box;
+  * {
     list-style-type:none;
     text-decoration: none;
-   font-family: 'Heebo', sans-serif;;
 }
 .profile-menu {
     position: absolute;

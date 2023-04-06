@@ -77,7 +77,8 @@ export default {
 </script>
 
 <style scoped>
- :root {
+@import url('htttps://fonts.googleapi.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+:root {
     --main-color:#fff;
     --color-dark:#02060b;
     --text-grey:#999999;
