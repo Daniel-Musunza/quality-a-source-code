@@ -745,12 +745,16 @@ td i {
     .recent-grid {
         grid-template-columns: 60% 40%;
     }
+    .recent-grid2{
+        grid-template-columns: 60% 40%;
+    }
  }
  @media only screen and (max-width: 768px) {
     .cards  {
         grid-template-columns:repeat(2, 1fr);
     }
-    .recent-grid {
+    .recent-grid ,
+    .recent-grid2 {
         grid-template-columns: 100%;
     }
     .search-wrapper{

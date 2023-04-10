@@ -7,10 +7,10 @@
             </label>
           </h3>
         </div>
-        <div class="search-wrapper">
+        <!-- <div class="search-wrapper">
             <span><i class="fa-solid fa-magnifying-glass"></i></span>
              <input type="search" placeholder="search here" />
-           </div>
+           </div> -->
           <div class="user-wrapper"  @click="toggleProfileMenu">
             <span><i class="fa-sharp fa-solid fa-bell-slash"></i></span>
             <span><i class="fa-sharp fa-solid fa-comment"></i></span>

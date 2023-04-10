@@ -3,8 +3,8 @@
         <div class="sidebar-brand">
             <img id="logo-img" class="img-center" src="../../assets/client/images/logo.png" alt="" >
         </div>
-        <div class="sidebar-menu" style="height: 500px; overflow: auto;">
-            <ul>
+        <div class="sidebar-menu" style="height: 500px;">
+            <ul style="margin-left: 5px;">
                
                 <!-- freelancer begin -->
                 <li v-if="freelancer||admin">
@@ -272,12 +272,14 @@ export default {
 }
 .sidebar-menu {
     margin-top: 1rem;
+    margin-left:5px;
 }
 .sidebar-menu li {
     width: 100%;
     margin-bottom: 1.3rem;
     padding-left: 2rem;
     font-size: 15px;
+ 
 }
 .sidebar-menu li .available{
     margin-left:3rem ;

@@ -33,12 +33,16 @@
                 </div>
                 <div class="card-content">
                     <div class="card-body login">
+                        <div class="alert alert-danger" v-if="error">
+                            {{ this.errorMsg }}
+                          </div>
                         <form class="form-horizontal form-simple" method="POST" action="">
+                            <TheLoader v-if="loading"/>
                             <input type="hidden" name="_token" >                          
                               <fieldset class="form-group position-relative has-icon-left">
                                 <input type="text"
                                     class="form-control form-control-lg input-lg "
-                                    id="user-name" value="" name="email"
+                                   v-model="email"
                                     placeholder="Enter Your Email" required>
                                 <div class="form-control-position">
                                     <i class="ft-user"></i>
@@ -47,8 +51,8 @@
                             <fieldset class="form-group position-relative has-icon-left">
                                 <input type="password"
                                     class="form-control form-control-lg input-lg "
-                                    id="user-password" placeholder="Enter Your Account Password" required
-                                    autocomplete="current-password" name="password">
+                                    placeholder="Enter Your Account Password" required
+                                   v-model="password">
                                 <div class="form-control-position">
                                     <i class="fa fa-lock"></i>
                                 </div>
@@ -56,7 +60,7 @@
                             <div class="form-group row">
                                 <div class="col-md-6 col-12 text-center text-md-left">
                                     <fieldset>
-                                        <input type="checkbox" name="remember" id="remember-me" class="chk-remember"
+                                        <input type="checkbox" class="chk-remember"
                                             >
                                         <label for="remember-me"> Remember Me</label>
                                     </fieldset>
@@ -66,8 +70,8 @@
                                         Password?</router-link>
                                 </div>
                             </div>
-                            <button type="submit" class="btn blue-bg btn-lg btn-block" id="send-btn">
-                              <router-link to="/freelancer-dashboard" >Log In</router-link>
+                            <button type="submit"   class="btn blue-bg btn-lg btn-block" @click.prevent="signIn()">
+                              Log In
                             </button>
                         </form>
                     </div>
@@ -91,10 +95,44 @@
     </div>
 </template>
 
-<script>
-export default {
 
-}
+<script>
+ import TheLoader from "@/components/TheLoader";
+  import {getAuth, signInWithEmailAndPassword} from 'firebase/auth';
+
+export default {
+    name: "clientLogIn",
+      data() {
+          return {
+              email: '',
+              password: '',
+              errorMsg: '',
+              error: null,
+              loading: null
+          };
+      },
+      components: {
+        TheLoader
+      },
+      methods: {
+       async signIn () {
+          this.loading= true;
+          const auth = getAuth();
+    
+          try {
+           await signInWithEmailAndPassword(auth, this.email, this.password);
+            this.$router.push('/freelancer-dashboard');
+            this.error = false;
+            this.errorMsg = "";
+            this.loading = false;
+        } catch(err) {
+            this.loading = false;
+            this.error = true;
+            this.errorMsg = err.message;
+          }
+        }
+      },
+  };
 </script>
 
 <style scoped>

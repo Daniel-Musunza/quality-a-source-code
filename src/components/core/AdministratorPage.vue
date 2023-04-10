@@ -1,9 +1,9 @@
 <template>
 <input type="checkbox" id="nav-toggle">
-   <SideBar></SideBar>
-
+<SideBar/>
+    <div class="main-content">
+      <Header></Header>
     <div class="container">
-      <div>
               <div>
                 <h2>Administration</h2>
                 <hr />
@@ -36,21 +36,21 @@
                     Add Freelancer
                   </button>
                 </div>
-            </div>
+                </div>
               </form>
-            </div>  <!-- <Administration /> -->
+      </div>  <!-- <Administration /> -->
       </div>
 </template>
 <script>
 import SideBar from "@/components/core/SideBar.vue";
+import Header from "@/components/core/Header.vue";
 import { getFunctions, httpsCallable } from "firebase/functions";
-    import { functions } from "@/firebase";
-          export default {
-            name: "AdministratorPage",
-            components: {
-        SideBar, 
-    
-      },
+  export default {
+   name: "AdministratorPage",
+   components: {
+    SideBar, 
+    Header,
+   },
           
               data() {
                   return {
@@ -85,21 +85,54 @@ import { getFunctions, httpsCallable } from "firebase/functions";
       .container {
       
         background-color: rgb(108, 142, 235);
-        margin-left: 200px;
-        position: absolute;
+        /* margin-left: 200px; */
+        margin-top: 40px;
         display: flex;
         justify-content: center;
+        flex-direction: column;
+        width:fit-content
         /* max-width: fit-content; */
       }
       h2 {
         font-weight: 500;
         text-align: center;
       }
-      @media (min-width: 577px){
+      .main-content {
+    transition: margin-left 300ms;
+    margin-left: 200px;
+}
+
+.main-content header{
+    background: #fff;
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    box-shadow: 2px 2px 5px rgba(0,0,0, 0.2);
+    position: fixed;
+    left: 200px;
+    right: 0;
+    /* width: calc(100% -200px); */
+    top: 0;
+    z-index: 100;
+    transition: left 300ms;
+
+}
+      @media (min-width: 777px){
         .container {
-          margin-left: 0;
-          position: relative;
+          margin: 10px;
+       
         }
+
+    .main-content {
+        width: 100%;
+        margin-left: 0rem;
+    }
+    header {
+        width: 100% !important;
+        left: 0 !important;
+        
+    }
+
       }
 
       

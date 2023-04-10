@@ -162,17 +162,7 @@ export default {
   }
   i{
     padding-right:10px;
-  }
-.sidebar {
-    width: 200px;
-    position: fixed;
-    left: 0;
-    top: 0;
-    height: 100%;
-    background-color: var(--main-color);
-    z-index: 100;
-    transition: margin-left 300ms;
-}
+  } 
 .sidebar-brand{
     height: 90px;
     padding:1rem 0rem 1rem 2rem; 
