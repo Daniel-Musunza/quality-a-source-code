@@ -14,7 +14,7 @@
                       <div class="card-header" >
                           
                           <!-- Freelancer should not see -->
-                        <router-link to="/client-view" class="employer-div" v-if="admin">
+                          <router-link to="/client-view" class="employer-div" v-if="admin">
                               <div class="employer-img">
                                   <div style="border-radius: 38%; background: #808080; height: 60px; width: 60px; display: flex; justify-content:center;" >
                                       <span style="weight: 700; margin-left:5px; font-size: 30px" >CL</span>
@@ -22,7 +22,18 @@
                                   </div>
                               </div>
                               <div>
-                                <!-- <span class="h5"><h3>{{ clientInfo.firstName }} {{ clientInfo.lastName }}</h3></span> -->
+                                <span class="h5">
+                                    <h3> 
+                                        <div v-if="!userData">
+                                        Loading...
+                                        </div>
+                                        <div v-else>
+                                        {{ userData.firstName }} {{ userData.lastName }}
+                                        </div>
+
+
+                                    </h3>
+                                </span>
 
                                   <div id="body-employer-rating" style="font-size: 15px;">
                                       <i class="fa rating 
@@ -213,7 +224,7 @@
 </template>
 
 <script>
-import { getFirestore, doc, updateDoc, collection, setDoc, deleteDoc } from "firebase/firestore"; 
+import { getFirestore, doc, updateDoc, collection, getDoc, setDoc, deleteDoc } from "firebase/firestore"; 
 import SideBar from "@/components/core/SideBar.vue";
 import Header from "@/components/core/Header.vue";
 import { mapState } from 'vuex';
@@ -226,7 +237,7 @@ export default {
         return {
             available: null,
             profileMenu: null,
-       
+            userData: null,
              payment: null,
         }
     },
@@ -297,27 +308,43 @@ export default {
         return tobebidded;
     }
     },
-    async client() {
-        const userSnapshot = await getDoc(this.order.client);
-       
-        const userData = userSnapshot.data();
-        const profileInfo = {
-                  firstName: userData.firstName,
-                  lastName: userData.lastName,
-                  phoneNumber: userData.phoneNumber,
-                  email: userData.email,
-                };
-        return profileInfo;
-    },
-    
-    clientInfo() {
-        this.client.then(client => {
+    // async clientInfo() {
+    //     // console.log('clientInfo method called');
+    // if (this.order) {
+    //   const firestore = getFirestore();
+    //   const userRef = doc(collection(firestore, "users"), this.order.client);
+    //   const userSnapshot = await getDoc(userRef);
+    //     // console.log('userSnapshot.exists:', userSnapshot.exists);
+    //     const userData = userSnapshot.data();
+    //     // console.log('userData:', userData);
 
-        return client;
-      });
-    }
-    }
-  
+    //   return {
+    //     firstName: userData.firstName,
+    //     lastName: userData.lastName,
+    //     phoneNumber: userData.phoneNumber,
+    //     email: userData.email,
+    //   };
+    
+    // } else {
+    //   return {}; // or return a default value if order is not found
+    // }
+    // }, 
+
+    },
+async created() {
+  if (this.order) {
+    const firestore = getFirestore();
+    const userRef = doc(collection(firestore, "users"), this.order.client);
+    const userSnapshot = await getDoc(userRef);
+    const userData = userSnapshot.data();
+    this.userData = {
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      phoneNumber: userData.phoneNumber,
+      email: userData.email,
+    };
+  }
+},
 }
 </script>
 

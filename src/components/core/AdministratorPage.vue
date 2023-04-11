@@ -3,7 +3,7 @@
 <SideBar/>
     <div class="main-content">
       <Header></Header>
-    <div class="container">
+   
               <div>
                 <h2>Administration</h2>
                 <hr />
@@ -39,7 +39,7 @@
                 </div>
               </form>
       </div>  <!-- <Administration /> -->
-      </div>
+  
 </template>
 <script>
 import SideBar from "@/components/core/SideBar.vue";
@@ -80,9 +80,9 @@ import { getFunctions, httpsCallable } from "firebase/functions";
                 },
          
           }
-      </script>
+</script>
     <style scoped>
-      .container {
+      .main-content {
       
         background-color: rgb(108, 142, 235);
         /* margin-left: 200px; */
@@ -90,17 +90,29 @@ import { getFunctions, httpsCallable } from "firebase/functions";
         display: flex;
         justify-content: center;
         flex-direction: column;
-        width:fit-content
+        /* max-width: 200px; */
+        transition: margin-left 300ms;
+     
+       
         /* max-width: fit-content; */
+      }
+      .form-group {
+        display: flex;
+        justify-content: center;
+        /* max-width: 400px; */
+      }
+      input {
+        margin-left: 400px;
+        margin-right: 400px;
       }
       h2 {
         font-weight: 500;
         text-align: center;
       }
-      .main-content {
+      /* .main-content {
     transition: margin-left 300ms;
     margin-left: 200px;
-}
+} */
 
 .main-content header{
     background: #fff;
@@ -114,24 +126,24 @@ import { getFunctions, httpsCallable } from "firebase/functions";
     /* width: calc(100% -200px); */
     top: 0;
     z-index: 100;
-    transition: left 300ms;
+    /* transition: left 300ms; */
 
 }
-      @media (min-width: 777px){
-        .container {
-          margin: 10px;
-       
-        }
+      @media (max-width: 777px){
 
     .main-content {
         width: 100%;
-        margin-left: 0rem;
+        margin-left: 10px;
     }
     header {
         width: 100% !important;
         left: 0 !important;
         
     }
+   input {
+        margin-left: 10px;
+        margin-right: 10px;
+      }
 
       }
 

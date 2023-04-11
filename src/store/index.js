@@ -227,7 +227,6 @@ updateComment(state, payload) {
 
   },
   actions: {
-  
 // auth actions
     async getCurrentUser(context, user) {
       const auth = getAuth();
