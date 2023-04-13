@@ -26,47 +26,20 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td>34567890</td>
-                                        <td>UI/UX Design</td>
-                                        <td>UI Team</td>
+                                    <tr v-for="(order, index) in myBids" :key="order.id">
+                                        <td>{{ index + 1 }}</td>
+                                        <td>{{ order.id }}</td>
+                                        <td>{{ order.orderTitle }}</td>
+                                        <td>{{ order.orderCategory }}</td>
                                   
-                                        <td>560</td>
-                                        <td>9hrs 34min</td>
+                                        <td>{{ order.payment }}</td>
+                                        <td>{{ order.dueDate }} {{ order.dueTime }}</td>
                                         <td style="color:red">cancel</td>
                                         <td> 
-                                            <router-link to="/order-view">
+                                            <router-link :to="{ name: 'order-view', params: {id: order.id}}">
                                                 View Details
                                             </router-link>
                                         </td>
-                                    </tr>
-                                    <tr>
-                                        <td>456789</td>
-                                        <td>Web Development</td>
-                                        <td>Frontend</td>
-                                     
-                                        <td>4000</td>
-                                        <td>9hrs 34min</td>
-                                        <td style="color:red">cancel</td>
-                                    </tr>
-                                    <tr>
-                                        <td>3456788</td>
-                                        <td>Ushop App</td>
-                                        <td>Mobile Team</td>
-                                  
-                                        <td>4500</td>
-                                        <td>34min</td>
-                                        <td style="color:red">cancel</td>
-                                    </tr>
-                                    <tr>
-                                        <td>234567</td>
-                                        <td>Accademic Writing</td>
-                                        <td>Writing Team</td>
-                                      
-                                        <td>45</td>
-                                        <td>7hr</td>
-                                        <td style="color:red">cancel</td>
                                     </tr>
                                    
                                 </tbody>
@@ -82,6 +55,7 @@
 <script>
 import SideBar from "@/components/core/SideBar.vue";
 import Header from "@/components/core/Header.vue";
+import { mapState, mapActions } from 'vuex';
 export default {
     components: {
         SideBar, 
@@ -102,7 +76,14 @@ export default {
         toggleProfileMenu(){
             this.profileMenu= !this.profileMenu
         },
-    }
+        ...mapActions(['getMyBids'])
+    },
+    computed: {
+    ...mapState(['myBids'])
+  },
+  created() {
+    this.getMyBids();
+  }
 }
 </script>
 

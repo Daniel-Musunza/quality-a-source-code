@@ -283,38 +283,41 @@ export default {
         async placeBid() {
             const orderId = this.order.id;
             const bidtext = this.bidtext;
-                try {
-                    const db = getFirestore();
-                    const auth = getAuth();
-                    const userRef = doc(db, 'users', auth.currentUser.uid)
-                    // Update the payment field in the current order document
-                    const orderRef = doc(db, "orders", orderId);
-                    const myBidsCollectionRef = collection(userRef, "mybids");
-                    const myBidsOrderRef = doc(myBidsCollectionRef, orderRef.id);
-                    await setDoc(myBidsOrderRef, {
+            try {
+                const db = getFirestore();
+                const auth = getAuth();
+                const userRef = doc(db, 'users', auth.currentUser.uid)
+                
+                // Update the payment field in the current order document
+                const orderRef = doc(db, "tobebidded_orders", orderId);
+                const myBidsCollectionRef = collection(userRef, "myBids");
+                const myBidsOrderRef = doc(myBidsCollectionRef, orderRef.id);
+                await setDoc(myBidsOrderRef, {
+                ...this.order,
+                bidtext,
+                date: new Date()
+                },
+                console.log("successfully!")
+                );
+                
+                const bidsRef = collection(orderRef, 'bids');
+                const newOrderRef = doc(bidsRef, orderRef.id);
+                await setDoc(newOrderRef, {
                     ...this.order,
                     bidtext,
                     date: new Date()
-                    });
-                    const bidsRef = collection(orderRef, 'bids');
-                    const newOrderRef = doc(bidsRef, orderRef.id);
-                    await setDoc(newOrderRef, {
-                        ...this.order,
-                        bidtext,
-                    date: new Date()
-                    });
+                });
 
-               
                 
-                //   await this.$store.dispatch("getMyBidsOrders");
-
-                    console.log("Order bidded successfully!");
-                    this.$router.push("/freelancer/my-bids");
-                } catch (error) {
-                    console.error("Error bidding order:", error);
-                }
+                alert("Order bidded successfully!");
+                await this.$store.dispatch("getyBids");
+                // this.$router.push("/freelancer/my-bids");
+            } catch (error) {
+                console.error("Error bidding order:", error);
+            }
             this.bidtext = null;
-        }
+}
+
   },
 
     computed: {
@@ -343,27 +346,6 @@ export default {
         return tobebidded;
     }
     },
-    // async clientInfo() {
-    //     // console.log('clientInfo method called');
-    // if (this.order) {
-    //   const firestore = getFirestore();
-    //   const userRef = doc(collection(firestore, "users"), this.order.client);
-    //   const userSnapshot = await getDoc(userRef);
-    //     // console.log('userSnapshot.exists:', userSnapshot.exists);
-    //     const userData = userSnapshot.data();
-    //     // console.log('userData:', userData);
-
-    //   return {
-    //     firstName: userData.firstName,
-    //     lastName: userData.lastName,
-    //     phoneNumber: userData.phoneNumber,
-    //     email: userData.email,
-    //   };
-    
-    // } else {
-    //   return {}; // or return a default value if order is not found
-    // }
-    // }, 
 
     },
 async created() {

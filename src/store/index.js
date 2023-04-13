@@ -28,6 +28,7 @@ export default createStore({
             // orders state
             clientOrders: [],
             orders: [],
+            myBids: [],
             forwarded_orders: [],
             tobebidded_orders: [],
             postloaded: null,
@@ -53,6 +54,7 @@ export default createStore({
   getters: {
     // order getters
 orders: state => state.orders,
+myBids: state => state.myBids,
 forwarded_orders: state => state.forwarded_orders,
 tobebidded_orders: state => state.tobebidded_orders,
 clientOrders: state => state.clientOrders,
@@ -147,6 +149,9 @@ fullName(state) {
         },
         setTobebiddedOrderState(state, payload){
           state.tobebidded_orders = payload;
+        },
+        setMyBidsState(state, payload){
+          state.myBids = payload;
         },
          newOrderPost(state, payload) {
           state.orderHTML = payload;
@@ -322,6 +327,12 @@ updateComment(state, payload) {
         const querySnapshot = await getDocs(collection(db, "tobebidded_orders"));
         const data = querySnapshot.docs.map((doc) => doc.data());
         commit('setTobebiddedOrderState', data);
+      },
+      async getMyBids({ commit }) {
+
+        const querySnapshot = await getDocs(collection(db, "myBids"));
+        const data = querySnapshot.docs.map((doc) => doc.data());
+        commit('setMyBidsState', data);
       },
       async getClientOrders({ commit }) {
         onAuthStateChanged(getAuth(), async (user) => {

@@ -35,7 +35,8 @@
                 
                 <hr>
                 <br>
-                <router-link to="/client-log-in"> <i class="fa-solid fa-user-group"></i>Switch Account</router-link>
+                <router-link v-show="freelancer||admin" to="/client-log-in"> <i class="fa-solid fa-user-group"></i>Switch Account</router-link>
+                <router-link v-show="!freelancer&&!admin" to="/freelancer-log-in"> <i class="fa-solid fa-user-group"></i>Switch Account</router-link>
                 <hr>
                 <br>
                 <div @click="signOut()"><i class="fa-solid fa-user-lock"></i>Logout</div>

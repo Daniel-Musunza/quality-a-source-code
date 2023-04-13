@@ -5,15 +5,14 @@
        <Header></Header>
         <main>
             <div style="display: flex; flex-direction: column; text-align: center;">
-                <h2> Post a Review</h2>
-
-                <div class="editor">
-                    <vue-editor :editorOptions="editorSettings" useCustomImageHandler @image-added="imageHandler" />
-                  </div>
+                 <div class="form-group">
+                <label>Post a Review</label>
+                <textarea class="form-control" name="description" rows="5"></textarea>
+                </div>
             </div>
             <section id="reviews" class="service pos-r bg-effect o-hidden">
                 <div style="text-align: center;">
-                    <h2>Reviews</h2>
+                    <label>Reviews</label>
                     </div>
                 <div class="container">
                     <div class="row align-items-center">
