@@ -14,7 +14,7 @@
                       <div class="card-header" >
                           
                           <!-- Freelancer should not see -->
-                          <router-link to="/client-view" class="employer-div" v-if="admin">
+                          <router-link :to="{ name: 'client-view', params: {id: userData.id}}" class="employer-div" v-if="admin">
                               <div class="employer-img">
                                   <div style="border-radius: 38%; background: #808080; height: 60px; width: 60px; display: flex; justify-content:center;" >
                                       <span style="weight: 700; margin-left:5px; font-size: 30px" >CL</span>
@@ -133,7 +133,7 @@
                                   </div>
                                   <div class="modal-footer">
                                       <button type="button" class="btn main-light" data-dismiss="modal">Cancel</button>
-                                      <button type="submit" id="btn-request" class="btn btn-primary">Place bid</button>
+                                      <button type="submit" @click.prevent="placeOrder()" id="btn-request" class="btn btn-primary">Place bid</button>
                                   </div>
                               </form>
                           </div>
@@ -227,6 +227,7 @@
 import { getFirestore, doc, updateDoc, collection, getDoc, setDoc, deleteDoc } from "firebase/firestore"; 
 import SideBar from "@/components/core/SideBar.vue";
 import Header from "@/components/core/Header.vue";
+import { getAuth} from "firebase/auth";
 import { mapState } from 'vuex';
 export default {
     components: {
@@ -239,6 +240,7 @@ export default {
             profileMenu: null,
             userData: null,
              payment: null,
+             bidtext: null,
         }
     },
     methods: {
@@ -276,9 +278,42 @@ export default {
                 } catch (error) {
                     console.error("Error forwarding order:", error);
                 }
-
-
             this.payment = null;
+        },
+        async placeBid() {
+            const orderId = this.order.id;
+            const bidtext = this.bidtext;
+                try {
+                    const db = getFirestore();
+                    const auth = getAuth();
+                    const userRef = doc(db, 'users', auth.currentUser.uid)
+                    // Update the payment field in the current order document
+                    const orderRef = doc(db, "orders", orderId);
+                    const myBidsCollectionRef = collection(userRef, "mybids");
+                    const myBidsOrderRef = doc(myBidsCollectionRef, orderRef.id);
+                    await setDoc(myBidsOrderRef, {
+                    ...this.order,
+                    bidtext,
+                    date: new Date()
+                    });
+                    const bidsRef = collection(orderRef, 'bids');
+                    const newOrderRef = doc(bidsRef, orderRef.id);
+                    await setDoc(newOrderRef, {
+                        ...this.order,
+                        bidtext,
+                    date: new Date()
+                    });
+
+               
+                
+                //   await this.$store.dispatch("getMyBidsOrders");
+
+                    console.log("Order bidded successfully!");
+                    this.$router.push("/freelancer/my-bids");
+                } catch (error) {
+                    console.error("Error bidding order:", error);
+                }
+            this.bidtext = null;
         }
   },
 
@@ -342,6 +377,7 @@ async created() {
       lastName: userData.lastName,
       phoneNumber: userData.phoneNumber,
       email: userData.email,
+      id: userData.id,
     };
   }
 },

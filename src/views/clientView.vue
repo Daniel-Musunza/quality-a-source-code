@@ -2,10 +2,147 @@
 
 <template>
     <input type="checkbox" id="nav-toggle">
- 
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <img id="logo-img" class="img-center" src="@/assets/client/images/logo.png" alt="" >
+        </div>
+        <div class="sidebar-menu" style="height: 500px;">
+            <ul style="margin-left: 5px;">
+               
+                <!-- freelancer begin -->
+                <li>
+                    <router-link  to="/freelancer-dashboard" class="active">
+                    <i class="fa fa-book" aria-hidden="true"></i>
+                    <span>Dashboard</span>
+                    </router-link>
+                </li>
+                <li>
+                    <router-link to="/" class="active">
+                        <i class="fa-solid fa-house"></i>
+                    <span>Home</span>
+                    </router-link>
+                </li>
+                <li>
+                    <router-link to="/client-view">
+                      <i class="fa-solid fa-user"></i>
+                    <span>Profile</span>
+                    </router-link>
+                </li>
+                <!-- <li >
+                    <router-link to="/freelancer/in-progress">
+                        <i class="fa-sharp fa-solid fa-pen"></i>
+                    <span>In Progress</span>
+                    <span class="li-span">0</span>
+                    </router-link>
+                </li>
+                <li >
+                    <router-link to="/freelancer/in-review">
+                        <i class="fa-sharp fa-solid fa-font-awesome"></i>
+                    <span>In review</span>
+                    <span class="li-span">1</span>
+                    </router-link>
+                </li>
+                <li >
+                    <router-link to="/freelancer/completed"><i class="fa fa-clipboard" aria-hidden="true"></i>
+                    <span>Done</span>
+                    <span class="li-span">0</span>
+                    </router-link>
+                </li>
+                <li >
+                    <router-link to="/freelancer/on-revision">
+                        <i class="fa-sharp fa-solid fa-pen-to-square"></i>
+                    <span>Revision</span>
+                    <span class="li-span">0</span>
+                    </router-link>
+                </li>
+                <li >
+                    <router-link to="/freelancer/disputed"><i class="fa-sharp fa-solid fa-thumbs-down"></i>
+                    <span>Disputed</span>
+                    <span class="li-span">0</span>
+                    </router-link>
+                </li>
+               
+                 -->
+                <!-- freelancer end -->
+                 <!-- client begin -->
+            <li >
+                <router-link to="/new-order">
+                    <i class="fa-solid fa-square-arrow-up-right"></i>
+                <span>New Order</span>
+                </router-link>
+            </li>
+            <li >
+                <router-link to="/client/all-orders"><i class="fa fa-shopping-bag" aria-hidden="true"></i>
+                <span>All Orders</span>
+                </router-link>
+            </li>
+            <li >
+                <router-link to="/client/done">
+                    <i class="fa fa-clipboard" aria-hidden="true"></i>
+                <span>Completed</span>
+                </router-link>
+            </li>
+            <li >
+                <router-link to="/client/incomplete"><i class="fa-solid fa-sort"></i>
+                <span>Incomplete</span>
+                </router-link>
+            </li>
+            <li >
+                <router-link to="/client/revision"><i class="fa-solid fa-rotate"></i>
+                <span>On Revision</span>
+                </router-link>
+            </li>
+            
+            </ul>
+        </div>
+    </div>
     <div class="main-content">
-        
-    <div class="container">
+      <header>
+        <div>
+          <h3>
+            <label for="nav-toggle">
+                <span><i class="fa-solid fa-bars"></i></span>
+            </label>
+          </h3>
+        </div>
+        <!-- <div class="search-wrapper">
+            <span><i class="fa-solid fa-magnifying-glass"></i></span>
+             <input type="search" placeholder="search here" />
+           </div> -->
+          <div class="user-wrapper"  @click="toggleProfileMenu">
+            <span><i class="fa-sharp fa-solid fa-bell-slash"></i></span>
+            <span><i class="fa-sharp fa-solid fa-comment"></i></span>
+         
+            <!-- <img src="images/BuyoneFree_65.jpg" class="img" width="30px" height="30px" alt=""> -->
+            <div class="profile">
+                <span style="font-size:20px; padding-left: 25px;">{{ this.$store.state.profileInitials}}</span>
+            </div>
+            <span class="down"><i class="fa-sharp fa-solid fa-angle-down"></i></span>
+          </div>
+          <div v-if="profileMenu " class="profile-menu">
+            <div class="info">
+              <div class="right">
+                <h4>{{this.$store.state.profileFirstName}} {{this.$store.state.profileLastName}} </h4>
+                <small v-show="admin">Super admin</small>
+                <small v-show="freelancer">Freelancer</small>
+                <small v-show="!freelancer&&!admin">Client</small>
+                <hr>
+                <br>
+               
+                <router-link to="/profile-view"><i class="fa-regular fa-user" ></i>View Profile</router-link>
+                
+                <hr>
+                <br>
+                <router-link to="/client-log-in"> <i class="fa-solid fa-user-group"></i>Switch Account</router-link>
+                <hr>
+                <br>
+                <div @click="signOut()"><i class="fa-solid fa-user-lock"></i>Logout</div>
+                <br>
+              </div>
+            </div>
+          </div> 
+        </header>
+    <!-- <div class="container"> -->
       <ModalItem v-if="modalActive" :modalMessage="modalMessage" v-on:close-modal="closeModal" />
         <!-- <img src="../assets/client/images/logo.png" style="height:200px;" class="logo" > -->
           <div class="row">
@@ -16,95 +153,52 @@
                   <h2>Account Settings</h2>
                   <hr />
                 </div>
-                <div class="initials">
-                  <div>
-                  {{ $store.state.profileInitials }}
-                  </div>
-                
-                </div>
-                <span @click="openPreview" :class="{ 'button-inactive': !this.$store.state.profilePhotoFileURL}" style>{{ this.$store.state.profilePhotoName}}</span>
-                <div v-if="admin" class="admin-badge">
-                 <span> <i class="fa-solid fa-user"></i> Admin</span>
-                </div>
+        
+            
                 <form>
                   <TheLoader v-if="loading"/>
                   <div class="form-group">
                     <label for="firstName">First Name</label>
-                    <input
-                    type="text"
-                    class="form-control"
-                    id="firstName" v-model="firstName"
-                    />
+                   {{ client.firstName }}
                   </div>
                   <div class="form-group">
                     <label for="lastName" >Last Name</label>
-                    <input
-                    type="text"
-                    class="form-control"
-                    id="lastName" v-model="lastName"
-                   />
+                    {{ client.lastName }}
                   </div>
                   <div class="form-group">
                     <label for="username">Username</label>
-                    <input
-                    type="text"
-                    class="form-control"
-                    id="username" v-model="username"
-                  />
+                    {{ client.username }}
                   </div>
                   <div class="form-group">
                     <label for="phoneNumber">Phone Number</label>
-                    <input
-                    type="text"
-                    class="form-control"
-                    id="phoneNumber" v-model="phoneNumber"
-                   />
+                    {{ client.phoneNumber }}
                   </div>
                   <div class="form-group">
                     <label for="niche">Niche</label>
-                    <input
-                    type="text"
-                    class="form-control"
-                    id="username" v-model="niche"
-                    />
+                    {{ client.niche }}
                   </div>
                  
                   <div class="form-group">
                     <label for="email" >Email</label>
-                    <input
-                    disabled
-                    type="email"
-                    class="form-control"
-                    id="email" v-model="email"
-                    />
+                    {{ client.email }}
                   </div>
-                  <div class="my-3">
-                    <button @click.prevent="addAdmin">Add Admin</button>
-                  </div>
-                  <div class="my-3">
-                    <button @click.prevent="addReviewer">Add Reviewer</button>
-                  </div>
+                
                 </form>
               </div>
              </div>
             </div>
           </div>
-    </div>
+    <!-- </div> -->
     </div>
     </template>
     
     <script>
-import SideBar from "@/components/core/SideBar.vue";
-import Header from "@/components/core/Header.vue";
-  
+
+import { getFirestore, doc, collection, getDoc} from "firebase/firestore";
     import ModalItem from "@/components/ModalItem"
     import TheLoader from "@/components/TheLoader"
-    import { getAuth} from "firebase/auth";
+   
     export default {
-    components: {
-        SideBar, 
-        Header
-    },
         name: "ProfileView",
         data () {
         return {
@@ -113,6 +207,7 @@ import Header from "@/components/core/Header.vue";
             modalMessage: "Changes were saved!",
             modalActive: false,
             photoAvailable: null,
+            client: null,
             loading: null,
             file: null,
           
@@ -137,78 +232,34 @@ import Header from "@/components/core/Header.vue";
           closeModal() {
             this.modalActive = !this.modalActive;
           },
-        updateProfile(){
-          this.loading = true;
-          // await this.getCurrentUser() // Call the getCurrentUser action to populate the currentUser state
-          this.$store.dispatch("updateUserSettings");// Pass the currentUser data as an argument to updateUserSettings action
-          this.modalActive = !this.modalActive;
-          return;
-      },
-      // signOut(){
-      //         this.$store.dispatch('logOut');
-      //         router.push('/');
-      //   }
+      
+  
      
         },
-
-  computed: {
-    // ...mapState(['currentUser']),
-    // user: {
-    //   get(){
-    //     return this.$store.getters.user;
-    //   }
-    // },
-    firstName: {
-        get() {
-          return this.$store.state.profileFirstName;
-        },
-        set(payload){
-          this.$store.commit("changeFirstName", payload);
-        }
-      },
-      lastName: {
-        get() {
-          return this.$store.state.profileLastName;
-        },
-        set(payload){
-          this.$store.commit("changeLastName", payload);
-        }
-      },
-      username: {
-        get() {
-          return this.$store.state.profileUsername;
-        },
-        set(payload){
-          this.$store.commit("changeUsername", payload);
-        }
-      },
-      phoneNumber: {
-        get() {
-          return this.$store.state.profilePhoneNumber;
-        },
-        set(payload){
-          this.$store.commit("changePhoneNumber", payload);
-        }
-      },
-      email: {
-        get() {
-          return this.$store.state.profileEmail;
-        }
-      },
-      admin() {
+        computed: {
+          admin() {
           return this.$store.state.profileAdmin;
-      }
-
- },
-
-async mounted() {
-  const auth = getAuth();
-   await auth.onAuthStateChanged(user => {
-     this.$store.dispatch("getCurrentUser", user);
-
-    });
-  
-  }
+          },
+          freelancer() {
+                return this.$store.state.profileFreelancer;
+          },
+          reviewer() {
+                return this.$store.state.profileReviewer;
+          },
+        },
+        async created() {
+          const db = getFirestore();
+          const clientId = this.$route.params.id;
+          const clientSnapshot = await getDoc(doc(db, 'users', clientId));
+          const clientData = clientSnapshot.data();
+        this.client = {
+          firstName: clientData.firstName,
+          lastName: clientData.lastName,
+          email: clientData.email,
+          phoneNumber: clientData.phoneNumber,
+        };
+  },
+ 
 }
     </script>
     

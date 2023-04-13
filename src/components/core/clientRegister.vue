@@ -159,6 +159,7 @@ export default {
                     lastName: this.lastName,
                     email: this.email,
                     phoneNumber: this.phoneNumber,
+                    id: dataBase.id
                  });
                 this.$router.push('/client-dashboard');
                 this.loading = false;
