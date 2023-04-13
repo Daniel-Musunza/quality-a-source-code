@@ -133,7 +133,7 @@
                                   </div>
                                   <div class="modal-footer">
                                       <button type="button" class="btn main-light" data-dismiss="modal">Cancel</button>
-                                      <button type="submit" @click.prevent="placeOrder()" id="btn-request" class="btn btn-primary">Place bid</button>
+                                      <button type="submit" @click.prevent="placeBid()" id="btn-request" class="btn btn-primary">Place bid</button>
                                   </div>
                               </form>
                           </div>
