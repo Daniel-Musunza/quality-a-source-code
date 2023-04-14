@@ -27,7 +27,7 @@
                     </div>
                     <div v-if="available" class="available">
                     <router-link to="/freelancer/available">New <span>{{ tobebidded_orders.length }}</span></router-link>
-                    <router-link to="/freelancer/my-bids">My Bids <span>3</span></router-link>
+                    <router-link to="/freelancer/my-bids">My Bids <span>{{ myBids.length }}</span></router-link>
                     <router-link to="/freelancer/invited">Invited <span>1</span></router-link>
                     </div>
                 </li>
@@ -189,12 +189,14 @@ export default {
         },
         ...mapActions(['getOrders']),
         ...mapActions(['getForwardedOrders']),
-        ...mapActions(['getTobebiddedOrders'])
+        ...mapActions(['getTobebiddedOrders']),
+        ...mapActions(['getMyBids'])
     },
     computed: {
     ...mapState(['orders']),
     ...mapState(['forwarded_orders']),
     ...mapState(['tobebidded_orders']),
+    ...mapState(['myBids']),
         admin() {
           return this.$store.state.profileAdmin;
      },
@@ -206,6 +208,7 @@ export default {
     this.getOrders();
     this.getForwardedOrders();
     this.getTobebiddedOrders();
+    this.getMyBids();
   }
 
 }

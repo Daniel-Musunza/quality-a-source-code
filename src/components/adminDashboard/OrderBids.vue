@@ -1,118 +1,141 @@
 <template>
-    <input type="checkbox" id="nav-toggle">
+  
       <SideBar></SideBar>
         <div class="main-content">
-                <Header>
+            <Header>
             </Header>
             <main>
                 <div class="recent-grid ">
-                    <div class="card">
                         <div class="card-header">
-                            <h2>My bids</h2>
+                            <h2>Bids for order {{ orderId }}</h2>
                         </div>
                         <div class="card-body">
-                        <div class="table-responsive">
-                            <table width="100%">
-                                <thead>
-                                    <tr>
-                                        <td>NO:</td>
-                                        <td>Order ID</td>
-                                        <td>Order Title</td>
-                                        <td>Category</td>
-                                
-                                        <td>Budget($)</td>
-                                        <td>Due Time</td>
-                                        <td></td>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="(order, index) in myBids" :key="order.id">
-                                        <td>{{ index + 1 }}</td>
-                                        <td>{{ order.orderID}}</td>
-                                        <td>{{ order.orderTitle }}</td>
-                                        <td>{{ order.orderCategory }}</td>
-                                  
-                                        <td>{{ order.payment }}</td>
-                                        <td>{{ order.dueDate }} {{ order.dueTime }}</td>
-                                        <td @click.prevent="cancelBid()" style="color:red">cancel</td>
-                                        <td> 
-                                            <router-link :to="{ name: 'order-view', params: {id: order.id}}">
-                                                View Details
-                                            </router-link>
-                                        </td>
-                                    </tr>
-                                   
-                                </tbody>
-                            </table>
+                        <div class="card">
+                        <div class="head">
+                        <div class="image"></div>
+                        <div>
+                            <div class="stars">
+                            <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                            </svg>
+                            <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                            </svg>
+                            <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                            </svg>
+                            <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                            </svg>
+                            <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                            </svg>
+                            </div>
+                            <p class="name">John Doe</p>
                         </div>
                         </div>
-                    </div>
-            </div>
+
+                        <p class="message">
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Deserunt
+                        voluptatem alias ut provident sapiente repellendus.
+                        </p>
+                        </div>
+                        </div>
+                 </div>
             </main>
         </div>
-</template>
-
-<script>
-import SideBar from "@/components/core/SideBar.vue";
-import Header from "@/components/core/Header.vue";
-import { mapState, mapActions } from 'vuex';
-export default {
+  </template>
+  
+  <script>
+  import { getDocs, doc, getFirestore, collection } from 'firebase/firestore'
+    import SideBar from "@/components/core/SideBar.vue";
+    import Header from "@/components/core/Header.vue";
+    import { mapState } from 'vuex';
+    export default {
     components: {
         SideBar, 
         Header
     },
-    name: "myBids",
-    data () {
-        return {
-            available: null,
-            profileMenu: null,
-
-        }
-    },
-    methods: {
-        toggleAvailable(){
-            this.available= !this.available
-        },
-        toggleProfileMenu(){
-            this.profileMenu= !this.profileMenu
-        },
-        ...mapActions(['getMyBids']),
-        async cancelBid(){
-            const orderId = this.order.id;
-            const db = getFirestore();
-            const orderRef = doc(db, "MyBids", orderId);
-            await deleteDoc(orderRef);
-            alert("bid Canceled!");
-        }
+    name: 'OrderBids',
+    props: {
+      id: {
+        type: String,
+        required: true
+      }
     },
     computed: {
-    ...mapState(['myBids'])
-  },
-  created() {
-    this.getMyBids();
+      ...mapState(['user']),
+      orderId () {
+        return this.$route.params.id
+      }
+    },
+    data () {
+      return {
+        bids: []
+      }
+    },
+    async created () {
+      const db = getFirestore()
+      const orderRef = doc(db, 'tobebidded_orders', this.orderId)
+      const bidsRef = collection(orderRef, 'bids')
+      const snapshot = await getDocs(bidsRef)
+      this.bids = snapshot.docs.map(doc => doc.data())
+    }
   }
+  </script>
+    <style scoped>
+    .card {
+  background-color: rgba(243, 244, 246, 1);
+  padding: 2rem;
+  max-width: 320px;
+  border-radius: 10px;
+  box-shadow: 0 20px 30px -20px rgba(5, 5, 5, 0.24);
 }
-</script>
 
-<style scoped>
- :root {
-    --main-color:#fff;
-    --color-dark:#02060b;
-    --text-grey:#999999;
+.head {
+  display: flex;
+  align-items: center;
+  grid-gap: 1rem;
+  gap: 1rem;
 }
-  * {
-    list-style-type:none;
-    text-decoration: none;
+
+.head .image {
+  height: 4rem;
+  width: 4rem;
+  border-radius: 9999px;
+  object-fit: cover;
+  background-color: royalblue;
 }
-.profile-menu {
-    position: absolute;
-    border-radius: 10px;
-    top: 60px;
-    right: 0; 
-    width: 270px;
-    background-color: #fff;
-    box-shadow: 0 4px 0px -1px #79aae6;
-  }
+
+.stars {
+  display: flex;
+  justify-content: center;
+  grid-gap: 0.125rem;
+  gap: 0.125rem;
+  color: rgba(34, 197, 94, 1);
+}
+
+.stars svg {
+  height: 1rem;
+  width: 1rem;
+}
+
+.name {
+  margin-top: 0.25rem;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  font-weight: 600;
+  --tw-text-opacity: 1;
+  color: rgba(55, 65, 81, 1);
+}
+
+.message {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  margin-top: 1rem;
+  color: rgba(107, 114, 128, 1);
+}
   .info {
     display: flex;
     align-items: center;
@@ -126,82 +149,7 @@ export default {
   i{
     padding-right:10px;
   }
-.sidebar {
-    width: 200px;
-    position: fixed;
-    left: 0;
-    top: 0;
-    height: 100%;
-    background-color: #fff;
-    z-index: 999;
-    transition: margin-left 300ms;
-}
-.sidebar-brand{
-    height: 90px;
-    padding:1rem 0rem 1rem 2rem; 
-}
-.sidebar-brand span {
-    display: inline-block;
-    padding-right: 1rem;
-}
-.sidebar-menu {
-    margin-top: 1rem;
-}
-.sidebar-menu li {
-    width: 100%;
-    margin-bottom: 1.3rem;
-    padding-left: 2rem;
-    font-size: 15px;
-}
-.sidebar-menu li .available{
-    margin-left:3rem ;
-}
-.sidebar-menu li .available a span{
-    margin-left: 3.1rem;
-    background: #79aae6;
-    border-radius: 50%;
-    padding-left: .5rem;
-    font-size: 1.5rem;
-}
-a .li-span{
-    margin-left: 0rem;
-    background: #79aae6;
-    border-radius: 50%;
-    font-size: 1.5rem;
-    padding-left:.5rem;
-}
-.sidebar-menu a {
-    display: block;
-    color: #02060b;
-    padding-bottom: 1rem;
-}
-.sidebar-menu a.active {
-    color: #1c68c4;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-} 
-.sidebar-menu a span:first-child {
-    font-size: 1.5rem;
-    padding-right: 1rem;
-} 
-#nav-toggle:checked + .sidebar {
-    width: 70px;
-}
-#nav-toggle:checked + .sidebar .sidebar-brand,
-#nav-toggle:checked + .sidebar li {
-   padding-left: 1rem;
-   text-align: center;
-}
-#nav-toggle:checked + .sidebar li a{
-    padding-left: 0rem;
- }
- #nav-toggle:checked + .sidebar li a span{
-    padding-right: 1rem;
- }
-#nav-toggle:checked + .sidebar .sidebar-brand h3 span:last-child,
-#nav-toggle:checked + .sidebar li a span:last-child {
-   display: none;
-}
+
 #nav-toggle:checked ~ .main-content{
     margin-left: 70px;
  }
@@ -241,26 +189,7 @@ header label span {
     padding-left: 1rem ;
 }
 
-.user-wrapper{
-    display: flex;
-    align-items: center;
-    float: right;
-     
-}
-.user-wrapper span{
-    font-size: 25px;
-    margin-right: 30px;
-     
-}
-.user-wrapper img{
-    border-radius: 50%;
-    margin-right: 1rem;
-}
-.user-wrapper small {
-    display: inline-block;
-    color:var(--text-grey) ;
-    margin-top: -10px !important;
-}
+
 main{
     margin-top: 85px;
     padding: 2rem 1.5rem;
@@ -268,12 +197,12 @@ main{
     min-height: calc(100vh -90px);
 
 }
-.cards {
+/* .cards {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-gap: 2rem;
     margin-top: 1rem;
-}
+} */
 .card-single {
     display: flex;
     justify-content: space-between;
@@ -302,13 +231,18 @@ main{
     margin-top: 3.5rem;
 
 }
-.card{
-   background: #fff; 
+.card-header{
+    display:flex;
+    justify-content: center;
 }
-.card-header,
 .card-body {
     padding: 1rem;
     width: 100%;
+    display:flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+
 }
 .card-header {
     display: flex;
@@ -485,4 +419,4 @@ td i {
         grid-template-columns: 100%;
     }
  }
-</style>
+    </style>

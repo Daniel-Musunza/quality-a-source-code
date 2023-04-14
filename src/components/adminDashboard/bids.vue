@@ -25,7 +25,8 @@
                                 <tbody>
                                     <tr v-for="(order, index) in tobebidded_orders" :key="order.id">
                                         <td>{{ index +1 }}</td>
-                                        <td> <span>{{ order.bids }}</span></td>
+                                            <td><router-link :to="{ name: 'order-bids', params: { id: order.id } }">{{ numBids[order.id] }}</router-link></td>
+                                        
                                         <td>
                                         {{ order.orderID }}
                                         </td>
@@ -50,6 +51,7 @@
 import SideBar from "@/components/core/SideBar.vue";
 import Header from "@/components/core/Header.vue";
 import { mapState, mapActions } from 'vuex';
+import {getDocs, doc, getFirestore, collection} from 'firebase/firestore';
 export default {
     components: {
         SideBar, 
@@ -59,6 +61,7 @@ export default {
         return {
             available: null,
             profileMenu: null,
+            bids: {},
 
         }
     },
@@ -69,14 +72,35 @@ export default {
         toggleProfileMenu(){
             this.profileMenu= !this.profileMenu
         },
-         ...mapActions(['getTobebiddedOrders'])
+         ...mapActions(['getTobebiddedOrders']),
+         
     },
     computed: {
-    ...mapState(['tobebidded_orders'])
+    ...mapState(['tobebidded_orders']),
+    async getNumBids(orderId) {
+        const db = getFirestore();
+        const orderRef = doc(db, "tobebidded_orders", orderId);
+        const bidsRef = collection(orderRef, 'bids');
+        const snapshot = await getDocs(bidsRef);
+        const numBids = snapshot.size;
+        console.log(`Found ${numBids} bids for order ${orderId}`);
+        return numBids;
+    },
+    async updateNumBids() {
+    const numBids = {};
+    for (const order of this.tobebidded_orders) {
+        const orderId = order.id;
+        const orderNumBids = await this.getNumBids(orderId);
+        numBids[orderId] = orderNumBids;
+    }
+    this.numBids = numBids;
+    },
+
+
   },
-  created() {
-    this.getTobebiddedOrders();
-  }
+  async created() {
+    await this.getTobebiddedOrders();
+}
 }
 </script>
 

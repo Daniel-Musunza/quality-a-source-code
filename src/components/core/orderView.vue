@@ -301,9 +301,9 @@ export default {
                 );
                 
                 const bidsRef = collection(orderRef, 'bids');
-                const newOrderRef = doc(bidsRef, orderRef.id);
+                const newOrderRef = doc(bidsRef, userRef.id);
                 await setDoc(newOrderRef, {
-                    ...this.order,
+                    freelancer: userRef.id,
                     bidtext,
                     date: new Date()
                 });
@@ -362,6 +362,8 @@ async created() {
       id: userData.id,
     };
   }
+
+
 },
 }
 </script>

@@ -63,6 +63,7 @@ import revisions from '../components/adminDashboard/revisions.vue'
 import suspendedFreelancers from '../components/adminDashboard/suspendedFreelancers.vue'
 import transactions from '../components/adminDashboard/transactions.vue'
 import unpaidOrders from '../components/adminDashboard/unpaidOrders.vue'
+import OrderBids from '../components/adminDashboard/OrderBids.vue'
 const routes = [
   {
     path: '/',
@@ -574,6 +575,13 @@ const routes = [
       requiresAuth: false,
     }
   },
+  {
+    path: '/orders/:id/bids',
+    name: 'order-bids',
+    component: OrderBids,
+    props: true
+  }
+  
 ]
 
 const router = createRouter({

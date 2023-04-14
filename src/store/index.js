@@ -1,8 +1,6 @@
 import { createStore } from 'vuex';
-
 import {db} from "../firebase";
 import {setDoc, getDocs, doc, getDoc, getFirestore, collection} from 'firebase/firestore';
-
 import { getAuth, onAuthStateChanged} from "firebase/auth";
 
 export default createStore({
@@ -116,27 +114,6 @@ fullName(state) {
     changePhoneNumber(state, payload){
       state.profilePhoneNumber = payload
   },
-         // order mutations
-
-        //  setOrderState(state, payload) {
-           
-        //     state.orderHTML= payload.orderHTML;
-        //     state.orderTitle= payload.orderTitle;
-        //     state.orderCategory= payload.orderCategory;
-        //     state.orderFileName= payload.orderFileName;
-        //     state.orderFileURL= payload.orderFileURL;
-        //     state.dueDate= payload.dueDate;
-        //     state.dueTime= payload.dueTime;
-        //     state.experienceNeeded=payload.experienceNeeded;
-        //     state.budget= payload.budget;
-        //     state.dateSubmited = payload.dateSubmited;
-        //     state.freelancerUsername = payload.freelancerUsername;
-        //     state.clientFirstName = payload.changeFirstName;
-        //     state.bids= payload.bids;
-        //     state.status= payload.status;
-        //     state.payment= payload.payment;
-        //     state.comment= payload.comment;
-        //   },
         setOrderState(state, payload) {
           state.orders= payload;
           
@@ -277,39 +254,6 @@ updateComment(state, payload) {
       },
         
         // orders actions
-     // In your actions
-// async getOrders({ state }) {
-//   console.log('getOrders action called');
-  
-//   const q = query(ordersRef, orderBy('date', 'desc'));
-//   const dbResults = await getDocs(q);
-          
-//   dbResults.forEach((doc) => {
-//     if (!state.orders.some((order) =>order.orderID === doc.id)) {
-//       const data = {
-//         orderID: doc.data().orderID,
-//         orderHTML: doc.data().orderHTML,
-//         orderCategory: doc.data().orderCategory,
-//         orderFileName: doc.data().orderFileName,
-//         orderFileURL: doc.data().orderFileURL,
-//         dueDate: doc.data().dueDate,
-//         dueTime: doc.data().dueTime,
-//         experienceNeeded: doc.data().experienceNeeded,
-//         budget: doc.data().budget,
-//         dateSubmited : doc.data().dateSubmited,
-//         freelancerUsername: doc.data().freelancerUsername,
-//         clientFirstName : doc.data().changeFirstName,
-//         bids: doc.data().bids,
-//         status: doc.data().status,
-//         payment: doc.data().payment,
-//         comment: doc.data().comment,
-//       };
-//       state.orders.push(data);
-//     }
-//   });
-//   state.postLoaded = true;
-//   console.log('state.orders:', state.orders);
-// },
       async getOrders({ commit }) {
 
         const querySnapshot = await getDocs(collection(db, "orders"));
@@ -328,12 +272,26 @@ updateComment(state, payload) {
         const data = querySnapshot.docs.map((doc) => doc.data());
         commit('setTobebiddedOrderState', data);
       },
-      async getMyBids({ commit }) {
-
-        const querySnapshot = await getDocs(collection(db, "myBids"));
-        const data = querySnapshot.docs.map((doc) => doc.data());
-        commit('setMyBidsState', data);
+      async getMyBids({ commit}) {
+        onAuthStateChanged(getAuth(), async (user) => {
+          if (user) {
+            const userRef = doc(db, 'users', user.uid);
+            const ordersRef = collection(userRef, 'myBids');   
+            try {
+              const querySnapshot = await getDocs(ordersRef);
+              const data = querySnapshot.docs.map((doc) => doc.data());
+              commit('setMyBidsState', data);
+            } catch (error) {
+              console.error(error);
+            }
+          } else {
+            console.log('No user is currently logged in.');
+          }
+        });
+      }, 
+      
       },
+      
       async getClientOrders({ commit }) {
         onAuthStateChanged(getAuth(), async (user) => {
           if (user) {
@@ -362,6 +320,5 @@ updateComment(state, payload) {
           await getPost.delete();
           commit('filterOrderPost', payload)
       },
-        },
- 
-})
+    },
+)
