@@ -14,7 +14,7 @@
                                 <thead>
                                     <tr>
                                         <td>NO:</td>
-                                        <td>Tally</td>
+                                        <td>bids</td>
                                         <td>OrderID</td>
                                         <td>Title</td>
                                         <td>Due Time</td>
@@ -23,21 +23,21 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="(order, index) in tobebidded_orders" :key="order.id">
-                                        <td>{{ index +1 }}</td>
-                                            <td><router-link :to="{ name: 'order-bids', params: { id: order.id } }">{{ numBids[order.id] }}</router-link></td>
-                                        
-                                        <td>
-                                        {{ order.orderID }}
-                                        </td>
-                                        <td>{{order.orderTitle}}</td>
-                                        <td>{{ order.dueDate }} {{ order.dueTime }}</td>
-                                        <td> 
+                                    <tr v-for="(order, index) in tobebidded_orders" :key="order.id" @click="getNumBids(order.id)">
+                                            <td>{{ index + 1 }}</td>
+                                            <td>
+                                                <router-link :to="{ name: 'order-bids', params: { id: order.id } }">{{ bids.length }}</router-link>
+                                            </td>
+                                            <td>{{ order.orderID }}</td>
+                                            <td>{{ order.orderTitle }}</td>
+                                            <td>{{ order.dueDate }} {{ order.dueTime }}</td>
+                                            <td> 
                                             <router-link :to="{ name: 'order-view', params: {id: order.id}}">
                                                 View Details
                                             </router-link>
-                                        </td>
+                                            </td>
                                     </tr>
+
                                 </tbody>
                             </table>
                         </div>
@@ -61,7 +61,7 @@ export default {
         return {
             available: null,
             profileMenu: null,
-            bids: {},
+            bids: [],
 
         }
     },
@@ -73,33 +73,29 @@ export default {
             this.profileMenu= !this.profileMenu
         },
          ...mapActions(['getTobebiddedOrders']),
+         async getNumBids(orderId) {
+            const db = getFirestore();
+            const orderRef = doc(db, "tobebidded_orders", orderId);
+            const bidsRef = collection(orderRef, 'bids');
+            
+            const snapshot = await getDocs(bidsRef);
+            const data = snapshot.docs.map((doc) => doc.data());
+            this.bids = data; 
+            console.log(this.bids);
+            // update bids with the number of documents in the QuerySnapshot
+        }
+
+
          
     },
     computed: {
     ...mapState(['tobebidded_orders']),
-    async getNumBids(orderId) {
-        const db = getFirestore();
-        const orderRef = doc(db, "tobebidded_orders", orderId);
-        const bidsRef = collection(orderRef, 'bids');
-        const snapshot = await getDocs(bidsRef);
-        const numBids = snapshot.size;
-        console.log(`Found ${numBids} bids for order ${orderId}`);
-        return numBids;
-    },
-    async updateNumBids() {
-    const numBids = {};
-    for (const order of this.tobebidded_orders) {
-        const orderId = order.id;
-        const orderNumBids = await this.getNumBids(orderId);
-        numBids[orderId] = orderNumBids;
-    }
-    this.numBids = numBids;
-    },
 
 
   },
-  async created() {
-    await this.getTobebiddedOrders();
+  created() {
+    this.getTobebiddedOrders();
+    
 }
 }
 </script>

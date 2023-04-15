@@ -182,7 +182,9 @@
                     <label for="email" >Email</label>
                     {{ client.email }}
                   </div>
-                
+                  <div class="my-3">
+                    <button >Assign Task</button>
+                  </div>
                 </form>
               </div>
              </div>
