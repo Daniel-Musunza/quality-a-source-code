@@ -22,13 +22,13 @@
                     <span>Home</span>
                     </router-link>
                 </li>
-                <li>
+               <!-- <li>
                     <router-link to="/client-view">
                       <i class="fa-solid fa-user"></i>
                     <span>Profile</span>
                     </router-link>
-                </li>
-                <!-- <li >
+                </li> -->
+               <li >
                     <router-link to="/freelancer/in-progress">
                         <i class="fa-sharp fa-solid fa-pen"></i>
                     <span>In Progress</span>
@@ -62,15 +62,10 @@
                     </router-link>
                 </li>
                
-                 -->
+                 
                 <!-- freelancer end -->
                  <!-- client begin -->
-            <li >
-                <router-link to="/new-order">
-                    <i class="fa-solid fa-square-arrow-up-right"></i>
-                <span>New Order</span>
-                </router-link>
-            </li>
+        <!--
             <li >
                 <router-link to="/client/all-orders"><i class="fa fa-shopping-bag" aria-hidden="true"></i>
                 <span>All Orders</span>
@@ -92,7 +87,7 @@
                 <span>On Revision</span>
                 </router-link>
             </li>
-            
+        -->
             </ul>
         </div>
     </div>
@@ -182,8 +177,31 @@
                     <label for="email" >Email</label>
                     {{ client.email }}
                   </div>
+                  
+                  <div class="form-group">
+                    <label for="email" >Bids</label>
+                    <table>
+                        <thead>
+                        <tr>
+                            <td>NO:</td>
+                            <td>ID</td>
+                            <td>Title</td>
+
+                        </tr>
+                        </thead>
+                        <tbody>
+                       
+                            <tr v-for="(bid, index) in bids" :key="bid.id">
+                                <td>{{ index + 1 }}</td>
+                                <td> {{ bid.id }} </td>
+                                <td> {{ bid.orderTitle }}</td>
+                            </tr>
+                         
+                       </tbody>
+                    </table>
+                  </div>
                   <div class="my-3">
-                    <button >Assign Task</button>
+                    <button @click.prevent="assignTask()">Assign Task {{ orderId }} </button>
                   </div>
                 </form>
               </div>
@@ -196,7 +214,7 @@
     
     <script>
 
-import { getFirestore, doc, collection, getDoc} from "firebase/firestore";
+import { getFirestore, doc, collection, getDoc, getDocs} from "firebase/firestore";
     import ModalItem from "@/components/ModalItem"
     import TheLoader from "@/components/TheLoader"
    
@@ -210,6 +228,7 @@ import { getFirestore, doc, collection, getDoc} from "firebase/firestore";
             modalActive: false,
             photoAvailable: null,
             client: null,
+            bids: [],
             loading: null,
             file: null,
           
@@ -234,7 +253,29 @@ import { getFirestore, doc, collection, getDoc} from "firebase/firestore";
           closeModal() {
             this.modalActive = !this.modalActive;
           },
-      
+    
+          async assignTask() {
+            this.loading=true;
+                try {
+                const db = getFirestore();
+                const userRef = doc(db, 'users', this.clientId)
+                    const invitedCollectionRef = collection(userRef, "invited");
+                    const invitedOrderRef = doc(invitedCollectionRef, this.orderId);
+                    await setDoc(invitedOrderRef, {
+                    ...this.ordersRef.data(),
+                    date: new Date()
+                    });
+
+                    // Delete the current order document from the "orders" collection
+                    //await deleteDoc(this.ordersRef);
+                   this.loading=false;
+                    alert("Order has been assigned successfully!");
+                    this.$router.push("/admin/all-bids");
+                } catch (error) {
+                    this.loading=false;
+                    console.error("Error in assiging task:", error);
+                }      
+        },
   
      
         },
@@ -248,10 +289,13 @@ import { getFirestore, doc, collection, getDoc} from "firebase/firestore";
           reviewer() {
                 return this.$store.state.profileReviewer;
           },
+          orderId () {
+        return this.$route.params.orderId
+      },
         },
         async created() {
           const db = getFirestore();
-          const clientId = this.$route.params.id;
+          let clientId = this.$route.params.id;
           const clientSnapshot = await getDoc(doc(db, 'users', clientId));
           const clientData = clientSnapshot.data();
         this.client = {
@@ -259,13 +303,56 @@ import { getFirestore, doc, collection, getDoc} from "firebase/firestore";
           lastName: clientData.lastName,
           email: clientData.email,
           phoneNumber: clientData.phoneNumber,
+          
         };
-  },
+
+
+       
+            const userRef = doc(db, 'users', clientId);
+            let ordersRef = collection(userRef, 'myBids');   
+            try {
+              const querySnapshot = await getDocs(ordersRef);
+              this.bids = querySnapshot.docs.map((doc) => doc.data());
+            } catch (error) {
+              console.error(error);
+            }
+
+      }, 
+
+  }
  
-}
     </script>
     
     <style scoped>
+    
+table {
+    border-collapse:collapse;
+}
+thead tr {
+    border: 1px solid #1c68c4;;
+}
+tbody tr {
+    border: 1px solid #1c68c4;;
+}
+thead td {
+    font-weight: 700;
+}
+td {
+    padding: .5rem 1rem;
+    font-size: 15px;
+    color: #222;
+    border: 1px solid #1c68c4;;
+   
+}
+td i {
+    color: #1c68c4;
+    padding-right: 1rem;
+}
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
     label{
         margin-left:10px;
     }

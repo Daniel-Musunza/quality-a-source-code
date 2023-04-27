@@ -80,12 +80,7 @@ export default {
             this.profileMenu= !this.profileMenu
         },
     },
-//     computed: {
-//     orders() {
-//         console.log('orders computed property called');
-//        return this.$store.state.orders;
-//     },
-//    },
+
 computed: {
     ...mapState(['clientOrders'])
   },

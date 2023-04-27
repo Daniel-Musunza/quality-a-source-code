@@ -7,11 +7,11 @@
             <main>
                 <div class="recent-grid ">
                         <div class="card-header">
-                            <h2>Bids for order {{ orderId }}</h2>
+                            <h2>Bids for order: {{ orderId }}</h2>
                         </div>
                         <div class="card-body">
-                        <div class="card" v-for="(bid, index) in bids" :key="bid.id">
-                            <router-link :to="{ name: 'client-view', params: {id: bid.userData.id}}">
+                        <div class="card" v-for="bid in bids" :key="bid.id">
+                            <router-link :to="{ name: 'client-view', params: {id: bid.userData.id, orderId: orderId}}">
                                 <div class="head">
                                 <div class="image"></div>
                                 <div>

@@ -567,7 +567,7 @@ const routes = [
     }
   },
   {
-    path: '/client-view/:id',
+    path: '/client-view/:id/:orderId',
     name: 'client-view',
     component: clientView,
     meta: {
