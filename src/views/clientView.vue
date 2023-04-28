@@ -151,7 +151,7 @@
         
             
                 <form>
-                  <TheLoader v-if="loading"/>
+                 
                   <div class="form-group">
                     <label for="firstName">First Name</label>
                    {{ client.firstName }}
@@ -200,8 +200,9 @@
                        </tbody>
                     </table>
                   </div>
+                  <TheLoader v-show="loading"/>
                   <div class="my-3">
-                    <button @click.prevent="assignTask()">Assign Task {{ orderId }} </button>
+                    <button @click.prevent="assignTask($route.params.id)">Assign Task {{ orderId }}</button>
                   </div>
                 </form>
               </div>
@@ -214,7 +215,7 @@
     
     <script>
 
-import { getFirestore, doc, collection, getDoc, getDocs} from "firebase/firestore";
+import { getFirestore, doc, collection, setDoc, getDoc, getDocs, deleteDoc} from "firebase/firestore";
     import ModalItem from "@/components/ModalItem"
     import TheLoader from "@/components/TheLoader"
    
@@ -231,6 +232,7 @@ import { getFirestore, doc, collection, getDoc, getDocs} from "firebase/firestor
             bids: [],
             loading: null,
             file: null,
+            tobeAssignedTask: null,
           
 
         }
@@ -254,29 +256,37 @@ import { getFirestore, doc, collection, getDoc, getDocs} from "firebase/firestor
             this.modalActive = !this.modalActive;
           },
     
-          async assignTask() {
-            this.loading=true;
-                try {
+          async assignTask(clientId) {
+            this.loading = true;
+            try {
                 const db = getFirestore();
-                const userRef = doc(db, 'users', this.clientId)
-                    const invitedCollectionRef = collection(userRef, "invited");
-                    const invitedOrderRef = doc(invitedCollectionRef, this.orderId);
-                    await setDoc(invitedOrderRef, {
-                    ...this.ordersRef.data(),
-                    date: new Date()
+                const userRef = doc(db, 'users', clientId);
+                const invitedCollectionRef = collection(userRef, "invited");
+                const invitedOrderRef = doc(invitedCollectionRef, this.orderId);
+                await setDoc(invitedOrderRef, {
+                    ...this.tobeAssignedTask,
+                    date: new Date(),
+                });
+
+                const ordersCollectionRef = collection(db, "forwarded_orders");
+                const orderRef = doc(ordersCollectionRef);
+                await setDoc( orderRef,{
+                    ...this.tobeAssignedTask,
+                    freelancer: clientId,
+                    date: new Date(),
                     });
 
-                    // Delete the current order document from the "orders" collection
-                    //await deleteDoc(this.ordersRef);
-                   this.loading=false;
-                    alert("Order has been assigned successfully!");
-                    this.$router.push("/admin/all-bids");
-                } catch (error) {
-                    this.loading=false;
-                    console.error("Error in assiging task:", error);
-                }      
-        },
-  
+                // Delete the current order document from the "orders" collection
+               // await deleteDoc(this.ordersRef);
+                this.loading = false;
+                alert("Order has been assigned successfully!");
+                this.$router.push("/admin/all-bids");
+            } catch (error) {
+                this.loading = false;
+                console.error("Error in assiging task:", error);
+            }      
+            },
+
      
         },
         computed: {
@@ -298,13 +308,13 @@ import { getFirestore, doc, collection, getDoc, getDocs} from "firebase/firestor
           let clientId = this.$route.params.id;
           const clientSnapshot = await getDoc(doc(db, 'users', clientId));
           const clientData = clientSnapshot.data();
-        this.client = {
-          firstName: clientData.firstName,
-          lastName: clientData.lastName,
-          email: clientData.email,
-          phoneNumber: clientData.phoneNumber,
-          
-        };
+            this.client = {
+            firstName: clientData.firstName,
+            lastName: clientData.lastName,
+            email: clientData.email,
+            phoneNumber: clientData.phoneNumber,
+            
+            };
 
 
        
@@ -315,7 +325,10 @@ import { getFirestore, doc, collection, getDoc, getDocs} from "firebase/firestor
               this.bids = querySnapshot.docs.map((doc) => doc.data());
             } catch (error) {
               console.error(error);
-            }
+            };
+
+            this.tobeAssignedTask = (await getDoc(doc(ordersRef, this.orderId))).data();
+          
 
       }, 
 

@@ -33,9 +33,10 @@
                                                     <h5>Order Category</h5> 
                                                     <select name="field" class="form-control form-control-lg input-lg" required  v-model="orderCategory">
                                                         <option value="Writing">Writing</option>
-                                                        <option value="graphicDesign">Graphic Design</option>
-                                                        <option value="development">Development</option>
-                                                        <option value="dataScience">Data Science</option>
+                                                        <option value="Graphic Design">Graphic Design</option>
+                                                        <option value="Web development">Website Development</option>
+                                                        <option value="Mobile app development">Mobile App Development</option>
+                                                        <option value="Data Science">Data Science</option>
                                                     </select>
                                                 </div>
                                             </div>

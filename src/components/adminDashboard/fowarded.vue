@@ -30,7 +30,11 @@
                                 <tbody>
                                     <tr v-for="(order, index) in forwarded_orders" :key="order.id">
                                         <td>{{index + 1}}</td>
-                                        <td>{{ order.freelancer }}</td>
+                                        <td>
+                                         <!--   <router-link :to="{ name: 'client-view', params: {id: order.userData.id}}"> -->
+                                            {{ order.userData.firstName }}
+                                          <!--  </router-link> -->
+                                        </td>
                                         <td>{{order.orderID}}</td>
                                         <td>{{ order.orderTitle }}</td>
                                         <td>{{ order.orderCategory }}</td>
@@ -58,6 +62,7 @@
 import SideBar from "@/components/core/SideBar.vue";
 import Header from "@/components/core/Header.vue";
 import { mapState, mapActions } from 'vuex';
+import {getDoc, doc, getFirestore, collection } from 'firebase/firestore'
 export default {
     components: {
         SideBar, 
@@ -79,11 +84,39 @@ export default {
         },  ...mapActions(['getForwardedOrders'])
     },
     computed: {
-    ...mapState(['forwarded_orders'])
-  },
+    ...mapState(['forwarded_orders']),
+    userData() {
+        return this.forwarded_orders.map(order => {
+            return {
+                ...order,
+                userData: null,
+            };
+        });
+    }
+},
   created() {
-    this.getForwardedOrders();
-  }
+    const db = getFirestore();
+    this.getForwardedOrders().then(() => {
+        this.forwarded_orders.forEach(async order => {
+            if (order.freelancer) {
+               
+             const userRef = doc(collection(db, "users"), order.freelancer);
+            const userSnapshot = await getDoc(userRef);
+            const userData = userSnapshot.data();
+            
+            order.userData = {
+                firstName: userData.firstName,
+                lastName: userData.lastName,
+                phoneNumber: userData.phoneNumber,
+                email: userData.email,
+                id: userData.id,
+            };
+            console.log(order.userData.firstName);
+        }
+        });
+    });
+}
+
 }
 </script>
 
