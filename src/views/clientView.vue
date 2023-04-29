@@ -276,8 +276,15 @@ import { getFirestore, doc, collection, setDoc, getDoc, getDocs, deleteDoc} from
                     date: new Date(),
                     });
 
-                // Delete the current order document from the "orders" collection
-               // await deleteDoc(this.ordersRef);
+                // Delete the current order document from the "myBids" collection
+                const collectionRef = collection(userRef, 'myBids'); 
+                const ref = doc(collectionRef, this.orderId);
+                await deleteDoc(ref);
+ // Delete the current order document from the "tobebidded_orders" collection
+                const tobebidded_ordersRef = collection(userRef, 'tobebidded_orders'); 
+                const tobebidded_ordersref = doc(tobebidded_ordersRef, this.orderId);
+                await deleteDoc(tobebidded_ordersref);
+
                 this.loading = false;
                 alert("Order has been assigned successfully!");
                 this.$router.push("/admin/all-bids");
@@ -319,7 +326,7 @@ import { getFirestore, doc, collection, setDoc, getDoc, getDocs, deleteDoc} from
 
        
             const userRef = doc(db, 'users', clientId);
-            let ordersRef = collection(userRef, 'myBids');   
+            const ordersRef = collection(userRef, 'myBids');   
             try {
               const querySnapshot = await getDocs(ordersRef);
               this.bids = querySnapshot.docs.map((doc) => doc.data());

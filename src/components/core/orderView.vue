@@ -113,6 +113,7 @@
                                       <span aria-hidden="true">&times;</span>
                                   </button>
                               </div>
+                              <TheLoader v-show="loading"/>
                               <form id="form-request-order" method="POST">
                                   <input type="hidden" name="csrfmiddlewaretoken" v-model="user">
                                   <div class="modal-body">
@@ -133,7 +134,7 @@
                                   </div>
                                   <div class="modal-footer">
                                       <button type="button" class="btn main-light" data-dismiss="modal">Cancel</button>
-                                      <button type="submit" @click.prevent="placeBid()" id="btn-request" class="btn btn-primary">Place bid</button>
+                                      <button type="submit" @click.prevent="placeBid()" data-dismiss="modal" id="btn-request" class="btn btn-primary">Place bid</button>
                                   </div>
                               </form>
                           </div>
@@ -227,12 +228,16 @@
 import { getFirestore, doc, updateDoc, collection, getDoc, setDoc, deleteDoc } from "firebase/firestore"; 
 import SideBar from "@/components/core/SideBar.vue";
 import Header from "@/components/core/Header.vue";
+import ModalItem from "@/components/ModalItem";
+import TheLoader from "@/components/TheLoader";
 import { getAuth} from "firebase/auth";
 import { mapState } from 'vuex';
 export default {
     components: {
         SideBar, 
-        Header
+        Header,
+        ModalItem,
+        TheLoader,
     },
     data () {
         return {
@@ -241,6 +246,7 @@ export default {
             userData: null,
              payment: null,
              bidtext: null,
+             loading: null,
         }
     },
     methods: {
@@ -254,6 +260,7 @@ export default {
         async updateOrder() {
             const orderId = this.order.id;
             const payment = this.payment;
+            this.loading = true;
                 try {
                     const db = getFirestore();
                     // Update the payment field in the current order document
@@ -272,10 +279,11 @@ export default {
 
                     // Delete the current order document from the "orders" collection
                     await deleteDoc(orderRef);
-
+                    this.loading = false;
                     console.log("Order sent to be bidded successfully!");
                     this.$router.push("/admin/all-bids");
                 } catch (error) {
+                    this.loading = false;
                     console.error("Error forwarding order:", error);
                 }
             this.payment = null;
@@ -283,6 +291,7 @@ export default {
         async placeBid() {
             const orderId = this.order.id;
             const bidtext = this.bidtext;
+            this.loading = true;
             try {
                 const db = getFirestore();
                 const auth = getAuth();
@@ -297,6 +306,7 @@ export default {
                 bidtext,
                 date: new Date()
                 },
+            
                 console.log("successfully!")
                 );
                 
@@ -308,11 +318,12 @@ export default {
                     date: new Date()
                 });
 
-                
+                this.loading = false;
                 alert("Order bidded successfully!");
-                await this.$store.dispatch("getyBids");
-                // this.$router.push("/freelancer/my-bids");
+                await this.$store.dispatch("getBids");
+                this.$router.push("/freelancer/my-bids");
             } catch (error) {
+                this.loading = false;
                 console.error("Error bidding order:", error);
             }
             this.bidtext = null;

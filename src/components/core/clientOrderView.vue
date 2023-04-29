@@ -13,32 +13,7 @@
                   <div class="card">
                       <div class="card-header">
                           
-                          <!-- Freelancer should not see -->
-                          <a href="#" class="employer-div">
-                              <div class="employer-img">
-                                  <div style="border-radius: 38%; background: #808080; height: 60px; width: 60px; display: flex; justify-content:center;" >
-                                      <span style="weight: 700; margin-left:5px; font-size: 30px" >{{this.$store.state.profileInitials}}</span>
-                                      <i class="employer-online" id="online-body-badge"></i>
-                                  </div>
-                              </div>
-                              <div style="font-size:15px">
-                                
-                                  <div id="body-employer-rating">
-                                      <i class="fa rating 
-                                      fa-star rated"></i>
-                                      <i class="fa rating 
-                                      fa-star rated"></i>
-                                      <i class="fa rating 
-                                      fa-star rated"></i>
-                                      <i class="fa rating 
-                                      fa-star rated"></i>
-                                      <i class="fa rating 
-                                      fa-star rated"></i>
-                                  </div>
-                              </div>
-                          </a>
-                          <!-- upto here-->
-              
+       
                           <!-- order topic -->
                           <h4>{{order.orderTitle}}</h4>
                       </div>

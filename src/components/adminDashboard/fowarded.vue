@@ -31,9 +31,9 @@
                                     <tr v-for="(order, index) in forwarded_orders" :key="order.id">
                                         <td>{{index + 1}}</td>
                                         <td>
-                                         <!--   <router-link :to="{ name: 'client-view', params: {id: order.userData.id}}"> -->
+                                            <router-link :to="{ name: 'client-view', params: {id: order.userData.id, orderId: order.userData.firstName}}">
                                             {{ order.userData.firstName }}
-                                          <!--  </router-link> -->
+                                           </router-link>
                                         </td>
                                         <td>{{order.orderID}}</td>
                                         <td>{{ order.orderTitle }}</td>
@@ -61,8 +61,7 @@
 <script>
 import SideBar from "@/components/core/SideBar.vue";
 import Header from "@/components/core/Header.vue";
-import { mapState, mapActions } from 'vuex';
-import {getDoc, doc, getFirestore, collection } from 'firebase/firestore'
+import {getDoc, getDocs, doc, getFirestore, collection } from 'firebase/firestore'
 export default {
     components: {
         SideBar, 
@@ -72,7 +71,8 @@ export default {
         return {
             available: null,
             profileMenu: null,
-
+            forwarded_orders: [],
+            userData: null,
         }
     },
     methods: {
@@ -81,29 +81,20 @@ export default {
         },
         toggleProfileMenu(){
             this.profileMenu= !this.profileMenu
-        },  ...mapActions(['getForwardedOrders'])
+        },  
+     
     },
-    computed: {
-    ...mapState(['forwarded_orders']),
-    userData() {
-        return this.forwarded_orders.map(order => {
-            return {
-                ...order,
-                userData: null,
-            };
-        });
-    }
-},
-  created() {
-    const db = getFirestore();
-    this.getForwardedOrders().then(() => {
+    async created() {
+        const db = getFirestore();
+        const orderRef = collection(db, 'forwarded_orders');
+        const snapshot = await getDocs(orderRef);
+        this.forwarded_orders = snapshot.docs.map(doc => doc.data());
+
         this.forwarded_orders.forEach(async order => {
             if (order.freelancer) {
-               
-             const userRef = doc(collection(db, "users"), order.freelancer);
+            const userRef = doc(collection(db, "users"), order.freelancer);
             const userSnapshot = await getDoc(userRef);
             const userData = userSnapshot.data();
-            
             order.userData = {
                 firstName: userData.firstName,
                 lastName: userData.lastName,
@@ -111,11 +102,12 @@ export default {
                 email: userData.email,
                 id: userData.id,
             };
-            console.log(order.userData.firstName);
-        }
+            } else{
+                console.log("no userID");
+            }
         });
-    });
 }
+
 
 }
 </script>
