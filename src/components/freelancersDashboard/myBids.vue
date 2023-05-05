@@ -55,7 +55,9 @@
 <script>
 import SideBar from "@/components/core/SideBar.vue";
 import Header from "@/components/core/Header.vue";
-import { mapState, mapActions } from 'vuex';
+import {db} from "@/firebase";
+import { getFirestore, doc,deleteDoc, collection,  getDocs} from "firebase/firestore"; 
+import { getAuth, onAuthStateChanged} from "firebase/auth";
 export default {
     components: {
         SideBar, 
@@ -66,6 +68,8 @@ export default {
         return {
             available: null,
             profileMenu: null,
+            myBids: [],
+            orderRef: null,
 
         }
     },
@@ -76,20 +80,43 @@ export default {
         toggleProfileMenu(){
             this.profileMenu= !this.profileMenu
         },
-        ...mapActions(['getMyBids']),
-        async cancelBid(){
-            const orderId = this.order.id;
-            const db = getFirestore();
-            const orderRef = doc(db, "MyBids", orderId);
-            await deleteDoc(orderRef);
-            alert("bid Canceled!");
+        cancelBid(){
+            onAuthStateChanged(getAuth(), async (user) => {
+                const userRef = doc(db, 'users', user.uid);
+                const orderRef = collection(userRef, 'myBids');  
+                const deleteMyBids = doc(orderRef, this.orderId);
+                await deleteDoc(deleteMyBids);
+
+                const ordersRef = doc(db, 'tobebidded_orders', this.orderId); 
+                const bidRef = collection(ordersRef, 'bids');  
+                const deletebid = doc(bidRef, user.uid);
+                await deleteDoc(deletebid);
+                alert("bid Canceled!");
+            });
         }
     },
     computed: {
-    ...mapState(['myBids'])
   },
-  created() {
-    this.getMyBids();
+ async created() {
+    onAuthStateChanged(getAuth(), async (user) => {
+          if (user) {
+            const userRef = doc(db, 'users', user.uid);
+            const ordersRef = collection(userRef, 'myBids');   
+            try {
+              const querySnapshot = await getDocs(ordersRef);
+              this.myBids = querySnapshot.docs.map((doc) => doc.data());
+
+              this.myBids.forEach(order => {
+              this.orderId = order.id;
+        });
+             
+            } catch (error) {
+              console.error(error);
+            }
+          } else {
+            console.log('No user is currently logged in.');
+          }
+        });
   }
 }
 </script>

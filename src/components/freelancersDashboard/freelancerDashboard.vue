@@ -26,7 +26,7 @@
                     </router-link>
                     <router-link to="/admin/incomplete-orders" v-if="admin" class="card-single">
                         <div>
-                            <h1>7</h1>
+                            <h1>{{ incomplete_orders.length }}</h1>
                             <span>Incomplete Orders</span>
                         </div>
                         <div>
@@ -381,7 +381,8 @@ export default {
             this.profileMenu= !this.profileMenu
         },
         ...mapActions(['getOrders']),
-         ...mapActions(['getTobebiddedOrders'])
+         ...mapActions(['getTobebiddedOrders']),
+         ...mapActions(['getIncompleteOrders']),
     },
     computed: {
         admin() {
@@ -391,11 +392,14 @@ export default {
             return this.$store.state.profileFreelancer;
         },
         ...mapState(['orders']),
-        ...mapState(['tobebidded_orders'])
+        ...mapState(['tobebidded_orders']),
+        ...mapState(['incomplete_orders'])
   },
+
   created() {
     this.getOrders();
     this.getTobebiddedOrders();
+    this.getIncompleteOrders();
   }
  
 }

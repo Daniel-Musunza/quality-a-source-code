@@ -28,14 +28,14 @@
                     <div v-if="available" class="available">
                     <router-link to="/freelancer/available">New <span>{{ tobebidded_orders.length }}</span></router-link>
                     <router-link to="/freelancer/my-bids">My Bids <span>{{ myBids.length }}</span></router-link>
-                    <router-link to="/freelancer/invited">Invited <span>1</span></router-link>
+                    <router-link to="/freelancer/invited">Invited <span>{{ invited.length }}</span></router-link>
                     </div>
                 </li>
                 <li v-if="freelancer">
                     <router-link to="/freelancer/in-progress">
                         <i class="fa-sharp fa-solid fa-pen"></i>
                     <span>In Progress</span>
-                    <span class="li-span">0</span>
+                    <span class="li-span">{{ incomplete.length }}</span>
                     </router-link>
                 </li>
                 <li v-if="freelancer">
@@ -190,13 +190,17 @@ export default {
         ...mapActions(['getOrders']),
         ...mapActions(['getForwardedOrders']),
         ...mapActions(['getTobebiddedOrders']),
-        ...mapActions(['getMyBids'])
+        ...mapActions(['getMyBids']),
+        ...mapActions(['getInvited']),
+        ...mapActions(['getIncomplete'])
     },
     computed: {
     ...mapState(['orders']),
     ...mapState(['forwarded_orders']),
     ...mapState(['tobebidded_orders']),
     ...mapState(['myBids']),
+    ...mapState(['invited']),
+    ...mapState(['incomplete']),
         admin() {
           return this.$store.state.profileAdmin;
      },
@@ -209,6 +213,8 @@ export default {
     this.getForwardedOrders();
     this.getTobebiddedOrders();
     this.getMyBids();
+    this.getInvited();
+    this.getIncomplete();
   }
 
 }

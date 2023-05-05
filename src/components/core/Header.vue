@@ -11,15 +11,15 @@
             <span><i class="fa-solid fa-magnifying-glass"></i></span>
              <input type="search" placeholder="search here" />
            </div> -->
-          <div class="user-wrapper"  @click="toggleProfileMenu">
+          <div class="user-wrapper" >
             <span><i class="fa-sharp fa-solid fa-bell-slash"></i></span>
             <span><i class="fa-sharp fa-solid fa-comment"></i></span>
          
             <!-- <img src="images/BuyoneFree_65.jpg" class="img" width="30px" height="30px" alt=""> -->
-            <div class="profile">
+            <div @click="toggleProfileMenu" class="profile">
                 <span style="font-size:20px; padding-left: 25px;">{{ this.$store.state.profileInitials}}</span>
             </div>
-            <span class="down"><i class="fa-sharp fa-solid fa-angle-down"></i></span>
+            <span @click="toggleProfileMenu" class="down"><i class="fa-sharp fa-solid fa-angle-down"></i></span>
           </div>
           <div v-if="profileMenu " class="profile-menu">
             <div class="info">
@@ -135,10 +135,10 @@ export default {
     border-bottom: 1px solid #fff;
   }
 
-  .right {
+  /* .right {
     flex: 1;
     margin-left: 24;
-  }
+  } */
   i{
     padding-right:10px;
   }

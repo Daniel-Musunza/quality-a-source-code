@@ -27,8 +27,11 @@ export default createStore({
             clientOrders: [],
             orders: [],
             myBids: [],
+            invited: [],
+            incomplete: [],
             forwarded_orders: [],
             tobebidded_orders: [],
+            incomplete_orders: [],
             postloaded: null,
             orderHTML: 'write your instructions here...',
             orderTitle: "",
@@ -53,8 +56,11 @@ export default createStore({
     // order getters
     orders: state => state.orders,
     myBids: state => state.myBids,
+    invited: state => state.invited,
+    incomplete: state => state.incomplete,
     forwarded_orders: state => state.forwarded_orders,
-    tobebidded_orders: state => state.tobebidded_orders,
+    tobebidded_orders: state => state.tobebidded_orders, 
+    incomplete_orders: state => state.incomplete_orders,
     clientOrders: state => state.clientOrders,
     user(state){
       return state.user
@@ -121,9 +127,18 @@ export default createStore({
       setTobebiddedOrderState(state, payload){
             state.tobebidded_orders = payload;
       },
+      setIncompleteOrderState(state, payload){
+        state.incomplete_orders = payload;
+  },
       setMyBidsState(state, payload){
             state.myBids = payload;
       },
+      setInvitedState(state, payload){
+        state.invited = payload;
+     },
+     setIncompleteState(state, payload){
+      state.incomplete = payload;
+   },
       newOrderPost(state, payload) {
             state.orderHTML = payload;
       },
@@ -203,6 +218,12 @@ export default createStore({
         const data = querySnapshot.docs.map((doc) => doc.data());
         commit('setTobebiddedOrderState', data);
       },
+      async getIncompleteOrders({ commit }) {
+
+        const querySnapshot = await getDocs(collection(db, "incomplete_orders"));
+        const data = querySnapshot.docs.map((doc) => doc.data());
+        commit('setIncompleteOrderState', data);
+      },
       async getMyBids({ commit}) {
         onAuthStateChanged(getAuth(), async (user) => {
           if (user) {
@@ -219,7 +240,41 @@ export default createStore({
             console.log('No user is currently logged in.');
           }
         });
-      },       
+      }, 
+      async getInvited({ commit}) {
+        onAuthStateChanged(getAuth(), async (user) => {
+          if (user) {
+            const userRef = doc(db, 'users', user.uid);
+            const ordersRef = collection(userRef, 'invited');   
+            try {
+              const querySnapshot = await getDocs(ordersRef);
+              const data = querySnapshot.docs.map((doc) => doc.data());
+              commit('setInvitedState', data);
+            } catch (error) {
+              console.error(error);
+            }
+          } else {
+            console.log('No user is currently logged in.');
+          }
+        });
+      },    
+      async getIncomplete({ commit}) {
+        onAuthStateChanged(getAuth(), async (user) => {
+          if (user) {
+            const userRef = doc(db, 'users', user.uid);
+            const ordersRef = collection(userRef, 'incomplete');   
+            try {
+              const querySnapshot = await getDocs(ordersRef);
+              const data = querySnapshot.docs.map((doc) => doc.data());
+              commit('setIncompleteState', data);
+            } catch (error) {
+              console.error(error);
+            }
+          } else {
+            console.log('No user is currently logged in.');
+          }
+        });
+      },    
       async getClientOrders({ commit }) {
         onAuthStateChanged(getAuth(), async (user) => {
           if (user) {
@@ -246,7 +301,7 @@ export default createStore({
           const getPost = await collection(db, "orders").doc(payload);
           
           await getPost.delete();
-          commit('filterOrderPost', payload)
+          commit('filterOrderPost', payload);
       },
     },
 }

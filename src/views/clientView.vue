@@ -104,15 +104,15 @@
             <span><i class="fa-solid fa-magnifying-glass"></i></span>
              <input type="search" placeholder="search here" />
            </div> -->
-          <div class="user-wrapper"  @click="toggleProfileMenu">
+          <div class="user-wrapper" >
             <span><i class="fa-sharp fa-solid fa-bell-slash"></i></span>
             <span><i class="fa-sharp fa-solid fa-comment"></i></span>
          
             <!-- <img src="images/BuyoneFree_65.jpg" class="img" width="30px" height="30px" alt=""> -->
-            <div class="profile">
+            <div  @click="toggleProfileMenu" class="profile">
                 <span style="font-size:20px; padding-left: 25px;">{{ this.$store.state.profileInitials}}</span>
             </div>
-            <span class="down"><i class="fa-sharp fa-solid fa-angle-down"></i></span>
+            <span  @click="toggleProfileMenu" class="down"><i class="fa-sharp fa-solid fa-angle-down"></i></span>
           </div>
           <div v-if="profileMenu " class="profile-menu">
             <div class="info">
@@ -216,6 +216,7 @@
     <script>
 
 import { getFirestore, doc, collection, setDoc, getDoc, getDocs, deleteDoc} from "firebase/firestore";
+import {getAuth} from "firebase/auth";
     import ModalItem from "@/components/ModalItem"
     import TheLoader from "@/components/TheLoader"
    
@@ -232,7 +233,7 @@ import { getFirestore, doc, collection, setDoc, getDoc, getDocs, deleteDoc} from
             bids: [],
             loading: null,
             file: null,
-            tobeAssignedTask: null,
+        
           
 
         }
@@ -255,45 +256,60 @@ import { getFirestore, doc, collection, setDoc, getDoc, getDocs, deleteDoc} from
           closeModal() {
             this.modalActive = !this.modalActive;
           },
-    
           async assignTask(clientId) {
             this.loading = true;
             try {
                 const db = getFirestore();
                 const userRef = doc(db, 'users', clientId);
-                const invitedCollectionRef = collection(userRef, "invited");
+
+                const ordersRef = collection(userRef, 'myBids');   
+                const task = await getDoc(doc(ordersRef, this.orderId));
+               
+                if (task.exists()) {
+                    const tobeAssignedTask = task.data();
+                 
+                    // rest of the method
+                    const invitedCollectionRef = collection(userRef, "invited");
+                 
                 const invitedOrderRef = doc(invitedCollectionRef, this.orderId);
                 await setDoc(invitedOrderRef, {
-                    ...this.tobeAssignedTask,
+                    ...tobeAssignedTask,
                     date: new Date(),
                 });
 
                 const ordersCollectionRef = collection(db, "forwarded_orders");
-                const orderRef = doc(ordersCollectionRef);
+                const orderRef = doc(ordersCollectionRef, this.orderId);
                 await setDoc( orderRef,{
-                    ...this.tobeAssignedTask,
+                    ...tobeAssignedTask,
                     freelancer: clientId,
                     date: new Date(),
                     });
 
-                // Delete the current order document from the "myBids" collection
-                const collectionRef = collection(userRef, 'myBids'); 
-                const ref = doc(collectionRef, this.orderId);
-                await deleteDoc(ref);
- // Delete the current order document from the "tobebidded_orders" collection
-                const tobebidded_ordersRef = collection(userRef, 'tobebidded_orders'); 
+                // // Delete the current order document from the "myBids" collection
+                const deleteMyBids = doc(ordersRef, this.orderId);
+                await deleteDoc(deleteMyBids);
+
+                // Delete the current order document from the "tobebidded_orders" collection
+                const tobebidded_ordersRef = collection(db, 'tobebidded_orders'); 
                 const tobebidded_ordersref = doc(tobebidded_ordersRef, this.orderId);
                 await deleteDoc(tobebidded_ordersref);
 
                 this.loading = false;
                 alert("Order has been assigned successfully!");
                 this.$router.push("/admin/all-bids");
+                } else {
+                    console.error("Error in assigning task: Task does not exist");
+                }
             } catch (error) {
                 this.loading = false;
-                console.error("Error in assiging task:", error);
+                console.error("Error in assigning task:", error);
             }      
-            },
-
+        },
+        signOut() {
+            getAuth().signOut();
+            // window.location.reload();
+            this.$router.replace('/');
+        },
      
         },
         computed: {
@@ -334,7 +350,6 @@ import { getFirestore, doc, collection, setDoc, getDoc, getDocs, deleteDoc} from
               console.error(error);
             };
 
-            this.tobeAssignedTask = (await getDoc(doc(ordersRef, this.orderId))).data();
           
 
       }, 
@@ -387,16 +402,43 @@ td i {
                 font-weight: 300;
                 font-size: 32px;
             }
-            .profile-info {
-                border-radius: 8px;
-                box-shadow: 0 4px 0px -1px rgba(0,0,0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.001);
-                padding: 32px;
-                background-color: #f1f1f1;
-                display: flex;
-                flex-direction: column;
-                max-width: 600px;
-                margin: 32px auto;
-            }
+          
+.profile {
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: #fff;
+    background-color: #303030;
+    float: right;
+  }
+.profile-menu {
+    position: absolute;
+    border-radius: 10px;
+    top: 60px;
+    right: 0; 
+    width: 270px;
+    background-color: #fff;
+    box-shadow: 0 4px 0px -1px #79aae6;
+  }
+  .info {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #fff;
+  }
+
+  .right {
+    flex: 1;
+    margin-left: 24;
+  }
+  i{
+    padding-right:10px;
+  }
             .col-md-12 {
               align-items: center;
             }

@@ -17,25 +17,30 @@
                                         <td>NO:</td>
                                         <td>Order ID</td>
                                         <td>Order Title</td>
-                                        <td>Category</td>
-                                
-                                        <td>Budget($)</td>
                                         <td>Due Time</td>
+                                        <td></td>
+                                
+                                        <td></td>
+                                        
                                         <td></td>
                                       
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td>34567890</td>
-                                        <td>UI/UX Design</td>
-                                        <td>UI Team</td>
-                                  
-                                        <td>560</td>
-                                        <td>9hrs 34min</td>
+                                    <tr v-for="(order, index) in invited" :key="order.id">
+                                        <td>{{ index + 1 }}</td>
+                                        <td>{{ order.orderID}}</td>
+                                        <td>{{ order.orderTitle }}</td>
+                                        <td>{{ order.dueDate }} {{ order.dueTime }}</td>
+                                        <td>  <button @click.prevent="decline()" class="btn btn-info btn-take" id="btn-take" style="background-color: red;">
+                      Decline<i class="fa-solid fa-arrow-right"></i>
+                  </button></td>
+                                        <td>    <button  @click.prevent="confirm()" class="btn btn-info btn-take" id="btn-take" >
+                      confirm<i class="fa-solid fa-arrow-right"></i>
+                  </button></td>
+                                      
                                         <td> 
-                                            <router-link to="/order-view">
+                                            <router-link :to="{ name: 'order-view', params: {id: order.id}}">
                                                 View Details
                                             </router-link>
                                         </td>
@@ -54,6 +59,9 @@
 <script>
 import SideBar from "@/components/core/SideBar.vue";
 import Header from "@/components/core/Header.vue";
+import {db} from "@/firebase";
+import { setDoc, doc,deleteDoc, collection,  getDoc, getDocs} from "firebase/firestore"; 
+import { getAuth, onAuthStateChanged} from "firebase/auth";
 export default {
     components: {
         SideBar, 
@@ -64,7 +72,8 @@ export default {
         return {
             available: null,
             profileMenu: null,
-
+            invited: [],
+            orderRef: null,
         }
     },
     methods: {
@@ -74,7 +83,92 @@ export default {
         toggleProfileMenu(){
             this.profileMenu= !this.profileMenu
         },
-    }
+        async decline() {
+            try {
+            const user = getAuth().currentUser;
+            if (!user) {
+                throw new Error("User is not signed in.");
+            }
+
+            const userRef = doc(db, "users", user.uid);
+            const invitedRef = collection(userRef, "invited");
+            const orderDoc = doc(invitedRef, this.orderId);
+            const orderData = (await getDoc(orderDoc)).data();
+            if (!orderData) {
+                throw new Error("Order does not exist.");
+            }
+
+            const toBeBiddedRef = doc(db, "tobebidded_orders", this.orderId);
+            await setDoc(toBeBiddedRef, orderData);
+
+            const forwardedRef = collection(db, "forwarded_orders");
+            const forwardedDoc = doc(forwardedRef, this.orderId);
+            await deleteDoc(orderDoc);
+            await deleteDoc(forwardedDoc);
+
+            alert("Order declined successfully.");
+            } catch (error) {
+            console.error("Failed to decline order:", error);
+            alert("Failed to decline order. Please try again later.");
+            }
+        },
+        async confirm(){
+            try {
+            const user = getAuth().currentUser;
+            if (!user) {
+                throw new Error("User is not signed in.");
+            }
+
+            const userRef = doc(db, "users", user.uid);
+            const invitedRef = collection(userRef, "invited");
+            const orderDoc = doc(invitedRef, this.orderId);
+            const orderData = (await getDoc(orderDoc)).data();
+            if (!orderData) {
+                throw new Error("Order does not exist.");
+            }
+
+            const userIncompleteRef = doc(userRef, "incomplete", this.orderId);
+            await setDoc(userIncompleteRef, orderData);
+            const incompleteRef = doc(db, "incomplete_orders", this.orderId);
+            await setDoc(incompleteRef, orderData);
+
+            const forwardedRef = collection(db, "forwarded_orders");
+            const forwardedDoc = doc(forwardedRef, this.orderId);
+            await deleteDoc(orderDoc);
+            await deleteDoc(forwardedDoc);
+
+            alert("Order confirmed successfully.");
+            } catch (error) {
+            console.error("Failed to confirm order:", error);
+            alert("Failed to confirm order. Please try again later.");
+            }
+        }
+    },
+    computed: {
+    
+  },
+  async created() {
+    onAuthStateChanged(getAuth(), async (user) => {
+          if (user) {
+            const userRef = doc(db, 'users', user.uid);
+            const ordersRef = collection(userRef, 'invited');   
+            try {
+              const querySnapshot = await getDocs(ordersRef);
+              this.invited = querySnapshot.docs.map((doc) => doc.data());
+
+              this.invited.forEach(order => {
+              this.orderId = order.id;
+        });
+             
+            } catch (error) {
+              console.error(error);
+            }
+          } else {
+            console.log('No user is currently logged in.');
+          }
+        });
+
+  }
 }
 </script>
 

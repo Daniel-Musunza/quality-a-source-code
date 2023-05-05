@@ -14,7 +14,7 @@
                       <div class="card-header" >
                           
                           <!-- Freelancer should not see -->
-                          <router-link :to="{ name: 'client-view', params: {id: userData.id}}" class="employer-div" v-if="admin">
+                          <!-- <router-link :to="{ name: 'client-view', params: {id: userData.id}}" class="employer-div" v-if="admin">
                               <div class="employer-img">
                                   <div style="border-radius: 38%; background: #808080; height: 60px; width: 60px; display: flex; justify-content:center;" >
                                       <span style="weight: 700; margin-left:5px; font-size: 30px" >CL</span>
@@ -48,7 +48,7 @@
                                       fa-star rated"></i>
                                   </div>
                               </div>
-                        </router-link>
+                        </router-link> -->
                           <!-- upto here-->
               
                           <!-- order topic -->
@@ -98,6 +98,7 @@
                     Send to freelancers <i class="fa-solid fa-arrow-right"></i>
                 </button>
                 <!-- upto here -->
+                <TheLoader v-show="loading"/>
                   <button v-if="freelancer" class="btn btn-info btn-take" id="btn-take" data-toggle="modal" data-target="#modal-bidding-form">
                       Request / Bid <i class="fa-solid fa-arrow-right"></i>
                   </button>
@@ -113,7 +114,7 @@
                                       <span aria-hidden="true">&times;</span>
                                   </button>
                               </div>
-                              <TheLoader v-show="loading"/>
+                         
                               <form id="form-request-order" method="POST">
                                   <input type="hidden" name="csrfmiddlewaretoken" v-model="user">
                                   <div class="modal-body">
@@ -188,7 +189,7 @@
                                   <!-- seen by admin and freelancer only -->
                     <div v-if="admin||freelancer" class="order-detail">
                         <label class="key-order-detail">Payment:</label>
-                        <span class="value-order-detail">$ {{order.payment}}</span>
+                        <span class="value-order-detail">$ {{order.payment }}</span>
                         
                     </div>
                   
@@ -214,6 +215,7 @@
                             fa-star rated"></i></span>
                     </div>
                     <input v-if="admin" type="number" v-model="payment" name="payment" placeholder="Freelancer Payment" style="border-radius: 5px; width:170px; height: 40px">
+                
                   </div>
               </div>
                   </div>
@@ -265,22 +267,22 @@ export default {
                     const db = getFirestore();
                     // Update the payment field in the current order document
                     const orderRef = doc(db, "orders", orderId);
-                    await updateDoc(orderRef, { payment });
+                    // await updateDoc(orderRef, { payment });
 
                     // Push the updated order document to the "forwarded_orders" collection
                     const tobebiddedOrdersCollectionRef = collection(db, "tobebidded_orders");
                     const tobebiddedOrderRef = doc(tobebiddedOrdersCollectionRef, orderId);
                     await setDoc(tobebiddedOrderRef, {
                     ...this.order,
-                    payment,
+                    payment: this.payment,
                     status: "inprogress",
                     date: new Date()
                     });
 
                     // Delete the current order document from the "orders" collection
-                    await deleteDoc(orderRef);
+            
                     this.loading = false;
-                    console.log("Order sent to be bidded successfully!");
+                    alert("Order sent to be bidded successfully!");
                     this.$router.push("/admin/all-bids");
                 } catch (error) {
                     this.loading = false;
@@ -360,19 +362,19 @@ export default {
 
     },
 async created() {
-  if (this.order) {
-    const firestore = getFirestore();
-    const userRef = doc(collection(firestore, "users"), this.order.client);
-    const userSnapshot = await getDoc(userRef);
-    const userData = userSnapshot.data();
-    this.userData = {
-      firstName: userData.firstName,
-      lastName: userData.lastName,
-      phoneNumber: userData.phoneNumber,
-      email: userData.email,
-      id: userData.id,
-    };
-  }
+//   if (this.order) {
+//     const firestore = getFirestore();
+//     const userRef = doc(collection(firestore, "users"), this.order.client);
+//     const userSnapshot = await getDoc(userRef);
+//     const userData = userSnapshot.data();
+//     this.userData = {
+//       firstName: userData.firstName,
+//       lastName: userData.lastName,
+//       phoneNumber: userData.phoneNumber,
+//       email: userData.email,
+//       id: userData.id,
+//     };
+//   }
 
 
 },
