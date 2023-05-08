@@ -33,7 +33,7 @@
                     <input
                     type="text"
                     class="form-control"
-                    id="firstName" v-model="firstName"
+                    id="firstName" v-model.trim="firstName"
                     />
                   </div>
                   <div class="form-group">
@@ -41,7 +41,7 @@
                     <input
                     type="text"
                     class="form-control"
-                    id="lastName" v-model="lastName"
+                    id="lastName" v-model.trim="lastName"
                    />
                   </div>
                   <div class="form-group">
@@ -49,7 +49,7 @@
                     <input
                     type="text"
                     class="form-control"
-                    id="username" v-model="username"
+                    id="username" v-model.trim="username"
                   />
                   </div>
                   <div class="form-group">
@@ -57,7 +57,7 @@
                     <input
                     type="text"
                     class="form-control"
-                    id="phoneNumber" v-model="phoneNumber"
+                    id="phoneNumber" v-model.trim="phoneNumber"
                    />
                   </div>
                   <div class="form-group">
@@ -65,7 +65,7 @@
                     <input
                     type="text"
                     class="form-control"
-                    id="username" v-model="niche"
+                    id="username" v-model.trim="niche"
                     />
                   </div>
                  
@@ -75,7 +75,7 @@
                     disabled
                     type="email"
                     class="form-control"
-                    id="email" v-model="email"
+                    id="email" v-model.trim="email"
                     />
                   </div>
                   <div class="my-3">

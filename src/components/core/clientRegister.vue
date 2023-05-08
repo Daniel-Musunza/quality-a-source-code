@@ -40,13 +40,13 @@
                                 <div class="col-sm-6 pd-right">
                                     <div class="form-group">
                                         <input type="text" name="first_name" class="form-control"
-                                            placeholder="First name" required="" v-model="firstName">
+                                            placeholder="First name" required="" v-model.trim="firstName">
                                     </div>
                                 </div>
                                 <div class="col-sm-6 pd-left">
                                     <div class="form-group">
                                         <input type="text"  class="form-control" placeholder="Last name"
-                                            required="" v-model="lastName">
+                                            required="" v-model.trim="lastName">
                                     </div>
                                 </div>
                             </div>
@@ -54,13 +54,13 @@
                                 <div class="col-sm-6 pd-right">
                                     <div class="form-group">
                                         <input type="email"  class="form-control"
-                                            placeholder="Email" required="" v-model="email">
+                                            placeholder="Email" required="" v-model.trim="email">
                                     </div>
                                 </div>
                                 <div class="col-sm-6 pd-left">
                                     <div class="form-group">
                                         <input type="text" class="form-control" placeholder="Phone"
-                                            required="" v-model="phoneNumber">
+                                            required="" v-model.trim="phoneNumber">
                                     </div>
                                 </div>
                             </div>
@@ -68,13 +68,13 @@
                                 <div class="col-sm-6 pd-right">
                                     <div class="form-group">
                                         <input type="password" class="form-control"
-                                            placeholder="Password" required="" v-model="password">
+                                            placeholder="Password" required="" v-model.trim="password">
                                     </div>
                                 </div>
                                 <div class="col-sm-6 pd-left">
                                     <div class="form-group">
                                         <input type="password"  class="form-control"
-                                            placeholder="Confirm Password" required="" v-model="confirmPassword">
+                                            placeholder="Confirm Password" required="" v-model.trim="confirmPassword">
                                     </div>
                                 </div>
                             </div>

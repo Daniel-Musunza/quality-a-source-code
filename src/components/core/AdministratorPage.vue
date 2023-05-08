@@ -16,7 +16,7 @@
                   type="text"
                   id="addAdmins"
                   class="form-control"
-                  v-model="adminEmail"
+                  v-model.trim="adminEmail"
                   />
                 </div>
                 <span>{{this.functionMsg }}</span>

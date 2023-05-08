@@ -4,17 +4,17 @@
             <img id="logo-img" class="img-center" src="../../assets/client/images/logo.png" alt="" >
         </div>
         <div class="sidebar-menu" style="height: 500px;">
-            <ul style="margin-left: 5px;">
+            <ul id="navbar" style="margin-left: 5px;">
                
                 <!-- freelancer begin -->
                 <li v-if="freelancer||admin">
-                    <router-link  to="/freelancer-dashboard" class="active">
+                    <router-link  to="/freelancer-dashboard" >
                     <i class="fa fa-book" aria-hidden="true"></i>
                     <span>Dashboard</span>
                     </router-link>
                 </li>
                 <li>
-                    <router-link to="/" class="active">
+                    <router-link to="/" >
                         <i class="fa-solid fa-house"></i>
                     <span>Home</span>
                     </router-link>
@@ -117,7 +117,7 @@
                 client begin -->
 
             <li v-if="!admin&&!freelancer">
-                <router-link to="/client-dashboard" class="active">
+                <router-link to="/client-dashboard">
                 <i class="fa fa-book" aria-hidden="true"></i>
                 <span>Dashboard</span>
                 </router-link>
@@ -306,6 +306,26 @@ a .li-span{
     border-radius: 50%;
     font-size: 1.5rem;
     padding-left:.5rem;
+}
+#navbar li a.router-link-exact-active {
+    color: #0773f7;
+  }
+#navbar li a:hover{
+color: #0773f7;
+}
+#navbar li a:hover,
+#navbar li a.active{
+    color: #0773f7;
+}
+#navbar li a.active::after,
+#navbar li a:hover::after{
+    content: "";
+    width: 30%;
+    height:2px;
+    background:  #0773f7;
+    position: absolute;
+    bottom: -4px;
+    left:20px;
 }
 .sidebar-menu a {
     display: block;

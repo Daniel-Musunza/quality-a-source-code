@@ -534,7 +534,7 @@
                     <img id="footer-logo-img" src="client/images/logo.png" class="img-center"
                         alt="">
                 </div>
-                <p class="mb-0"><a href="index.html" style="color: #2575fc">Quality A</a> is an online tool that
+                <p class="mb-0"><router-link to="/" style="color: #2575fc">Quality A</router-link> is an online tool that
                     which hosts the best freelancers across the globe to help you improve your business and studies.</p>
             </div>
             <div class="col-lg-4 col-md-6 pl-md-5 sm-mt-5 footer-list justify-content-between d-flex">
@@ -550,9 +550,9 @@
 
                 </ul>
                 <ul class="list-unstyled w-100">
-                    <li><a href="#">Login</a>
+                    <li><router-link to="/client-log-in">Login</router-link>
                     </li>
-                    <li><a href="#">Register</a>
+                    <li><router-link to="/client-register">Register</router-link>
                     </li>
                     <li> <a href="#step">How It Works</a>
                     </li>
@@ -562,7 +562,7 @@
 
             <div class="col-lg-4 col-md-12 md-mt-5">
                 <ul class="media-icon list-unstyled">
-                    <li>Email: <a href="mailto:qualityA@gmail.com"><b>qualityA@gmail.com</b></a>
+                    <li>Email: <a href="mailto:qualityafreelancers@gmail.com"><b>qualityafreelancers@gmail.com</b></a>
                     </li>
                     <li>Phone: <a href="tel:+254794711950"><b>+254 794711950</b></a>
                     </li>

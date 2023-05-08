@@ -42,7 +42,7 @@
                               <fieldset class="form-group position-relative has-icon-left">
                                 <input type="text"
                                     class="form-control form-control-lg input-lg "
-                                   v-model="email"
+                                   v-model.trim="email"
                                     placeholder="Enter Your Email" required>
                                 <div class="form-control-position">
                                     <i class="ft-user"></i>
@@ -52,7 +52,7 @@
                                 <input type="password"
                                     class="form-control form-control-lg input-lg "
                                     placeholder="Enter Your Account Password" required
-                                   v-model="password">
+                                   v-model.trim="password">
                                 <div class="form-control-position">
                                     <i class="fa fa-lock"></i>
                                 </div>

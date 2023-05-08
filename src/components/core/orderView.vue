@@ -189,14 +189,14 @@
                                   <!-- seen by admin and freelancer only -->
                     <div v-if="admin||freelancer" class="order-detail">
                         <label class="key-order-detail">Payment:</label>
-                        <span class="value-order-detail">$ {{order.payment }}</span>
+                        <span class="value-order-detail">$ {{order.Payment }}</span>
                         
                     </div>
                   
                     <!-- upto here -->
                     <div class="order-detail">
                         <label class="key-order-detail">Status:</label>
-                        <span class="value-order-detail">{{order.status}}</span>
+                        <span class="value-order-detail">{{order.Status}}</span>
                         
                     </div>
                     <div class="order-detail">
@@ -247,6 +247,7 @@ export default {
             profileMenu: null,
             userData: null,
              payment: null,
+             status: null,
              bidtext: null,
              loading: null,
         }
@@ -261,33 +262,30 @@ export default {
      
         async updateOrder() {
             const orderId = this.order.id;
-            const payment = this.payment;
             this.loading = true;
-                try {
-                    const db = getFirestore();
-                    // Update the payment field in the current order document
-                    const orderRef = doc(db, "orders", orderId);
-                    // await updateDoc(orderRef, { payment });
-
-                    // Push the updated order document to the "forwarded_orders" collection
-                    const tobebiddedOrdersCollectionRef = collection(db, "tobebidded_orders");
-                    const tobebiddedOrderRef = doc(tobebiddedOrdersCollectionRef, orderId);
-                    await setDoc(tobebiddedOrderRef, {
-                    ...this.order,
-                    payment: this.payment,
-                    status: "inprogress",
-                    date: new Date()
-                    });
-
-                    // Delete the current order document from the "orders" collection
             
-                    this.loading = false;
-                    alert("Order sent to be bidded successfully!");
-                    this.$router.push("/admin/all-bids");
-                } catch (error) {
-                    this.loading = false;
-                    console.error("Error forwarding order:", error);
-                }
+            try {
+                const db = getFirestore();
+                
+                // Add the current order document to the "tobebidded_orders" collection
+                const tobebiddedOrdersCollectionRef = collection(db, "tobebidded_orders");
+                const tobebiddedOrderRef = doc(tobebiddedOrdersCollectionRef, orderId);
+                
+                await setDoc(tobebiddedOrderRef, {
+                ...this.order,
+                payment: this.payment,
+                status: "inprogress",
+                date: new Date()
+                });         
+                this.loading = false;
+                alert("Order sent to be bidded successfully!");
+                this.$router.push("/admin/all-bids");
+                
+            } catch (error) {
+                this.loading = false;
+                console.error("Error forwarding order:", error);
+            }
+            
             this.payment = null;
         },
         async placeBid() {
@@ -329,7 +327,7 @@ export default {
                 console.error("Error bidding order:", error);
             }
             this.bidtext = null;
-}
+        }
 
   },
 
@@ -359,24 +357,12 @@ export default {
         return tobebidded;
     }
     },
-
+ 
     },
 async created() {
-//   if (this.order) {
-//     const firestore = getFirestore();
-//     const userRef = doc(collection(firestore, "users"), this.order.client);
-//     const userSnapshot = await getDoc(userRef);
-//     const userData = userSnapshot.data();
-//     this.userData = {
-//       firstName: userData.firstName,
-//       lastName: userData.lastName,
-//       phoneNumber: userData.phoneNumber,
-//       email: userData.email,
-//       id: userData.id,
-//     };
-//   }
 
-
+console.log("this order " + this.order.orderCategory);
+console.log("this order " + this.order.payment);
 },
 }
 </script>

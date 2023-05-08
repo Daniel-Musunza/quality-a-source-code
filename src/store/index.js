@@ -42,13 +42,10 @@ export default createStore({
             dueTime: "",
             experienceNeeded: "",
             budget: "",
-            dateSubmited: "",
-            freelancerUsername: "",
-            clientFirstName: "",
-            bids:"",
+            freelancer: "",
+            client: "",
             status: "",
             payment: "",
-            comment: "",
             editPost: null,
     }
   },
@@ -148,6 +145,32 @@ export default createStore({
       updateOrderCategory(state, payload) {
             state.orderCategory = payload;
       },
+      updatedueDate(state, payload) {
+        state.dueDate = payload;
+      },
+      updatedueTime(state, payload) {
+            state.dueTime = payload;
+      },
+      updateExperienceNeeded(state, payload) {
+        state.experienceNeeded = payload;
+      },
+      updateBudget(state, payload) {
+            state.budget = payload;
+      },
+      
+      updatefreelancer(state, payload) {
+        state.freelancer = payload;
+       },
+     updateclient(state, payload) {
+        state.client = payload;
+    },
+    updatestatus(state, payload) {
+      state.status = payload;
+    },
+    updatepayment(state, payload) {
+      state.payment = payload;
+    },
+    
       orderFileNameChange (state, payload) {
             state.orderFileName = payload;
       },

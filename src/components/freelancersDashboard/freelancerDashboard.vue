@@ -93,7 +93,7 @@
                     </router-link>
                     <router-link to="/freelancer/in-progress" v-if="freelancer" class="card-single">
                         <div>
-                            <h1>0</h1>
+                            <h1>{{ incomplete.length }}</h1>
                             <span>In Progress</span>
                         </div>
                         <div>
@@ -383,6 +383,7 @@ export default {
         ...mapActions(['getOrders']),
          ...mapActions(['getTobebiddedOrders']),
          ...mapActions(['getIncompleteOrders']),
+         ...mapActions(['getIncomplete']),
     },
     computed: {
         admin() {
@@ -393,13 +394,15 @@ export default {
         },
         ...mapState(['orders']),
         ...mapState(['tobebidded_orders']),
-        ...mapState(['incomplete_orders'])
+        ...mapState(['incomplete_orders']),
+        ...mapState(['incomplete'])
   },
 
   created() {
     this.getOrders();
     this.getTobebiddedOrders();
     this.getIncompleteOrders();
+    this.getIncomplete();
   }
  
 }
@@ -595,6 +598,9 @@ main{
 .card-single div:last-child span{
     color: #1c68c4;
     font-size:3.5rem;
+}
+.card-single div:hover::after{
+    background: #1c68c4;
 }
 .card-single div:first-child span{
     color: var(--text-grey);

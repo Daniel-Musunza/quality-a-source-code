@@ -19,7 +19,7 @@
                 <input
                 type="email"
                 class="form-control"
-                v-model="email"
+                v-model.trim="email"
                 />
               </div>
               <div class="my-3">

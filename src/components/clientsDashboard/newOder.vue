@@ -272,22 +272,21 @@ export default {
                     orderID = lastOrder.orderID + 1;
                     };
                 const userRef = doc(db, 'users', auth.currentUser.uid);
-                
+                const client = auth.currentUser.uid;
                 const ordersCollectionRef = collection(db, "orders");
                 const orderRef =doc(ordersCollectionRef);
                 await setDoc( orderRef,{
-                        client: userRef,
+                        client: client,
                         id: orderRef.id,
                         orderID: orderID,
                         orderHTML: this.orderHTML,
                         orderTitle: this.orderTitle,
                         orderCategory: this.orderCategory,
                         experienceNeeded: this.experienceNeeded,
-                        status: "incomplete",
+                        status: "pending",
                         budget: this.budget,
                         dueTime: this.dueTime,
                         dueDate: this.dueDate,
-                        
                         date: timestamp,
                         
                     });
@@ -302,7 +301,7 @@ export default {
                     orderTitle: this.orderTitle,
                     orderCategory: this.orderCategory,
                     experienceNeeded: this.experienceNeeded,
-                    status: "incomplete",
+                    status: "pending",
                     budget: this.budget,
                     dueTime: this.dueTime,
                     dueDate: this.dueDate,
