@@ -357,7 +357,22 @@ export default {
         return tobebidded;
     }
     },
- 
+    payment: {
+          get() {
+            return this.$store.state.payment;
+          },
+          set(payload) {
+            this.$store.commit("updatepayment", payload);
+          },
+        },
+        status: {
+          get() {
+            return this.$store.state.status;
+          },
+          set(payload) {
+            this.$store.commit("updateStatus", payload);
+          },
+        },
     },
 async created() {
 

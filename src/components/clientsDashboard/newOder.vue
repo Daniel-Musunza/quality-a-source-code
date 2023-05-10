@@ -212,13 +212,12 @@ export default {
                     };
                 const userRef = doc(db, 'users', auth.currentUser.uid);
                 const ordersCollectionRef = collection(db, "orders");
-                const orderRef =doc(ordersCollectionRef);
+                const orderRef = doc(ordersCollectionRef, orderID.toString());
                 await setDoc( orderRef,{
                      orderCoverFile: downloadURL,
                      orderCoverFileName: this.$store.state.orderFileName,
                         client: userRef,
                         id: orderRef.id,
-                        orderID: orderID,
                         orderHTML: this.orderHTML,
                         orderTitle: this.orderTitle,
                         orderCategory: this.orderCategory,
@@ -239,7 +238,6 @@ export default {
                         id: newOrderRef.id,
                      orderCoverFile: downloadURL,
                      orderCoverFileName: this.$store.state.orderFileName,
-                    orderID: orderID,
                     orderHTML: this.orderHTML,
                     orderTitle: this.orderTitle,
                     orderCategory: this.orderCategory,
@@ -261,42 +259,27 @@ export default {
               );
               return;
             }
-            else{
-                  const db = getFirestore();
-                  const auth = getAuth();
-                  const timestamp = await Date.now();
-                  let orderID = 1000;
-                  const querySnapshot = await getDocs(collection(db, "orders"), orderBy("orderID", "desc"), limit(1));
-                    if (!querySnapshot.empty) {
+             else {
+                const db = getFirestore();
+                const auth = getAuth();
+                const timestamp = await Date.now();
+                let orderID = 1000;
+                
+                const querySnapshot = await getDocs(collection(db, "orders"), orderBy("orderID", "desc"), limit(1));
+                
+                if (!querySnapshot.empty) {
                     const lastOrder = querySnapshot.docs[0].data();
-                    orderID = lastOrder.orderID + 1;
-                    };
-                const userRef = doc(db, 'users', auth.currentUser.uid);
+                    orderID = parseInt(lastOrder.orderID) + 1;
+                }
+                
+                const userRef = doc(db, "users", auth.currentUser.uid);
                 const client = auth.currentUser.uid;
                 const ordersCollectionRef = collection(db, "orders");
-                const orderRef =doc(ordersCollectionRef);
-                await setDoc( orderRef,{
-                        client: client,
-                        id: orderRef.id,
-                        orderID: orderID,
-                        orderHTML: this.orderHTML,
-                        orderTitle: this.orderTitle,
-                        orderCategory: this.orderCategory,
-                        experienceNeeded: this.experienceNeeded,
-                        status: "pending",
-                        budget: this.budget,
-                        dueTime: this.dueTime,
-                        dueDate: this.dueDate,
-                        date: timestamp,
-                        
-                    });
-
-                 
-                  const ordersRef = collection(userRef, 'orders');
-                  const newOrderRef = doc(ordersRef, orderRef.id);
-                    await setDoc(newOrderRef, {
-                        id: newOrderRef.id,
-                    orderID: orderID,
+                const orderRef = doc(ordersCollectionRef, orderID.toString());
+                
+                await setDoc(orderRef, {
+                    client: client,
+                    id: orderRef.id,
                     orderHTML: this.orderHTML,
                     orderTitle: this.orderTitle,
                     orderCategory: this.orderCategory,
@@ -306,16 +289,31 @@ export default {
                     dueTime: this.dueTime,
                     dueDate: this.dueDate,
                     date: timestamp,
-                    });
-
-               
+                });
                 
-                  await this.$store.dispatch("getClientOrders");
-                  this.loading = false;
-                  this.$router.push("/client/all-orders");
-               
+                const ordersRef = collection(userRef, "orders");
+                const newOrderRef = doc(ordersRef, orderRef.id);
+                
+                await setDoc(newOrderRef, {
+                    id: newOrderRef.id,
+                    orderHTML: this.orderHTML,
+                    orderTitle: this.orderTitle,
+                    orderCategory: this.orderCategory,
+                    experienceNeeded: this.experienceNeeded,
+                    status: "pending",
+                    budget: this.budget,
+                    dueTime: this.dueTime,
+                    dueDate: this.dueDate,
+                    date: timestamp,
+                });
+                
+                await this.$store.dispatch("getClientOrders");
+                this.loading = false;
+                this.$router.push("/client/all-orders");
+                
                 return;
             }
+
             
           }
           this.error = true;
