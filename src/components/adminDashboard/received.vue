@@ -28,7 +28,7 @@
                                     :key="index"
                                     >
                                         <td>{{index +1}}</td>
-                                        <td>{{order.orderID}}</td>
+                                        <td>{{order.id}}</td>
                                         <td>{{order.orderTitle}}</td>
                                         <td>{{order.orderCategory}}</td>
                                         <td>

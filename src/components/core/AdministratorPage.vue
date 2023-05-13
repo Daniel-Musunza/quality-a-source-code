@@ -92,13 +92,14 @@ import { getFunctions, httpsCallable } from "firebase/functions";
         flex-direction: column;
         /* max-width: 200px; */
         transition: margin-left 300ms;
-     
        
+     
         /* max-width: fit-content; */
       }
       .form-group {
         display: flex;
         justify-content: center;
+       
         /* max-width: 400px; */
       }
       input {
@@ -129,6 +130,7 @@ import { getFunctions, httpsCallable } from "firebase/functions";
     /* transition: left 300ms; */
 
 }
+
       @media (max-width: 777px){
 
     .main-content {

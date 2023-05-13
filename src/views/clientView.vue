@@ -215,7 +215,7 @@
     
     <script>
 
-import { getFirestore, doc, collection, setDoc, getDoc, getDocs, deleteDoc} from "firebase/firestore";
+import { getFirestore, doc, collection, setDoc, getDoc,updateDoc, getDocs, deleteDoc} from "firebase/firestore";
 import {getAuth} from "firebase/auth";
     import ModalItem from "@/components/ModalItem"
     import TheLoader from "@/components/TheLoader"
@@ -264,16 +264,17 @@ import {getAuth} from "firebase/auth";
 
                 const ordersRef = collection(userRef, 'myBids');   
                 const task = await getDoc(doc(ordersRef, this.orderId));
-               
+            
                 if (task.exists()) {
-                    const tobeAssignedTask = task.data();
-                 
-                    // rest of the method
-                    const invitedCollectionRef = collection(userRef, "invited");
-                 
+                const tobeAssignedTask = task.data();
+                
+                // rest of the method
+                const invitedCollectionRef = collection(userRef, "invited");
+                
                 const invitedOrderRef = doc(invitedCollectionRef, this.orderId);
                 await setDoc(invitedOrderRef, {
                     ...tobeAssignedTask,
+                    status: "in progress",
                     date: new Date(),
                 });
 
@@ -282,8 +283,26 @@ import {getAuth} from "firebase/auth";
                 await setDoc( orderRef,{
                     ...tobeAssignedTask,
                     freelancer: clientId,
+                    status: "in progress",
                     date: new Date(),
-                    });
+                });
+
+                //update clients status
+                const orderClientRef = doc(db, 'users', tobeAssignedTask.client);
+                const orderClientOrdersRef = collection(orderClientRef, 'orders');   
+                const orderClientDocRef = doc(orderClientOrdersRef, this.orderId);
+                await updateDoc(orderClientDocRef, {
+                    status: "in progress",
+                }); 
+                
+                const inprogress = await getDoc(doc(orderClientOrdersRef, this.orderId));
+                const inprogressCollectionRef = collection(orderClientRef, "incomplete");
+                const inprogressRef = doc(inprogressCollectionRef, this.orderId);
+                await setDoc(inprogressRef, {
+                    ...inprogress.data(),
+                    status: "in progress",
+                    date: new Date(),
+                });
 
                 // // Delete the current order document from the "myBids" collection
                 const deleteMyBids = doc(ordersRef, this.orderId);
@@ -298,13 +317,14 @@ import {getAuth} from "firebase/auth";
                 alert("Order has been assigned successfully!");
                 this.$router.push("/admin/all-bids");
                 } else {
-                    console.error("Error in assigning task: Task does not exist");
+                console.error("Error in assigning task: Task does not exist");
                 }
             } catch (error) {
                 this.loading = false;
                 console.error("Error in assigning task:", error);
             }      
-        },
+            },
+
         signOut() {
             getAuth().signOut();
             // window.location.reload();

@@ -27,7 +27,7 @@
                                 <tbody>
                                     <tr v-for="(order, index) in tobebidded_orders" :key="order.id">
                                         <td>{{ index + 1 }}</td>
-                                        <td>{{ order.orderID }}</td>
+                                        <td>{{ order.id }}</td>
                                         <td>{{ order.orderTitle }}</td>
                                         <td>{{ order.orderCategory }}</td>
                                   

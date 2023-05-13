@@ -17,7 +17,7 @@
                 </router-link>
                 <router-link to="/client/all-orders" class="card-single">
                     <div>
-                        <h1>124</h1>
+                        <h1>{{ clientOrders.length }}</h1>
                         <span>Orders</span>
                     </div>
                     <div>
@@ -26,7 +26,7 @@
                 </router-link>
                 <router-link to="/client/incomplete" class="card-single">
                     <div>
-                        <h1>4</h1>
+                        <h1>{{ incomplete.length }}</h1>
                         <span>Incomplete Orders</span>
                     </div>
                     <div>
@@ -65,20 +65,23 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td>UI/UX Design</td>
-                                        <td>UI Team</td>
-                                        <td>
-                                            <span class="status purple"></span>
-                                            review
-                                        </td>
-                                        <td>9hrs 34min</td>
-                                        <td> 
-                                            <router-link to="/order-view">
-                                                View Details
-                                            </router-link>
-                                        </td>
+                                    <tr  
+                                    v-for="(order,index) in clientOrders"
+                                    :key="order.id"
+                                    >
+                                            <td>{{index + 1}}</td>
+                                            <td>{{order.orderTitle}}</td>
+                                            <td>{{order.orderCategory}}</td>
+                                            <td>
+                                                
+                                                {{order.status}}
+                                            </td>
+                                            <td>{{order.dueDate}} ,{{order.dueTime}}</td>
+                                            <td> 
+                                                <router-link :to="{ name: 'client-order-view', params: {id: order.id}}">
+                                                    View Details
+                                                </router-link>
+                                            </td>
                                     </tr>
                                 
                                 </tbody>
@@ -94,7 +97,7 @@
 <script>
 import SideBar from "@/components/core/SideBar.vue";
 import Header from "@/components/core/Header.vue";
-
+import { mapState } from 'vuex'
 export default {
     components: {
         SideBar, 
@@ -116,6 +119,10 @@ export default {
         },
       
       },
+      computed: {
+        ...mapState(['clientOrders']),
+    ...mapState(['incomplete']),
+      }
 }
 </script>
 

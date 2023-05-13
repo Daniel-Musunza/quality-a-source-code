@@ -28,7 +28,7 @@
                                             <td>
                                                 <router-link :to="{ name: 'order-bids', params: { id: order.id } }">{{ bids.length }}</router-link>
                                             </td>
-                                            <td>{{ order.orderID }}</td>
+                                            <td>{{ order.id }}</td>
                                             <td>{{ order.orderTitle }}</td>
                                             <td>{{ order.dueDate }} {{ order.dueTime }}</td>
                                             <td> 

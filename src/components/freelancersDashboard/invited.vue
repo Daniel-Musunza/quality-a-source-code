@@ -29,7 +29,7 @@
                                 <tbody>
                                     <tr v-for="(order, index) in invited" :key="order.id">
                                         <td>{{ index + 1 }}</td>
-                                        <td>{{ order.orderID}}</td>
+                                        <td>{{ order.id}}</td>
                                         <td>{{ order.orderTitle }}</td>
                                         <td>{{ order.dueDate }} {{ order.dueTime }}</td>
                                         <td>  <button @click.prevent="decline()" class="btn btn-info btn-take" id="btn-take" style="background-color: red;">

@@ -155,7 +155,7 @@
               
                       <div class="order-detail">
                           <label class="key-order-detail">Order ID:</label>
-                          <span class="value-order-detail text-info"><b>{{order.orderID}}</b></span>
+                          <span class="value-order-detail text-info"><b>{{order.id}}</b></span>
                       </div>
                       <div class="order-detail">
                           <label class="key-order-detail">Due Time:</label>
@@ -246,8 +246,6 @@ export default {
             available: null,
             profileMenu: null,
             userData: null,
-             payment: null,
-             status: null,
              bidtext: null,
              loading: null,
         }
@@ -267,6 +265,14 @@ export default {
             try {
                 const db = getFirestore();
                 
+                //update orders status
+                const ordersCollectionRef = collection(db, "orders");
+                const orderRef = doc(ordersCollectionRef, orderId);
+                await updateDoc(orderRef, {
+                payment: this.payment,
+                status: "forwarded",
+                date: new Date(),
+                }); 
                 // Add the current order document to the "tobebidded_orders" collection
                 const tobebiddedOrdersCollectionRef = collection(db, "tobebidded_orders");
                 const tobebiddedOrderRef = doc(tobebiddedOrdersCollectionRef, orderId);
@@ -274,13 +280,24 @@ export default {
                 await setDoc(tobebiddedOrderRef, {
                 ...this.order,
                 payment: this.payment,
-                status: "inprogress",
+                status: "forwarded",
                 date: new Date()
-                });         
+                });   
+
+                //update clients status
+                const userRef = doc(db, 'users', this.order.client);
+                const ordersRef = collection(userRef, 'orders');   
+                const docRef = doc(ordersRef, orderId);
+                
+                await updateDoc(docRef, {
+                status: "forwarded",
+                }); 
+
                 this.loading = false;
                 alert("Order sent to be bidded successfully!");
                 this.$router.push("/admin/all-bids");
                 
+            
             } catch (error) {
                 this.loading = false;
                 console.error("Error forwarding order:", error);
@@ -299,10 +316,13 @@ export default {
                 
                 // Update the payment field in the current order document
                 const orderRef = doc(db, "tobebidded_orders", orderId);
+                const orderSnapshot = await getDoc(orderRef);
+                const data = orderSnapshot.data();
+
                 const myBidsCollectionRef = collection(userRef, "myBids");
                 const myBidsOrderRef = doc(myBidsCollectionRef, orderRef.id);
                 await setDoc(myBidsOrderRef, {
-                ...this.order,
+                ...data,
                 bidtext,
                 date: new Date()
                 },

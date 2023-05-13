@@ -35,7 +35,7 @@
                                             {{ order.userData.firstName }}
                                            </router-link>
                                         </td>
-                                        <td>{{order.orderID}}</td>
+                                        <td>{{order.id}}</td>
                                         <td>{{ order.orderTitle }}</td>
                                         <td>{{ order.orderCategory }}</td>
                                         <td>

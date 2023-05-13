@@ -208,7 +208,7 @@ export default {
                   const querySnapshot = await getDocs(collection(db, "orders"), orderBy("orderID", "desc"), limit(1));
                     if (!querySnapshot.empty) {
                     const lastOrder = querySnapshot.docs[0].data();
-                    orderID = lastOrder.orderID + 1;
+                    orderID = lastorder.id + 1;
                     };
                 const userRef = doc(db, 'users', auth.currentUser.uid);
                 const ordersCollectionRef = collection(db, "orders");
@@ -269,7 +269,7 @@ export default {
                 
                 if (!querySnapshot.empty) {
                     const lastOrder = querySnapshot.docs[0].data();
-                    orderID = parseInt(lastOrder.orderID) + 1;
+                    orderID = parseInt(lastorder.id) + 1;
                 }
                 
                 const userRef = doc(db, "users", auth.currentUser.uid);

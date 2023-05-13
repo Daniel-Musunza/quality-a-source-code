@@ -70,7 +70,7 @@
               
                       <div class="order-detail">
                           <label class="key-order-detail">Order ID:</label>
-                          <span class="value-order-detail text-info"><b>{{order.orderID}}</b></span>
+                          <span class="value-order-detail text-info"><b>{{order.id}}</b></span>
                       </div>
                       <div class="order-detail">
                           <label class="key-order-detail">Due Time:</label>
@@ -142,8 +142,17 @@ export default {
     },
     computed: {
     ...mapState(['clientOrders']),
+    ...mapState(['incomplete']),
     order () {
-      return this.clientOrders.find(order => order.id === this.$route.params.id);
+        const orderId = this.$route.params.id;
+        const clientOrders = this.clientOrders.find(order => order.id === orderId);
+    const incomplete = this.incomplete.find(order => order.id === orderId);
+    if (clientOrders) {
+        return clientOrders;
+    } else if (incomplete) {
+        return incomplete;
+    } 
+    
     }
   }
 

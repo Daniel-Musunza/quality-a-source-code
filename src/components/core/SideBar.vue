@@ -26,9 +26,9 @@
                     <span class="down"><i class="fa-sharp fa-solid fa-angle-down"></i></span>
                     </div>
                     <div v-if="available" class="available">
-                    <router-link to="/freelancer/available">New <span>{{ tobebidded_orders.length }}</span></router-link>
-                    <router-link to="/freelancer/my-bids">My Bids <span>{{ myBids.length }}</span></router-link>
-                    <router-link to="/freelancer/invited">Invited <span>{{ invited.length }}</span></router-link>
+                    <router-link to="/freelancer/available">New <span class="span">{{ tobebidded_orders.length }}</span></router-link>
+                    <router-link to="/freelancer/my-bids">My Bids <span class="span">{{ myBids.length }}</span></router-link>
+                    <router-link to="/freelancer/invited">Invited <span class="span">{{ invited.length }}</span></router-link>
                     </div>
                 </li>
                 <li v-if="freelancer">
@@ -92,8 +92,8 @@
                     <span class="down"><i class="fa-sharp fa-solid fa-angle-down"></i></span>
                     </div>
                     <div v-if="available" class="available">
-                        <router-link to="/admin/received" >Received<span>{{orders.length}}</span></router-link>
-                        <router-link to="/admin/fowarded">Fowarded <span>{{ forwarded_orders.length}}</span></router-link>
+                        <router-link to="/admin/received" >Received<span class="span">{{orders.length}}</span></router-link>
+                        <router-link to="/admin/fowarded">Fowarded <span class="span">{{ forwarded_orders.length}}</span></router-link>
                     </div>
                 </li>
                 <li v-if="admin">
@@ -131,7 +131,7 @@
             </li>
             <li v-if="!admin&&!freelancer">
                 <router-link to="/client/all-orders"><i class="fa fa-shopping-bag" aria-hidden="true"></i>
-                <span>All Orders</span>
+                <span>All Orders <span class="span">{{clientOrders.length}}</span></span>
                 </router-link>
             </li>
             <li v-if="!admin&&!freelancer">
@@ -142,7 +142,7 @@
             </li>
             <li v-if="!admin&&!freelancer">
                 <router-link to="/client/incomplete"><i class="fa-solid fa-sort"></i>
-                <span>Incomplete</span>
+                <span>Incomplete <span class="span">{{incomplete.length}}</span></span>
                 </router-link>
             </li>
             <li v-if="!admin&&!freelancer">
@@ -201,6 +201,7 @@ export default {
     ...mapState(['myBids']),
     ...mapState(['invited']),
     ...mapState(['incomplete']),
+    ...mapState(['clientOrders']),
         admin() {
           return this.$store.state.profileAdmin;
      },
@@ -300,9 +301,10 @@ export default {
     padding-left: .5rem;
     font-size: 1.5rem;
 }
-a .li-span{
+.span {
     margin-left: 0rem;
-    background: #79aae6;
+    background: #529bf4;
+    color: #fff;
     border-radius: 50%;
     font-size: 1.5rem;
     padding-left:.5rem;
