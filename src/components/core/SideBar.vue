@@ -10,19 +10,19 @@
                 <li v-if="freelancer||admin">
                     <router-link  to="/freelancer-dashboard" >
                     <i class="fa fa-book" aria-hidden="true"></i>
-                    <span>Dashboard</span>
+                   Dashboard
                     </router-link>
                 </li>
                 <li>
                     <router-link to="/" >
                         <i class="fa-solid fa-house"></i>
-                    <span>Home</span>
+                  Home
                     </router-link>
                 </li>
                 <li v-if="freelancer">
                     <div class="active" @click="toggleAvailable">
                     <i class="fa-sharp fa-solid fa-tag"></i>
-                    <span>Available</span>
+                    Available
                     <span class="down"><i class="fa-sharp fa-solid fa-angle-down"></i></span>
                     </div>
                     <div v-if="available" class="available">
@@ -34,39 +34,39 @@
                 <li v-if="freelancer">
                     <router-link to="/freelancer/in-progress">
                         <i class="fa-sharp fa-solid fa-pen"></i>
-                    <span>In Progress</span>
+                    In Progress
                     <span class="li-span">{{ incomplete.length }}</span>
                     </router-link>
                 </li>
                 <li v-if="freelancer">
                     <router-link to="/freelancer/in-review">
                         <i class="fa-sharp fa-solid fa-font-awesome"></i>
-                    <span>In review</span>
+                  In review
                     <span class="li-span">1</span>
                     </router-link>
                 </li>
                 <li v-if="freelancer">
                     <router-link to="/freelancer/completed"><i class="fa fa-clipboard" aria-hidden="true"></i>
-                    <span>Completed</span>
+                   Completed
                     <span class="li-span">0</span>
                     </router-link>
                 </li>
                 <li v-if="freelancer">
                     <router-link to="/freelancer/on-revision">
                         <i class="fa-sharp fa-solid fa-pen-to-square"></i>
-                    <span>Revision</span>
+                  Revision
                     <span class="li-span">0</span>
                     </router-link>
                 </li>
                 <li v-if="freelancer">
                     <router-link to="/freelancer/disputed"><i class="fa-sharp fa-solid fa-thumbs-down"></i>
-                    <span>Disputed</span>
+                    Disputed
                     <span class="li-span">0</span>
                     </router-link>
                 </li>
                 <li v-if="freelancer">
                     <router-link to="/freelancer/plagiarism-checker"><i class="fa-solid fa-paste"></i>
-                    <span>Plagiarism Checker</span>
+                  Plagiarism Checker
                     </router-link>
                 </li>
                 
@@ -76,19 +76,19 @@
                 <li v-if="admin">
                     <router-link to="/admin/clients" >
                     <i class="fa fa-users" aria-hidden="true"></i>
-                    <span>Clients</span>
+                   Clients
                     </router-link>
                 </li>
                 <li v-if="admin">
                     <router-link to="/admin/all-bids">
                         <i class="fa-solid fa-hand"></i>
-                    <span>Bids</span>
+                Bids
                     </router-link>
                 </li>
                 <li v-if="admin">
                     <div @click="toggleAvailable">
                     <i class="fa fa-clipboard" aria-hidden="true"></i>
-                    <span>Orders</span>
+                   Orders
                     <span class="down"><i class="fa-sharp fa-solid fa-angle-down"></i></span>
                     </div>
                     <div v-if="available" class="available">
@@ -99,17 +99,17 @@
                 <li v-if="admin">
                     <router-link to="/admin/transactions">
                         <i class="fa-solid fa-receipt"></i>
-                    <span>Transactions</span>
+                  Transactions
                     </router-link>
                 </li>
                 <li v-if="admin">
                     <router-link to="/admin/accounts"><i class="fa-solid fa-file-invoice"></i>
-                    <span>Accounts</span>
+                   Accounts
                     </router-link>
                 </li>
                 <li v-if="admin">
                     <router-link to="/administrator"><i class="fa-solid fa-user"></i>
-                    <span>Administration</span>
+                   Administration
                     </router-link>
                 </li>
                 <!-- admin end
@@ -119,50 +119,50 @@
             <li v-if="!admin&&!freelancer">
                 <router-link to="/client-dashboard">
                 <i class="fa fa-book" aria-hidden="true"></i>
-                <span>Dashboard</span>
+               Dashboard
                 </router-link>
             </li>
            
             <li v-if="!admin&&!freelancer">
                 <router-link to="/new-order">
                     <i class="fa-solid fa-square-arrow-up-right"></i>
-                <span>New Order</span>
+             New Order
                 </router-link>
             </li>
             <li v-if="!admin&&!freelancer">
                 <router-link to="/client/all-orders"><i class="fa fa-shopping-bag" aria-hidden="true"></i>
-                <span>All Orders <span class="span">{{clientOrders.length}}</span></span>
+               All Orders <span class="span">{{clientOrders.length}}</span>
                 </router-link>
             </li>
             <li v-if="!admin&&!freelancer">
                 <router-link to="/client/done">
                     <i class="fa fa-clipboard" aria-hidden="true"></i>
-                <span>Done</span>
+              Done
                 </router-link>
             </li>
             <li v-if="!admin&&!freelancer">
                 <router-link to="/client/incomplete"><i class="fa-solid fa-sort"></i>
-                <span>Incomplete <span class="span">{{incomplete.length}}</span></span>
+               Incomplete <span class="span">{{incomplete.length}}</span>
                 </router-link>
             </li>
             <li v-if="!admin&&!freelancer">
                 <router-link to="/client/revision"><i class="fa-solid fa-rotate"></i>
-                <span>On Revision</span>
+               On Revision
                 </router-link>
             </li>
             <li v-if="!admin&&!freelancer">
                 <router-link to="/client/reviews"><i class="fa-solid fa-square-pen"></i>
-                <span>Post a review</span>
+                Post a review
                 </router-link>
             </li>
             <li v-if="!admin&&!freelancer">
                 <router-link to="/chat"><i class="fa-sharp fa-solid fa-comments"></i>
-                <span>General Chat</span>
+                General Chat
                 </router-link>
             </li>
             <li v-if="!admin||!freelancer">
                 <router-link to="/faq"><i class="fa-sharp fa-solid fa-question"></i>
-                <span>FAQ</span>
+              FAQ
                 </router-link>
             </li>
             </ul>
@@ -295,19 +295,28 @@ export default {
     margin-left:3rem ;
 }
 .sidebar-menu li .available a span{
-    margin-left: 3.1rem;
-    background: #79aae6;
-    border-radius: 50%;
-    padding-left: .5rem;
-    font-size: 1.5rem;
-}
-.span {
     margin-left: 0rem;
     background: #529bf4;
     color: #fff;
-    border-radius: 50%;
-    font-size: 1.5rem;
-    padding-left:.5rem;
+    border-radius: 40%;
+    font-size: 1.4rem;
+    padding:.2rem;
+}
+.sidebar-menu li a .span {
+    margin-left: 0rem;
+    background: #529bf4;
+    color: #fff;
+    border-radius: 40%;
+    font-size: 1.4rem;
+    padding:.2rem;
+}
+.sidebar-menu li span {
+    margin-left: 0rem;
+    background: #529bf4;
+    color: #fff;
+    border-radius: 40%;
+    font-size: 1.4rem;
+    padding:.2rem;
 }
 #navbar li a.router-link-exact-active {
     color: #0773f7;

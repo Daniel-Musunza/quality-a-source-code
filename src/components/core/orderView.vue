@@ -179,7 +179,29 @@
                       <!-- seen by admin only -->
                       <div v-if="admin" class="order-detail">
                         <label class="key-order-detail">Freelancer:</label>
-                        <span class="value-order-detail">{{order.freelancerUsername}}</span>
+                        <span class="value-order-detail"> 
+                            <router-link
+                                 v-if="order.freelancerData"
+                                 :to="{
+                                 name: 'client-view',
+                                 params: { id: order.freelancerData?.id, orderId: order.freelancerData?.firstName }
+                              }"
+                             >
+                             {{ order.freelancerData?.firstName }}
+                             </router-link></span>
+                    </div>
+                    <div v-if="admin" class="order-detail">
+                        <label class="key-order-detail">Freelancer:</label>
+                        <span class="value-order-detail"> 
+                            <router-link
+                             v-if="order.clientData"
+                             :to="{
+                             name: 'client-view',
+                            params: { id: order.clientData?.id, orderId: order.clientData?.firstName }
+                             }"
+                             >
+                            {{ order.clientData?.firstName }}
+                            </router-link></span>
                     </div>
                     <div v-if="admin" class="order-detail">
                         <label class="key-order-detail">Reviewer:</label>
@@ -214,8 +236,20 @@
                             <i class="fa rating 
                             fa-star rated"></i></span>
                     </div>
-                    <input v-if="admin" type="number" v-model="payment" name="payment" placeholder="Freelancer Payment" style="border-radius: 5px; width:170px; height: 40px">
-                
+                    <div class="order-detail">
+                     <input v-if="admin" type="number" v-model="payment" name="payment" placeholder="Freelancer Payment" style="border-radius: 5px; width:170px; height: 40px">
+                     </div>
+                     <div  style="background-color:#71affb; color:rgb(11, 10, 10);" v-if="freelancer" class="order-detail">
+                        <h3 style="align-item: center;  font-weight: 600;">Submit</h3>
+                        <form type="submit">
+                            <input type="file" ref="orderFile" id="order-file" @change="fileChange"  name="avatar" class="form-control">
+                            <input type="text" class="form-control form-control-lg input-lg " placeholder="Paste the link here if available" 
+                            v-model="submissionLink">
+                            <button @click.prevent="submitTask()" class="btn btn-info btn-take">
+                                Submit
+                            </button>
+                         </form>
+                    </div>
                   </div>
               </div>
                   </div>
@@ -227,7 +261,10 @@
 </template>
 
 <script>
-import { getFirestore, doc, updateDoc, collection, getDoc, setDoc, deleteDoc } from "firebase/firestore"; 
+import { getFirestore, doc, updateDoc, collection, getDoc, setDoc, deleteDoc } from "firebase/firestore";
+import { getStorage ,ref, getDownloadURL, uploadBytesResumable} from "firebase/storage"; 
+import { reactive, toRefs } from 'vue';
+import {db} from "@/firebase";
 import SideBar from "@/components/core/SideBar.vue";
 import Header from "@/components/core/Header.vue";
 import ModalItem from "@/components/ModalItem";
@@ -347,37 +384,169 @@ export default {
                 console.error("Error bidding order:", error);
             }
             this.bidtext = null;
-        }
+        },
+        fileChange() {
+            if (this.$refs.orderFile && this.$refs.orderFile.files.length > 0) {
+                this.file = this.$refs.orderFile.files[0];
+                const fileName = this.file.name;
+                this.$store.commit("orderFileNameChange", fileName);
+                this.$store.commit("createOrderFileURL", URL.createObjectURL(this.file));
+            }else {
+                console.log("no file");
+            }
+         },
+         async submitTask() {
+          if (this.submissionLink.length !== 0 || !this.file) {
+            this.loading = true;
+            if (this.file) {
+             
+               this.loading = true;
+                const storage = getStorage();
+                const storageRef = ref(
+                storage,
+                `documents/submitedFiles/${this.$store.state.orderFileName}`
+                );
+                const uploadTask = uploadBytesResumable(storageRef, this.file);
+                uploadTask.on(
+                "state_changed",
+                (snapshot) => {
+                    console.log(snapshot);
+                },
+                (err) => {
+                    console.log(err);
+                    this.loading = false;
+                },
+                async () => {
+                  const downloadURL = await getDownloadURL(storageRef);
+                  const db = getFirestore();
+                  const timestamp = await Date.now();
 
+                  //adding to admins/reviewer reviews
+                  const ordersRef = collection(db, 'inreview_orders');
+                  const newOrderRef = doc(ordersRef, this.order.id);
+                    await setDoc(newOrderRef, {
+                       ...this.order,
+                       status: "in Review",
+                       submitedCoverFile: downloadURL,
+                       submitedCoverFileName: this.$store.state.orderFileName,
+                       submissionLink: this.submissionLink,
+                       date: timestamp,
+
+                    });
+
+                    //adding to freelancer reviews
+                    const orderFreelancerRef = doc(db, 'users', this.order.freelancer);
+                  
+                    const reviewsRef = collection(orderFreelancerRef, 'inReview');
+                    const reviewOrderRef = doc(reviewsRef, this.order.id);
+                    await setDoc(reviewOrderRef, {
+                       ...this.order,
+                       status: "in Review",
+                       submitedCoverFile: downloadURL,
+                       submitedCoverFileName: this.$store.state.orderFileName,
+                       submissionLink: this.submissionLink,
+                       date: timestamp,
+
+                    });
+
+                    //updating clients status to be on review
+                    const orderClientRef = doc(db, 'users', this.order.client);
+                    const orderClientOrdersRef = collection(orderClientRef, 'orders');   
+                    const orderClientDocRef = doc(orderClientOrdersRef, this.order.id);
+                    await updateDoc(orderClientDocRef, {
+                        status: "in Review",
+                    }); 
+
+                  await this.$store.dispatch("getInReview");
+                  this.loading = false;
+                  this.$router.push("/freelancer-dashboard");
+               
+                }
+              );
+              return;
+            }
+             else {
+                const db = getFirestore();
+                  const timestamp = await Date.now();
+                  const ordersRef = collection(db, 'inreview_orders');
+                  const newOrderRef = doc(ordersRef, this.order.id);
+                    await setDoc(newOrderRef, {
+                       ...this.order,
+                       status: "in Review",
+                       submissionLink: this.submissionLink,
+                       date: timestamp,
+
+                    });
+
+                    //adding to freelancer reviews
+                    try {
+                        const orderFreelancerRef = doc(db, 'users', this.order.freelancer);
+                        console.log(orderFreelancerRef);
+                        
+                        const reviewsRef = collection(orderFreelancerRef, 'inReview');
+                        const reviewOrderRef = doc(reviewsRef, this.order.id);
+                        
+                        await setDoc(reviewOrderRef, {
+                            ...this.order,
+                            status: "in Review",
+                            submissionLink: this.submissionLink,
+                            date: timestamp,
+                        });
+                     } catch (error) {
+                        console.error("Error occurred:", error);
+                     }
+
+
+                    const orderClientRef = doc(db, 'users', this.order.client);
+                    const orderClientOrdersRef = collection(orderClientRef, 'orders');   
+                    const orderClientDocRef = doc(orderClientOrdersRef, this.order.id);
+                    await updateDoc(orderClientDocRef, {
+                        status: "in Review",
+                    }); 
+                  await this.$store.dispatch("getInReview");
+                  this.loading = false;
+                  this.$router.push("/freelancer-dashboard");
+                return;
+            }
+
+            
+          }
+          this.error = true;
+          this.errorMsg = "Please ensure all fields necessary have been filled!";
+          setTimeout(() => {
+            this.error = false;
+          }, 5000);
+          return;
+        },
   },
 
     computed: {
         admin() {
           return this.$store.state.profileAdmin;
-     },
-     freelancer() {
-          return this.$store.state.profileFreelancer;
-    },
-    reviewer() {
-          return this.$store.state.profileReviewer;
-    },
-    ...mapState(['orders']),
-    ...mapState(['forwarded_orders']),
-    ...mapState(['tobebidded_orders']),
-    order () {
-    const orderId = this.$route.params.id;
-    const order = this.orders.find(order => order.id === orderId);
-    const forwarded = this.forwarded_orders.find(order => order.id === orderId);
-    const tobebidded = this.tobebidded_orders.find(order => order.id === orderId);
-    if (order) {
-        return order;
-    } else if (forwarded) {
-        return forwarded;
-    } else if (tobebidded) {
-        return tobebidded;
-    }
-    },
-    payment: {
+        },
+        freelancer() {
+            return this.$store.state.profileFreelancer;
+        },
+        reviewer() {
+            return this.$store.state.profileReviewer;
+        },
+        ...mapState(['orders']),
+        ...mapState(['forwarded_orders']),
+        ...mapState(['tobebidded_orders']),
+        order () {
+        const orderId = this.$route.params.id;
+        const order = this.orders.find(order => order.id === orderId);
+        const forwarded = this.forwarded_orders.find(order => order.id === orderId);
+        const tobebidded = this.tobebidded_orders.find(order => order.id === orderId);
+        if (order) {
+            return order;
+        } else if (forwarded) {
+            return forwarded;
+        } else if (tobebidded) {
+            return tobebidded;
+        }
+        },
+       payment: {
           get() {
             return this.$store.state.payment;
           },
@@ -393,12 +562,46 @@ export default {
             this.$store.commit("updateStatus", payload);
           },
         },
+        inprogress() {
+            const orderId = this.order.id;
+            const inprogressCollectionRef = collection(db, "incomplete");
+            return doc(inprogressCollectionRef, orderId);
+        }
     },
-async created() {
+    async created() {
+        if (this.order.freelancer) {
+            const userRef = doc(collection(db, "users"), this.order.freelancer);
+            const userSnapshot = await getDoc(userRef);
+            const freelancerData = userSnapshot.data();
 
-console.log("this order " + this.order.orderCategory);
-console.log("this order " + this.order.payment);
-},
+            this.order.freelancerData = reactive({
+            firstName: freelancerData.firstName,
+            lastName: freelancerData.lastName,
+            phoneNumber: freelancerData.phoneNumber,
+            email: freelancerData.email,
+            id: freelancerData.id,
+            });
+        }
+
+        if (this.order.client) {
+            const userRef = doc(collection(db, "users"), this.order.client);
+            const userSnapshot = await getDoc(userRef);
+            const clientData = userSnapshot.data();
+
+            this.order.clientData = reactive({
+            firstName: clientData.firstName,
+            lastName: clientData.lastName,
+            phoneNumber: clientData.phoneNumber,
+            email: clientData.email,
+            id: clientData.id,
+            });
+        }
+
+        // Convert reactive properties to refs for template usage
+        const refs = toRefs(this.order);
+        Object.assign(this.order, refs);
+        }
+
 }
 </script>
 

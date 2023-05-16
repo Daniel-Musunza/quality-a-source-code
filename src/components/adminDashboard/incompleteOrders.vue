@@ -10,7 +10,7 @@
                     </div>
                     <div class="card-body">
                     <div class="table-responsive">
-                        <table width="100%">
+                        <table  v-if="incomplete_orders" width="100%">
                             <thead>
                                 <tr>
                                     <td>NO:</td>
@@ -28,14 +28,26 @@
                                         <td>{{order.id}}</td>
                                         <td>{{ order.orderTitle }}</td>
                                         <td>
-                                            <router-link :to="{ name: 'client-view', params: {id: order.freelancerData.id, orderId: order.freelancerData.firstName}}">
-                                            {{ order.freelancerData.firstName }}
-                                           </router-link>
+                                            <router-link
+                                                v-if="order.freelancerData"
+                                                :to="{
+                                                name: 'client-view',
+                                                params: { id: order.freelancerData?.id, orderId: order.freelancerData?.firstName }
+                                                }"
+                                            >
+                                                {{ order.freelancerData?.firstName }}
+                                            </router-link>
                                         </td>
                                         <td>
-                                            <router-link :to="{ name: 'client-view', params: {id: order.clientData.id, orderId: order.clientData.firstName}}">
-                                            {{ order.clientData.firstName }}
-                                           </router-link>
+                                            <router-link
+                                                v-if="order.clientData"
+                                                :to="{
+                                                name: 'client-view',
+                                                params: { id: order.clientData?.id, orderId: order.clientData?.firstName }
+                                                }"
+                                            >
+                                                {{ order.clientData?.firstName }}
+                                            </router-link>
                                         </td>
                                         <td>{{ order.dueDate }} {{ order.dueTime }}</td>
                                     <td> 
@@ -44,9 +56,12 @@
                                             </router-link>
                                     </td>
                             </tr>
-                         
+                        
                             </tbody>
                         </table>
+                        <div v-else>
+                             Loading...
+                        </div>
                     </div>
                     </div>
                 </div>
@@ -57,7 +72,7 @@
 <script>
 import SideBar from "@/components/core/SideBar.vue";
 import Header from "@/components/core/Header.vue";
-import {getDoc, getDocs, doc, getFirestore, collection } from 'firebase/firestore'
+import {getDoc, getDocs, doc, getFirestore, collection } from 'firebase/firestore';
 export default {
     components: {
         SideBar, 
@@ -84,13 +99,14 @@ export default {
         const db = getFirestore();
         const orderRef = collection(db, 'incomplete_orders');
         const snapshot = await getDocs(orderRef);
-        this.incomplete_orders = snapshot.docs.map(doc => doc.data());
+        const incompleteOrders = snapshot.docs.map(doc => doc.data());
 
-        this.incomplete_orders.forEach(async order => {
+        const promises = incompleteOrders.map(async order => {
             if (order.freelancer) {
             const userRef = doc(collection(db, "users"), order.freelancer);
             const userSnapshot = await getDoc(userRef);
             const freelancerData = userSnapshot.data();
+
             order.freelancerData = {
                 firstName: freelancerData.firstName,
                 lastName: freelancerData.lastName,
@@ -98,13 +114,15 @@ export default {
                 email: freelancerData.email,
                 id: freelancerData.id,
             };
-            } else{
-                console.log("no userID");
+            } else {
+            console.log("no userID");
             }
+
             if (order.client) {
             const userRef = doc(collection(db, "users"), order.client);
             const userSnapshot = await getDoc(userRef);
             const clientData = userSnapshot.data();
+
             order.clientData = {
                 firstName: clientData.firstName,
                 lastName: clientData.lastName,
@@ -112,11 +130,18 @@ export default {
                 email: clientData.email,
                 id: clientData.id,
             };
-            } else{
-                console.log("no userID");
+            } else {
+            console.log("no userID");
             }
         });
-}
+
+        // Wait for all promises to resolve
+        await Promise.all(promises);
+
+        // Assign the completed data to the component property
+        this.incomplete_orders = incompleteOrders;
+        }
+
 
 }
 </script>

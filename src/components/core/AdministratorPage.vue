@@ -84,7 +84,7 @@ import { getFunctions, httpsCallable } from "firebase/functions";
     <style scoped>
       .main-content {
       
-        background-color: rgb(108, 142, 235);
+        background-color:  #529bf4;
         /* margin-left: 200px; */
         margin-top: 40px;
         display: flex;
