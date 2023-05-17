@@ -17,7 +17,7 @@
                     </router-link>
                     <router-link to="/admin/complete-orders" v-if="admin" class="card-single">
                         <div>
-                            <h1>79</h1>
+                            <h1>{{ complete_orders.length }}</h1>
                             <span>Complete Orders</span>
                         </div>
                         <div>
@@ -111,8 +111,8 @@
                     </router-link>
                     <router-link to="/freelancer/completed" v-if="freelancer" class="card-single">
                         <div>
-                            <h1>0</h1>
-                            <span>Completed</span>
+                            <h1>{{ done_orders.length }}</h1>
+                            <span>Done</span>
                         </div>
                         <div>
                             <span ><i class="fa fa-clipboard" aria-hidden="true"></i></span>
@@ -383,6 +383,8 @@ export default {
         ...mapActions(['getOrders']),
          ...mapActions(['getTobebiddedOrders']),
          ...mapActions(['getIncompleteOrders']),
+         ...mapActions(['getCompleteOrders']),
+         ...mapActions(['getDoneOrders']),
          ...mapActions(['getIncomplete']),
     },
     computed: {
@@ -395,6 +397,8 @@ export default {
         ...mapState(['orders']),
         ...mapState(['tobebidded_orders']),
         ...mapState(['incomplete_orders']),
+        ...mapState(['complete_orders']),
+        ...mapState(['done_orders']),
         ...mapState(['incomplete']),
         ...mapState(['inReview'])
   },
@@ -403,6 +407,8 @@ export default {
     this.getOrders();
     this.getTobebiddedOrders();
     this.getIncompleteOrders();
+    this.getCompleteOrders();
+    this.getDoneOrders();
     this.getIncomplete();
   }
  

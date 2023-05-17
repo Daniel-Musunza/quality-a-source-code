@@ -26,64 +26,37 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                   <td>1</td>
-                                    <td>
-                                       345678909
-                                    </td>
-                                    <td>Poster Design</td>
-                                    <td>John</td>
-                                    <td> James</td>
-                                    <td>9/02/2023</td>
+                                <tr v-for="(order, index) in complete_orders" :key="order.id">
+                                        <td>{{index + 1}}</td>
+                                        <td>{{order.id}}</td>
+                                        <td>{{ order.orderTitle }}</td>
+                                        <td>
+                                            <router-link
+                                                v-if="order.freelancerData"
+                                                :to="{
+                                                name: 'client-view',
+                                                params: { id: order.freelancerData?.id, orderId: order.freelancerData?.firstName }
+                                                }"
+                                            >
+                                                {{ order.freelancerData?.firstName }}
+                                            </router-link>
+                                        </td>
+                                        <td>
+                                            <router-link
+                                                v-if="order.clientData"
+                                                :to="{
+                                                name: 'client-view',
+                                                params: { id: order.clientData?.id, orderId: order.clientData?.firstName }
+                                                }"
+                                            >
+                                                {{ order.clientData?.firstName }}
+                                            </router-link>
+                                        </td>
+                                        <td>{{ order.dueDate }} {{ order.dueTime }}</td>
                                     <td> 
-                                        <router-link to="/order-view">
-                                            View Details
-                                        </router-link>
-                                    </td>
-                                </tr>
-                                <tr>
-                                   <td>2</td>
-                                    <td>
-                                       345678909
-                                    </td>
-                                    <td>Poster Design</td>
-                                    <td>John</td>
-                                    <td> James</td>
-                                    <td>9/02/2023</td>
-                                    <td> 
-                                        <router-link to="/order-view">
-                                            View Details
-                                        </router-link>
-                                    </td>
-                                </tr>
-                                <tr>
-                                   <td>3</td>
-                                    <td>
-                                       345678909
-                                    </td>
-                                    <td>Poster Design</td>
-                                    <td>John</td>
-                                    <td> James</td>
-                                    <td>9/02/2023</td>
-                                    <td> 
-                                        <router-link to="/order-view">
-                                            View Details
-                                        </router-link>
-                                    </td>
-                                </tr>
-                                <tr>
-                                   <td>4</td>
-                                    <td>
-                                       345678909
-                                    </td>
-                                    <td>Poster Design</td>
-                                    <td>John</td>
-                                    <td> James</td>
-                                    <td>9/02/2023</td>
-                                    <td> 
-                                        <router-link to="/order-view">
-                                            View Details
-                                        </router-link>
+                                        <router-link :to="{ name: 'order-view', params: {id: order.id}}">
+                                                View Details
+                                            </router-link>
                                     </td>
                                 </tr>
                          
@@ -99,6 +72,7 @@
 <script>
 import SideBar from "@/components/core/SideBar.vue";
 import Header from "@/components/core/Header.vue";
+import {getDoc, getDocs, doc, getFirestore, collection } from 'firebase/firestore';
 export default {
     components: {
         SideBar, 
@@ -108,7 +82,9 @@ export default {
         return {
             available: null,
             profileMenu: null,
-
+            complete_orders: [],
+            freelancerData: null,
+            clientData: null,
         }
     },
     methods: {
@@ -118,7 +94,53 @@ export default {
         toggleProfileMenu(){
             this.profileMenu= !this.profileMenu
         },
-    }
+    },
+    async created() {
+        const db = getFirestore();
+        const orderRef = collection(db, 'complete_orders');
+        const snapshot = await getDocs(orderRef);
+        const completeOrders = snapshot.docs.map(doc => doc.data());
+
+        const promises = completeOrders.map(async order => {
+            if (order.freelancer) {
+            const userRef = doc(collection(db, "users"), order.freelancer);
+            const userSnapshot = await getDoc(userRef);
+            const freelancerData = userSnapshot.data();
+
+            order.freelancerData = {
+                firstName: freelancerData.firstName,
+                lastName: freelancerData.lastName,
+                phoneNumber: freelancerData.phoneNumber,
+                email: freelancerData.email,
+                id: freelancerData.id,
+            };
+            } else {
+            console.log("no userID");
+            }
+
+            if (order.client) {
+            const userRef = doc(collection(db, "users"), order.client);
+            const userSnapshot = await getDoc(userRef);
+            const clientData = userSnapshot.data();
+
+            order.clientData = {
+                firstName: clientData.firstName,
+                lastName: clientData.lastName,
+                phoneNumber: clientData.phoneNumber,
+                email: clientData.email,
+                id: clientData.id,
+            };
+            } else {
+            console.log("no userID");
+            }
+        });
+
+        // Wait for all promises to resolve
+        await Promise.all(promises);
+
+        // Assign the completed data to the component property
+        this.complete_orders = completeOrders;
+        }
 }
 </script>
 

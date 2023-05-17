@@ -47,8 +47,8 @@
                 </li>
                 <li v-if="freelancer">
                     <router-link to="/freelancer/completed"><i class="fa fa-clipboard" aria-hidden="true"></i>
-                   Completed
-                    <span class="li-span">0</span>
+                   Done
+                   <span class="li-span">{{ done_orders.length }}</span>
                     </router-link>
                 </li>
                 <li v-if="freelancer">
@@ -86,7 +86,7 @@
                     </router-link>
                 </li>
                 <li v-if="admin">
-                    <div @click="toggleAvailable">
+                    <div @click="toggleAvailable()">
                     <i class="fa fa-clipboard" aria-hidden="true"></i>
                    Orders
                     <span class="down"><i class="fa-sharp fa-solid fa-angle-down"></i></span>
@@ -94,6 +94,8 @@
                     <div v-if="available" class="available">
                         <router-link to="/admin/received" >Received<span class="span">{{orders.length}}</span></router-link>
                         <router-link to="/admin/fowarded">Fowarded <span class="span">{{ forwarded_orders.length}}</span></router-link>
+                        <router-link to="/admin/inreview-orders"> In Review <span class="span">{{ inreview_orders.length }}</span></router-link>
+                    <router-link to="/admin/complete-orders"> Completed <span class="span">{{ complete_orders.length }}</span></router-link>
                     </div>
                 </li>
                 <li v-if="admin">
@@ -105,11 +107,6 @@
                 <li v-if="admin">
                     <router-link to="/admin/accounts"><i class="fa-solid fa-file-invoice"></i>
                    Accounts
-                    </router-link>
-                </li>
-                <li v-if="admin">
-                    <router-link to="/admin/inreview-orders"><i class="fa fa-clipboard" aria-hidden="true"></i>
-                   In Review <span class="li-span">{{ inreview_orders.length }}</span>
                     </router-link>
                 </li>
                 <li v-if="admin">
@@ -142,7 +139,7 @@
             <li v-if="!admin&&!freelancer">
                 <router-link to="/client/done">
                     <i class="fa fa-clipboard" aria-hidden="true"></i>
-              Done
+              Completed <span class="span">{{done_orders.length}}</span>
                 </router-link>
             </li>
             <li v-if="!admin&&!freelancer">
@@ -195,6 +192,10 @@ export default {
         ...mapActions(['getOrders']),
         ...mapActions(['getForwardedOrders']),
         ...mapActions(['getTobebiddedOrders']),
+        ...mapActions(['getCompleteOrders']),
+        ...mapActions(['getInreviewOrders']),
+        ...mapActions(['getDoneOrders']),
+        ...mapActions(['getInreview']),
         ...mapActions(['getMyBids']),
         ...mapActions(['getInvited']),
         ...mapActions(['getIncomplete'])
@@ -209,6 +210,8 @@ export default {
     ...mapState(['incomplete']),
     ...mapState(['inReview']),
     ...mapState(['clientOrders']),
+    ...mapState(['done_orders']),
+    ...mapState(['complete_orders']),
         admin() {
           return this.$store.state.profileAdmin;
      },
@@ -220,6 +223,10 @@ export default {
     this.getOrders();
     this.getForwardedOrders();
     this.getTobebiddedOrders();
+    this.getInreviewOrders();
+    this.getCompleteOrders();
+    this.getDoneOrders();
+    this.getInreview();
     this.getMyBids();
     this.getInvited();
     this.getIncomplete();

@@ -30,10 +30,12 @@ export default createStore({
             invited: [],
             incomplete: [],
             inReview: [],
+            done_orders: [],
             forwarded_orders: [],
             tobebidded_orders: [],
             incomplete_orders: [],
             inreview_orders: [],
+            complete_orders: [],
             postloaded: null,
             orderHTML: 'write your instructions here...',
             orderTitle: "",
@@ -58,10 +60,12 @@ export default createStore({
     invited: state => state.invited,
     incomplete: state => state.incomplete,
     inReview: state => state.inReview,
+    done_orders: state => state.done_orders,
     forwarded_orders: state => state.forwarded_orders,
     tobebidded_orders: state => state.tobebidded_orders, 
     incomplete_orders: state => state.incomplete_orders,
     inreview_orders: state => state.inreview_orders,
+    complete_orders: state => state.complete_orders,
     clientOrders: state => state.clientOrders,
     user(state){
       return state.user
@@ -133,6 +137,12 @@ export default createStore({
   },
   setInreviewOrderState(state, payload){
     state.inreview_orders = payload;
+},
+setCompleteOrderState(state, payload){
+  state.complete_orders = payload;
+},
+setDoneOrderState(state, payload){
+  state.done_orders = payload;
 },
       setMyBidsState(state, payload){
             state.myBids = payload;
@@ -263,6 +273,11 @@ export default createStore({
         const data = querySnapshot.docs.map((doc) => doc.data());
         commit('setInreviewOrderState', data);
       },
+      async getCompleteOrders({ commit }) {
+        const querySnapshot = await getDocs(collection(db, "complete_orders"));
+        const data = querySnapshot.docs.map((doc) => doc.data());
+        commit('setCompleteOrderState', data);
+      },
       async getMyBids({ commit}) {
         onAuthStateChanged(getAuth(), async (user) => {
           if (user) {
@@ -323,6 +338,23 @@ export default createStore({
               const querySnapshot = await getDocs(ordersRef);
               const data = querySnapshot.docs.map((doc) => doc.data());
               commit('setInreviewState', data);
+            } catch (error) {
+              console.error(error);
+            }
+          } else {
+            console.log('No user is currently logged in.');
+          }
+        });
+      },  
+      async getDoneOrders({ commit}) {
+        onAuthStateChanged(getAuth(), async (user) => {
+          if (user) {
+            const userRef = doc(db, 'users', user.uid);
+            const ordersRef = collection(userRef, 'done_orders');   
+            try {
+              const querySnapshot = await getDocs(ordersRef);
+              const data = querySnapshot.docs.map((doc) => doc.data());
+              commit('setDoneOrderState', data);
             } catch (error) {
               console.error(error);
             }

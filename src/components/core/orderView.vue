@@ -255,7 +255,10 @@
                      <div style="display:flex; flex-direction: column;">
                         <label class="key-order-detail">Link:</label> <span> <a :href="order.submissionLink"> {{ order.submissionLink}} </a></span>
                         <label class="key-order-detail">File:</label><span>  <a :href="order.submitedCoverFile" download>{{order.submitedCoverFileName}}</a></span>
-                     </div>
+                        <button v-if="admin||reviewer" @click.prevent="submitToClient()" class="btn btn-info btn-take">
+                                Submit To Client
+                            </button>
+                    </div>
                     </div>
                   </div>
               </div>
@@ -474,6 +477,16 @@ export default {
                         submissionLink: this.submissionLink,
                         status: "in Review",
                     }); 
+                    // delete the document from incomplete_orders
+                  const incompleteordersRef = collection(db, 'incomplete_orders');
+                  const incompleteOrderRef = doc(incompleteordersRef, this.order.id);
+                  await deleteDoc(incompleteOrderRef);
+
+                    //delete the document from freelancer incomplete
+                const incompleteRef = collection(orderFreelancerRef, 'incomplete');
+                const incompletedocRef = doc(incompleteRef, this.order.id);
+                await deleteDoc(incompletedocRef); 
+
                   await this.$store.dispatch("getInReview");
                   this.loading = false;
                   this.$router.push("/freelancer-dashboard");
@@ -498,8 +511,6 @@ export default {
                     //adding to freelancer reviews
                     try {
                         const orderFreelancerRef = doc(db, 'users', this.order.freelancer);
-                      
-                        
                         const reviewsRef = collection(orderFreelancerRef, 'inReview');
                         const reviewOrderRef = doc(reviewsRef, this.order.id);
                         
@@ -525,6 +536,16 @@ export default {
                     await updateDoc(incompleteClientDocRef, {
                         status: "in Review",
                     }); 
+                //delete the document from incomplete orders
+                  const incompleteordersRef = collection(db, 'incomplete_orders');
+                  const incompleteOrderRef = doc(incompleteordersRef, this.order.id);
+                  await deleteDoc(incompleteOrderRef);
+
+                  //delete the document from freelancer incomplete
+                const incompleteRef = collection(orderFreelancerRef, 'incomplete');
+                const incompletedocRef = doc(incompleteRef, this.order.id);
+                await deleteDoc(incompletedocRef); 
+
                   await this.$store.dispatch("getInReview");
                   this.loading = false;
                   this.$router.push("/freelancer-dashboard");
@@ -540,8 +561,82 @@ export default {
           }, 5000);
           return;
         },
-  },
+        async submitToClient() {
+            const orderId = this.order.id;
+            this.loading = true;
+            
+            try {
+                const db = getFirestore();
+                
+                //update orders status
+                const ordersCollectionRef = collection(db, "orders");
+                const orderRef = doc(ordersCollectionRef, orderId);
+                await updateDoc(orderRef, {
+                status: "Done",
+                date: new Date(),
+                }); 
+                // Add the current order document to the "complete_orders" collection
+                const completeOrdersCollectionRef = collection(db, "complete_orders");
+                const completeOrderRef = doc(completeOrdersCollectionRef, orderId);
+                
+                await setDoc(completeOrderRef, {
+                ...this.order,
+                status: "Done",
+                date: new Date()
+                });   
 
+                //add done collection to freelancer
+                const freelancerRef = doc(db, 'users', this.order.freelancer);
+                const freelancerordersRef = collection(freelancerRef, 'done_orders');   
+                const freelancerdocRef = doc(freelancerordersRef, orderId);
+                await setDoc(freelancerdocRef, {
+                ...this.order,
+                status: "Done",
+                date: new Date()
+                });   
+
+                //update clients status
+                const userRef = doc(db, 'users', this.order.client);
+                const ordersRef = collection(userRef, 'orders');   
+                const docRef = doc(ordersRef, orderId);
+                await updateDoc(docRef, {
+                    ...this.order,
+                status: "Done",
+                }); 
+                //add Complete collection to client
+                const clientordersRef = collection(userRef, 'done_orders');   
+                const clientdocRef = doc(clientordersRef, orderId);
+                await setDoc(clientdocRef, {
+                ...this.order,
+                status: "Done",
+                date: new Date()
+                });   
+                
+                //delete the document from inreview_orders
+                const inreviewordersRef = collection(db, 'inreview_orders');
+                const inreviewOrderRef = doc(inreviewordersRef, this.order.id);
+                await deleteDoc(inreviewOrderRef);
+
+                  //delete the document from freelancer inReview
+                const inreviewRef = collection(freelancerRef, 'inReview');
+                const inreviewdocRef = doc(inreviewRef, this.order.id);
+                await deleteDoc(inreviewdocRef);
+
+                //delete the document from client incomplete
+                const clientincompleteRef = collection(userRef, 'incomplete');
+                const clientincompletedocRef = doc(clientincompleteRef, this.order.id);
+                await deleteDoc(clientincompletedocRef);
+
+                alert("Order Submited to client successfully!");
+                this.$router.push("/admin/complete-orders");
+                
+            
+            } catch (error) {
+                this.loading = false;
+                console.error("Error forwarding order:", error);
+            }
+        },
+    },
     computed: {
         admin() {
           return this.$store.state.profileAdmin;

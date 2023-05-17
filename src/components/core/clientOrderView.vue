@@ -96,7 +96,13 @@
                         <span class="value-order-detail">{{order.status}}</span>
                         
                     </div>
-                    
+                    <div class="order-detail">
+                        <h3 style="font-weight: 600; color:#041121">Submited Solution</h3>
+                     <div style="display:flex; flex-direction: column;">
+                        <label class="key-order-detail">Link:</label> <span> <a :href="order.submissionLink"> {{ order.submissionLink}} </a></span>
+                        <label class="key-order-detail">File:</label><span>  <a :href="order.submitedCoverFile" download>{{order.submitedCoverFileName}}</a></span>
+                    </div>
+                    </div>
                   
                   </div>
               </div>

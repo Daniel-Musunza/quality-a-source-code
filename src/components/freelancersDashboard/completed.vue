@@ -7,7 +7,7 @@
                 <div class="recent-grid ">
                     <div class="card">
                         <div class="card-header">
-                            <h2>Completed</h2>
+                            <h2>Done Orders</h2>
                         </div>
                         <div class="card-body">
                         <div class="table-responsive">
@@ -25,18 +25,20 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td>34567890</td>
-                                        <td>UI/UX Design</td>
-                                        <td>UI Team</td>
+                                    <tr v-for="(order, index) in done_orders" :key="order.id">
+                                        <td>{{index + 1}}</td>
+                                        <td>{{order.id}}</td>
+                                        <td>{{ order.orderTitle }}</td>
+                                        <td>{{ order.orderCategory }}</td>
                                   
-                                        <td>560</td>
+                                      
+                                        <td>{{ order.payment }}</td>
                                         <td> 
-                                            <router-link to="/order-view">
+                                            <router-link :to="{ name: 'order-view', params: {id: order.id}}">
                                                 View Details
                                             </router-link>
                                         </td>
+                                       
                                     </tr>
                                    
                                 </tbody>
@@ -52,6 +54,7 @@
 <script>
 import SideBar from "@/components/core/SideBar.vue";
 import Header from "@/components/core/Header.vue";
+import { mapState, mapActions } from 'vuex';
 export default {
     components: {
         SideBar, 
@@ -71,8 +74,15 @@ export default {
         },
         toggleProfileMenu(){
             this.profileMenu= !this.profileMenu
-        },
-    }
+        }, 
+        ...mapActions(['getDoneOrders'])
+    },
+    computed: {
+    ...mapState(['done_orders'])
+  },
+  created() {
+    this.getDoneOrders();
+  }
 }
 </script>
 
