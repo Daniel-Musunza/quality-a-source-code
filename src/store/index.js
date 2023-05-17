@@ -29,9 +29,11 @@ export default createStore({
             myBids: [],
             invited: [],
             incomplete: [],
+            inReview: [],
             forwarded_orders: [],
             tobebidded_orders: [],
             incomplete_orders: [],
+            inreview_orders: [],
             postloaded: null,
             orderHTML: 'write your instructions here...',
             orderTitle: "",
@@ -55,9 +57,11 @@ export default createStore({
     myBids: state => state.myBids,
     invited: state => state.invited,
     incomplete: state => state.incomplete,
+    inReview: state => state.inReview,
     forwarded_orders: state => state.forwarded_orders,
     tobebidded_orders: state => state.tobebidded_orders, 
     incomplete_orders: state => state.incomplete_orders,
+    inreview_orders: state => state.inreview_orders,
     clientOrders: state => state.clientOrders,
     user(state){
       return state.user
@@ -127,6 +131,9 @@ export default createStore({
       setIncompleteOrderState(state, payload){
         state.incomplete_orders = payload;
   },
+  setInreviewOrderState(state, payload){
+    state.inreview_orders = payload;
+},
       setMyBidsState(state, payload){
             state.myBids = payload;
       },
@@ -136,6 +143,9 @@ export default createStore({
      setIncompleteState(state, payload){
       state.incomplete = payload;
    },
+   setInreviewState(state, payload){
+    state.inReview = payload;
+ },
       newOrderPost(state, payload) {
             state.orderHTML = payload;
       },
@@ -247,6 +257,12 @@ export default createStore({
         const data = querySnapshot.docs.map((doc) => doc.data());
         commit('setIncompleteOrderState', data);
       },
+      async getInreviewOrders({ commit }) {
+
+        const querySnapshot = await getDocs(collection(db, "inreview_orders"));
+        const data = querySnapshot.docs.map((doc) => doc.data());
+        commit('setInreviewOrderState', data);
+      },
       async getMyBids({ commit}) {
         onAuthStateChanged(getAuth(), async (user) => {
           if (user) {
@@ -297,7 +313,24 @@ export default createStore({
             console.log('No user is currently logged in.');
           }
         });
-      },    
+      },  
+      async getInreview({ commit}) {
+        onAuthStateChanged(getAuth(), async (user) => {
+          if (user) {
+            const userRef = doc(db, 'users', user.uid);
+            const ordersRef = collection(userRef, 'inReview');   
+            try {
+              const querySnapshot = await getDocs(ordersRef);
+              const data = querySnapshot.docs.map((doc) => doc.data());
+              commit('setInreviewState', data);
+            } catch (error) {
+              console.error(error);
+            }
+          } else {
+            console.log('No user is currently logged in.');
+          }
+        });
+      },   
       async getClientOrders({ commit }) {
         onAuthStateChanged(getAuth(), async (user) => {
           if (user) {

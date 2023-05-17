@@ -1,71 +1,90 @@
 <template>
     <input type="checkbox" id="nav-toggle">
-      <SideBar></SideBar>
-        <div class="main-content">
-               <Header></Header>
+  <SideBar></SideBar>
+    <div class="main-content">
+        <Header></Header>
             <main>
-                <div class="recent-grid ">
-                    <div class="card">
-                        <div class="card-header">
-                            <h2>In Review</h2>
-                        </div>
-                        <div class="card-body">
-                        <div class="table-responsive">
-                            <table width="100%">
-                                <thead>
-                                    <tr>
-                                        <td>NO:</td>
-                                        <td>Order ID</td>
-                                        <td>Order Title</td>
-                                        <td>Category</td>
-                                
-                                        <td>Budget($)</td>
-                                        <td></td>
-                                        
-                                      
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="(order, index) in inReview" :key="order.id">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>In Review Orders</h2>
+                    </div>
+                    <div class="card-body">
+                    <div class="table-responsive">
+                        <table  v-if="inreview_orders" width="100%">
+                            <thead>
+                                <tr>
+                                    <td>NO:</td>
+                                    <td>OrderID</td>
+                                    <td>Title</td>
+                                    <td>Freelancer</td>
+                                    <td>Client</td>
+                                    <td>Due Time</td>
+                                    <td></td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(order, index) in inreview_orders" :key="order.id">
                                         <td>{{index + 1}}</td>
                                         <td>{{order.id}}</td>
                                         <td>{{ order.orderTitle }}</td>
-                                        <td>{{ order.orderCategory }}</td>
-                                  
-                                        <td>{{ order.payment }}</td>
-                                        <td> 
-                                            <router-link :to="{ name: 'order-view', params: {id: order.id}}">
-                                                View Details
+                                        <td>
+                                            <router-link
+                                                v-if="order.freelancerData"
+                                                :to="{
+                                                name: 'client-view',
+                                                params: { id: order.freelancerData?.id, orderId: order.freelancerData?.firstName }
+                                                }"
+                                            >
+                                                {{ order.freelancerData?.firstName }}
                                             </router-link>
                                         </td>
-                                       
-                                    </tr>
-                                   
-                                </tbody>
-                            </table>
-                        </div>
+                                        <td>
+                                            <router-link
+                                                v-if="order.clientData"
+                                                :to="{
+                                                name: 'client-view',
+                                                params: { id: order.clientData?.id, orderId: order.clientData?.firstName }
+                                                }"
+                                            >
+                                                {{ order.clientData?.firstName }}
+                                            </router-link>
+                                        </td>
+                                        <td>{{ order.dueDate }} {{ order.dueTime }}</td>
+                                    <td> 
+                                        <router-link :to="{ name: 'order-view', params: {id: order.id}}">
+                                                View Details
+                                            </router-link>
+                                    </td>
+                            </tr>
+                        
+                            </tbody>
+                        </table>
+                        <div v-else>
+                             Loading...
                         </div>
                     </div>
-            </div>
-            </main>
-        </div>
+                    </div>
+                </div>
+    </main>
+    </div>
 </template>
 
 <script>
 import SideBar from "@/components/core/SideBar.vue";
 import Header from "@/components/core/Header.vue";
-import { mapState, mapActions } from 'vuex';
+import {getDoc, getDocs, doc, getFirestore, collection } from 'firebase/firestore';
 export default {
     components: {
         SideBar, 
         Header
     },
-    name: "inReview",
     data () {
         return {
             available: null,
             profileMenu: null,
-
+            inreview_orders: [],
+            freelancerData: null,
+            clientData: null,
         }
     },
     methods: {
@@ -75,14 +94,55 @@ export default {
         toggleProfileMenu(){
             this.profileMenu= !this.profileMenu
         },
-        ...mapActions(['getInreview'])
     },
-    computed: {
-    ...mapState(['inReview'])
-  },
-  created() {
-    this.getInreview();
-  }
+    async created() {
+        const db = getFirestore();
+        const orderRef = collection(db, 'inreview_orders');
+        const snapshot = await getDocs(orderRef);
+        const inreviewOrders = snapshot.docs.map(doc => doc.data());
+
+        const promises = inreviewOrders.map(async order => {
+            if (order.freelancer) {
+            const userRef = doc(collection(db, "users"), order.freelancer);
+            const userSnapshot = await getDoc(userRef);
+            const freelancerData = userSnapshot.data();
+
+            order.freelancerData = {
+                firstName: freelancerData.firstName,
+                lastName: freelancerData.lastName,
+                phoneNumber: freelancerData.phoneNumber,
+                email: freelancerData.email,
+                id: freelancerData.id,
+            };
+            } else {
+            console.log("no userID");
+            }
+
+            if (order.client) {
+            const userRef = doc(collection(db, "users"), order.client);
+            const userSnapshot = await getDoc(userRef);
+            const clientData = userSnapshot.data();
+
+            order.clientData = {
+                firstName: clientData.firstName,
+                lastName: clientData.lastName,
+                phoneNumber: clientData.phoneNumber,
+                email: clientData.email,
+                id: clientData.id,
+            };
+            } else {
+            console.log("no userID");
+            }
+        });
+
+        // Wait for all promises to resolve
+        await Promise.all(promises);
+
+        // Assign the completed data to the component property
+        this.inreview_orders = inreviewOrders;
+        }
+
+
 }
 </script>
 
@@ -117,17 +177,7 @@ export default {
   }
   i{
     padding-right:10px;
-  }
-.sidebar {
-    width: 200px;
-    position: fixed;
-    left: 0;
-    top: 0;
-    height: 100%;
-    background-color: #fff;
-    z-index: 999;
-    transition: margin-left 300ms;
-}
+  } 
 .sidebar-brand{
     height: 90px;
     padding:1rem 0rem 1rem 2rem; 
@@ -143,29 +193,23 @@ export default {
     width: 100%;
     margin-bottom: 1.3rem;
     padding-left: 2rem;
-    font-size: 15px;
+    font-size: 20px;
+}
+.sidebar-menu a {
+    display: block;
+    color: #02060b;
+    padding-bottom: 1rem;
 }
 .sidebar-menu li .available{
     margin-left:3rem ;
+    font-size: 1.3rem;
 }
 .sidebar-menu li .available a span{
     margin-left: 3.1rem;
     background: #79aae6;
     border-radius: 50%;
     padding-left: .5rem;
-    font-size: 1.5rem;
-}
-a .li-span{
-    margin-left: 0rem;
-    background: #79aae6;
-    border-radius: 50%;
-    font-size: 1.5rem;
-    padding-left:.5rem;
-}
-.sidebar-menu a {
-    display: block;
-    color: #02060b;
-    padding-bottom: 1rem;
+    font-size: 1.3rem;
 }
 .sidebar-menu a.active {
     color: #1c68c4;
@@ -232,16 +276,31 @@ header label span {
     font-size: 1.7rem;
     padding-left: 1rem ;
 }
-
+.search-wrapper {
+    border:1px solid #ccc;
+    border-radius: 30px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    overflow: none;
+    width: 300px;
+    margin-right: 50px;
+}
+.search-wrapper  span{
+    display: inline-block;
+    padding: 0rem 1rem;
+    font-size:1.5 rem;
+}
+.search-wrapper input{
+    height: 100%;
+    padding: .5rem;
+    border: none;
+    outline: none;
+}
 .user-wrapper{
     display: flex;
     align-items: center;
     float: right;
-     
-}
-.user-wrapper span{
-    font-size: 25px;
-    margin-right: 30px;
      
 }
 .user-wrapper img{
@@ -292,7 +351,8 @@ main{
 }
 .recent-grid {
     margin-top: 3.5rem;
-
+    display: grid;
+    grid-template-columns: 70% auto;
 }
 .card{
    background: #fff; 
@@ -300,7 +360,6 @@ main{
 .card-header,
 .card-body {
     padding: 1rem;
-    width: 100%;
 }
 .card-header {
     display: flex;
@@ -317,8 +376,7 @@ main{
 }
 table {
     border-collapse:collapse;
-}
-thead tr {
+}thead tr {
     border: 1px solid #1c68c4;;
 }
 tbody tr {
@@ -338,11 +396,56 @@ td i {
     color: #1c68c4;
     padding-right: 1rem;
 }
+tr td:last-child{
+    display: flex;
+    align-items: center;
+}
+.status .purple {
+    background: rebeccapurple;
+
+}
+.status .pink {
+    background: deeppink;
+    
+}
+.status .orange {
+    background: orangered;
+    
+}
 .table-responsive {
     width: 100%;
     overflow-x: auto;
 }
+.customer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .5rem .7rem;
+}
+.info {
+    display: flex;
+    align-items: center;
+}
+.info img {
+    border-radius: 50%;
+    margin-right: 1rem;
+}
+.info h4 {
+    font-size: .8rem;
+    font-weight: 700;
+    color: #222;
 
+}
+.info small {
+    font-weight: 600;
+    color: var(--text-grey);
+}
+.contact span {
+    font-size: 1.2rem;
+    display: inline-block;
+    margin-left: .5rem;
+    color: #1c68c4;
+}
 @media only screen and (max-width:1200px){
    .sidebar {
         width: 70px;

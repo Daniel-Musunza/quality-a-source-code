@@ -42,7 +42,7 @@
                     <router-link to="/freelancer/in-review">
                         <i class="fa-sharp fa-solid fa-font-awesome"></i>
                   In review
-                    <span class="li-span">1</span>
+                    <span class="li-span">{{ inReview.length }}</span>
                     </router-link>
                 </li>
                 <li v-if="freelancer">
@@ -105,6 +105,11 @@
                 <li v-if="admin">
                     <router-link to="/admin/accounts"><i class="fa-solid fa-file-invoice"></i>
                    Accounts
+                    </router-link>
+                </li>
+                <li v-if="admin">
+                    <router-link to="/admin/inreview-orders"><i class="fa fa-clipboard" aria-hidden="true"></i>
+                   In Review <span class="li-span">{{ inreview_orders.length }}</span>
                     </router-link>
                 </li>
                 <li v-if="admin">
@@ -198,9 +203,11 @@ export default {
     ...mapState(['orders']),
     ...mapState(['forwarded_orders']),
     ...mapState(['tobebidded_orders']),
+    ...mapState(['inreview_orders']),
     ...mapState(['myBids']),
     ...mapState(['invited']),
     ...mapState(['incomplete']),
+    ...mapState(['inReview']),
     ...mapState(['clientOrders']),
         admin() {
           return this.$store.state.profileAdmin;
@@ -295,28 +302,28 @@ export default {
     margin-left:3rem ;
 }
 .sidebar-menu li .available a span{
-    margin-left: 0rem;
+    margin-left: 5px;
     background: #529bf4;
     color: #fff;
-    border-radius: 40%;
+    border-radius: 60%;
     font-size: 1.4rem;
-    padding:.2rem;
+    padding-left:5px;
 }
 .sidebar-menu li a .span {
-    margin-left: 0rem;
+    margin-left: 5px;
     background: #529bf4;
     color: #fff;
-    border-radius: 40%;
+    border-radius: 60%;
     font-size: 1.4rem;
-    padding:.2rem;
+    padding-left:5px;
 }
 .sidebar-menu li span {
-    margin-left: 0rem;
+    margin-left: 5px;
     background: #529bf4;
     color: #fff;
-    border-radius: 40%;
+    border-radius: 60%;
     font-size: 1.4rem;
-    padding:.2rem;
+    padding-left:5px;
 }
 #navbar li a.router-link-exact-active {
     color: #0773f7;
@@ -387,7 +394,7 @@ color: #0773f7;
      
 }
 .user-wrapper img{
-    border-radius: 50%;
+    border-radius: 60%;
     margin-right: 1rem;
 }
 .user-wrapper small {

@@ -102,7 +102,7 @@
                     </router-link>
                     <router-link to="/freelancer/in-review" v-if="freelancer" class="card-single">
                         <div>
-                            <h1>0</h1>
+                            <h1>{{ inReview.length }}</h1>
                             <span>In Review</span>
                         </div>
                         <div>
@@ -395,7 +395,8 @@ export default {
         ...mapState(['orders']),
         ...mapState(['tobebidded_orders']),
         ...mapState(['incomplete_orders']),
-        ...mapState(['incomplete'])
+        ...mapState(['incomplete']),
+        ...mapState(['inReview'])
   },
 
   created() {

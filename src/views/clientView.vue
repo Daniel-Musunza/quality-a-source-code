@@ -295,6 +295,13 @@ import {getAuth} from "firebase/auth";
                     status: "in progress",
                 }); 
                 
+                const ordersColRef = collection(db, 'orders');   
+                const orderDocRef = doc(ordersColRef, this.orderId);
+                await updateDoc(orderDocRef, {
+                    freelancer: clientId,
+                    status: "in progress",
+                }); 
+
                 const inprogress = await getDoc(doc(orderClientOrdersRef, this.orderId));
                 const inprogressCollectionRef = collection(orderClientRef, "incomplete");
                 const inprogressRef = doc(inprogressCollectionRef, this.orderId);

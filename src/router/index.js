@@ -57,6 +57,7 @@ import freelancers from '../components/adminDashboard/freelancers.vue'
 import completeOrders from '../components/adminDashboard/completeOrders.vue'
 import fowarded from '../components/adminDashboard/fowarded.vue'
 import incompleteOrders from '../components/adminDashboard/incompleteOrders.vue'
+import inreviewOrders from '../components/adminDashboard/inreviewOrders.vue'
 import allOrders from '../components/adminDashboard/allOrders.vue'
 import received from '../components/adminDashboard/received.vue'
 import revisions from '../components/adminDashboard/revisions.vue'
@@ -482,6 +483,15 @@ const routes = [
     component: incompleteOrders,
     meta: {
       title: "incomplete Orders",
+      requiresAuth: false,
+    }
+  },
+  {
+    path: '/admin/inreview-orders',
+    name: 'admin/inreview-orders',
+    component: inreviewOrders,
+    meta: {
+      title: "in Review Orders",
       requiresAuth: false,
     }
   },

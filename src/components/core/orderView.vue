@@ -191,7 +191,7 @@
                              </router-link></span>
                     </div>
                     <div v-if="admin" class="order-detail">
-                        <label class="key-order-detail">Freelancer:</label>
+                        <label class="key-order-detail">Client: </label>
                         <span class="value-order-detail"> 
                             <router-link
                              v-if="order.clientData"
@@ -211,14 +211,14 @@
                                   <!-- seen by admin and freelancer only -->
                     <div v-if="admin||freelancer" class="order-detail">
                         <label class="key-order-detail">Payment:</label>
-                        <span class="value-order-detail">$ {{order.Payment }}</span>
+                        <span class="value-order-detail">$ {{ order.payment }}</span>
                         
                     </div>
                   
                     <!-- upto here -->
                     <div class="order-detail">
                         <label class="key-order-detail">Status:</label>
-                        <span class="value-order-detail">{{order.Status}}</span>
+                        <span class="value-order-detail">{{ order.status}}</span>
                         
                     </div>
                     <div class="order-detail">
@@ -239,7 +239,7 @@
                     <div class="order-detail">
                      <input v-if="admin" type="number" v-model="payment" name="payment" placeholder="Freelancer Payment" style="border-radius: 5px; width:170px; height: 40px">
                      </div>
-                     <div  style="background-color:#71affb; color:rgb(11, 10, 10);" v-if="freelancer" class="order-detail">
+                     <div  style="background-color:#71affb; color:rgb(11, 10, 10);" v-if="freelancer&&inprogress" class="order-detail">
                         <h3 style="align-item: center;  font-weight: 600;">Submit</h3>
                         <form type="submit">
                             <input type="file" ref="orderFile" id="order-file" @change="fileChange"  name="avatar" class="form-control">
@@ -249,6 +249,13 @@
                                 Submit
                             </button>
                          </form>
+                    </div>
+                    <div class="order-detail">
+                        <h3 style="font-weight: 600; color:#041121">Submited Solution</h3>
+                     <div style="display:flex; flex-direction: column;">
+                        <label class="key-order-detail">Link:</label> <span> <a :href="order.submissionLink"> {{ order.submissionLink}} </a></span>
+                        <label class="key-order-detail">File:</label><span>  <a :href="order.submitedCoverFile" download>{{order.submitedCoverFileName}}</a></span>
+                     </div>
                     </div>
                   </div>
               </div>
@@ -263,7 +270,7 @@
 <script>
 import { getFirestore, doc, updateDoc, collection, getDoc, setDoc, deleteDoc } from "firebase/firestore";
 import { getStorage ,ref, getDownloadURL, uploadBytesResumable} from "firebase/storage"; 
-import { reactive, toRefs } from 'vue';
+
 import {db} from "@/firebase";
 import SideBar from "@/components/core/SideBar.vue";
 import Header from "@/components/core/Header.vue";
@@ -285,6 +292,7 @@ export default {
             userData: null,
              bidtext: null,
              loading: null,
+             order: null,
         }
     },
     methods: {
@@ -457,6 +465,15 @@ export default {
                         status: "in Review",
                     }); 
 
+                    //updating orders collection
+                    const ordersColRef = collection(db, 'orders');   
+                    const docRef = doc(ordersColRef, this.order.id);
+                    await updateDoc(docRef, {
+                        submitedCoverFile: downloadURL,
+                        submitedCoverFileName: this.$store.state.orderFileName,
+                        submissionLink: this.submissionLink,
+                        status: "in Review",
+                    }); 
                   await this.$store.dispatch("getInReview");
                   this.loading = false;
                   this.$router.push("/freelancer-dashboard");
@@ -481,7 +498,7 @@ export default {
                     //adding to freelancer reviews
                     try {
                         const orderFreelancerRef = doc(db, 'users', this.order.freelancer);
-                        console.log(orderFreelancerRef);
+                      
                         
                         const reviewsRef = collection(orderFreelancerRef, 'inReview');
                         const reviewOrderRef = doc(reviewsRef, this.order.id);
@@ -501,6 +518,11 @@ export default {
                     const orderClientOrdersRef = collection(orderClientRef, 'orders');   
                     const orderClientDocRef = doc(orderClientOrdersRef, this.order.id);
                     await updateDoc(orderClientDocRef, {
+                        status: "in Review",
+                    }); 
+                    const incompleteClientOrdersRef = collection(orderClientRef, 'incomplete');   
+                    const incompleteClientDocRef = doc(incompleteClientOrdersRef, this.order.id);
+                    await updateDoc(incompleteClientDocRef, {
                         status: "in Review",
                     }); 
                   await this.$store.dispatch("getInReview");
@@ -531,76 +553,62 @@ export default {
             return this.$store.state.profileReviewer;
         },
         ...mapState(['orders']),
-        ...mapState(['forwarded_orders']),
-        ...mapState(['tobebidded_orders']),
-        order () {
-        const orderId = this.$route.params.id;
-        const order = this.orders.find(order => order.id === orderId);
-        const forwarded = this.forwarded_orders.find(order => order.id === orderId);
-        const tobebidded = this.tobebidded_orders.find(order => order.id === orderId);
-        if (order) {
-            return order;
-        } else if (forwarded) {
-            return forwarded;
-        } else if (tobebidded) {
-            return tobebidded;
-        }
-        },
-       payment: {
-          get() {
-            return this.$store.state.payment;
-          },
-          set(payload) {
-            this.$store.commit("updatepayment", payload);
-          },
-        },
-        status: {
-          get() {
-            return this.$store.state.status;
-          },
-          set(payload) {
-            this.$store.commit("updateStatus", payload);
-          },
-        },
-        inprogress() {
-            const orderId = this.order.id;
-            const inprogressCollectionRef = collection(db, "incomplete");
-            return doc(inprogressCollectionRef, orderId);
-        }
+
+        inprogress: {
+            get() {
+                const orderId = this.order?.id; // Optional chaining to handle `this.order` being `undefined`
+                if (orderId) {
+                const inprogressCollectionRef = collection(db, "incomplete");
+                return doc(inprogressCollectionRef, orderId);
+                }
+                return null; // Return null if `this.order` is `undefined` or `orderId` is falsy
+            }
+            }
+
     },
     async created() {
-        if (this.order.freelancer) {
+
+        const orderId = this.$route.params.id;
+        const order = this.orders.find(order => order.id === orderId);
+            order.type = 'order'; // Set a property to differentiate the order type
+            this.order = order;
+          
+       console.log(this.order.submissionLink);
+        if (this.order && this.order.freelancer) {
             const userRef = doc(collection(db, "users"), this.order.freelancer);
             const userSnapshot = await getDoc(userRef);
             const freelancerData = userSnapshot.data();
-
-            this.order.freelancerData = reactive({
-            firstName: freelancerData.firstName,
-            lastName: freelancerData.lastName,
-            phoneNumber: freelancerData.phoneNumber,
-            email: freelancerData.email,
-            id: freelancerData.id,
-            });
+          
+            if (freelancerData) {
+            this.order.freelancerData = {
+                firstName: freelancerData.firstName,
+                lastName: freelancerData.lastName,
+                phoneNumber: freelancerData.phoneNumber,
+                email: freelancerData.email,
+                id: freelancerData.id,
+            };
+            }
+        } else {
+            console.log("no userID");
         }
 
-        if (this.order.client) {
+        if (this.order && this.order.client) {
             const userRef = doc(collection(db, "users"), this.order.client);
             const userSnapshot = await getDoc(userRef);
             const clientData = userSnapshot.data();
 
-            this.order.clientData = reactive({
-            firstName: clientData.firstName,
-            lastName: clientData.lastName,
-            phoneNumber: clientData.phoneNumber,
-            email: clientData.email,
-            id: clientData.id,
-            });
+            if (clientData) {
+            this.order.clientData = {
+                firstName: clientData.firstName,
+                lastName: clientData.lastName,
+                phoneNumber: clientData.phoneNumber,
+                email: clientData.email,
+                id: clientData.id,
+            };
+            }
+        }
         }
 
-        // Convert reactive properties to refs for template usage
-        const refs = toRefs(this.order);
-        Object.assign(this.order, refs);
-        }
 
 }
 </script>
