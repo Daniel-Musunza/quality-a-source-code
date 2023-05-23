@@ -35,7 +35,7 @@
                 </router-link>
                 <router-link to="/client/revision" class="card-single">
                     <div>
-                        <h1>0</h1>
+                        <h1>{{ onRevision.length }}</h1>
                         <span>On Revision</span>
                     </div>
                     <div>
@@ -97,7 +97,7 @@
 <script>
 import SideBar from "@/components/core/SideBar.vue";
 import Header from "@/components/core/Header.vue";
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 export default {
     components: {
         SideBar, 
@@ -117,11 +117,19 @@ export default {
         toggleProfileMenu(){
             this.profileMenu= !this.profileMenu
         },
-      
+        ...mapActions(['getClientOrders']),
+         ...mapActions(['getIncomplete']),
+         ...mapActions(['getOnRevision']),
       },
       computed: {
         ...mapState(['clientOrders']),
     ...mapState(['incomplete']),
+    ...mapState(['onRevision']),
+      },
+      created() {
+        this.getClientOrders();
+        this.getIncomplete();
+        this.getOnRevision();
       }
 }
 </script>

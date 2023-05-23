@@ -221,21 +221,7 @@
                         <span class="value-order-detail">{{ order.status}}</span>
                         
                     </div>
-                    <div class="order-detail">
-                        <label class="key-order-detail">Freelancer Ratings:</label>
-                        <br>
-                        <span class="value-order-detail text-info">
-                            <i class="fa rating 
-                            fa-star rated"></i>
-                            <i class="fa rating 
-                            fa-star rated"></i>
-                            <i class="fa rating 
-                            fa-star rated"></i>
-                            <i class="fa rating 
-                            fa-star rated"></i>
-                            <i class="fa rating 
-                            fa-star rated"></i></span>
-                    </div>
+                
                     <div class="order-detail">
                      <input v-if="admin" type="number" v-model="payment" name="payment" placeholder="Freelancer Payment" style="border-radius: 5px; width:170px; height: 40px">
                      </div>
@@ -259,6 +245,28 @@
                                 Submit To Client
                             </button>
                     </div>
+                    </div>
+                    <div class="order-detail">
+                        <label for="">Client's message: </label>
+                        <p>{{ order.message }}</p>
+                    </div>
+                    <div class="order-detail">
+                        <label class="key-order-detail">Task Ratings:</label>
+                        <br>
+                        <span class="value-order-detail text-info">
+                          
+                                                    <i v-if="order.rating === 1 || order.rating === 2 || order.rating === 3 || order.rating === 4 || order.rating === 5" class="fa rating fa-star rated"></i>
+                                                    <i v-if="order.rating === 2 || order.rating === 3 || order.rating === 4 || order.rating === 5" class="fa rating fa-star rated"></i>
+                                                    <i v-if="order.rating === 3 || order.rating === 4 || order.rating === 5" class="fa rating fa-star rated"></i>
+                                                    <i v-if="order.rating === 4 || order.rating === 5" class="fa rating fa-star rated"></i>
+                                                    <i v-if="order.rating === 5" class="fa rating fa-star rated"></i>
+                                                    <i v-if="!(order.rating === 1 || order.rating === 2 || order.rating === 3 || order.rating === 4 || order.rating === 5)" class="fa-regular fa-star"></i>
+                                                    <i v-if="!(order.rating === 2 || order.rating === 3 || order.rating === 4 || order.rating === 5)" class="fa-regular fa-star"></i>
+                                                    <i v-if="!(order.rating === 3 || order.rating === 4 || order.rating === 5)" class="fa-regular fa-star"></i>
+                                                    <i v-if="!(order.rating === 4 || order.rating === 5)" class="fa-regular fa-star"></i>
+                                                    <i v-if="!(order.rating === 5)" class="fa-regular fa-star"></i>
+                                                    
+                        </span>
                     </div>
                   </div>
               </div>
@@ -296,6 +304,8 @@ export default {
              bidtext: null,
              loading: null,
              order: null,
+             submissionLink: null,
+             file:null,
         }
     },
     methods: {
@@ -305,7 +315,6 @@ export default {
         toggleProfileMenu(){
             this.profileMenu= !this.profileMenu
         },
-     
         async updateOrder() {
             const orderId = this.order.id;
             this.loading = true;
@@ -405,154 +414,185 @@ export default {
             }else {
                 console.log("no file");
             }
-         },
-         async submitTask() {
+        },
+        async submitTask() {
           if (this.submissionLink.length !== 0 || !this.file) {
-            this.loading = true;
-            if (this.file) {
-             
-               this.loading = true;
-                const storage = getStorage();
-                const storageRef = ref(
-                storage,
-                `documents/submitedFiles/${this.$store.state.orderFileName}`
-                );
-                const uploadTask = uploadBytesResumable(storageRef, this.file);
-                uploadTask.on(
-                "state_changed",
-                (snapshot) => {
-                    console.log(snapshot);
-                },
-                (err) => {
-                    console.log(err);
-                    this.loading = false;
-                },
-                async () => {
-                  const downloadURL = await getDownloadURL(storageRef);
-                  const db = getFirestore();
-                  const timestamp = await Date.now();
+            this.loading = true;     
+                if (this.file) {
+                
+                this.loading = true;
+                    const storage = getStorage();
+                    const storageRef = ref(
+                    storage,
+                    `documents/submitedFiles/${this.$store.state.orderFileName}`
+                    );
+                    const uploadTask = uploadBytesResumable(storageRef, this.file);
+                    uploadTask.on(
+                    "state_changed",
+                    (snapshot) => {
+                        console.log(snapshot);
+                    },
+                    (err) => {
+                        console.log(err);
+                        this.loading = false;
+                    },
+                    async () => {
+                    const downloadURL = await getDownloadURL(storageRef);
+                    const db = getFirestore();
+                    const timestamp = await Date.now();
 
-                  //adding to admins/reviewer reviews
-                  const ordersRef = collection(db, 'inreview_orders');
-                  const newOrderRef = doc(ordersRef, this.order.id);
-                    await setDoc(newOrderRef, {
-                       ...this.order,
-                       status: "in Review",
-                       submitedCoverFile: downloadURL,
-                       submitedCoverFileName: this.$store.state.orderFileName,
-                       submissionLink: this.submissionLink,
-                       date: timestamp,
-
-                    });
-
-                    //adding to freelancer reviews
-                    const orderFreelancerRef = doc(db, 'users', this.order.freelancer);
-                  
-                    const reviewsRef = collection(orderFreelancerRef, 'inReview');
-                    const reviewOrderRef = doc(reviewsRef, this.order.id);
-                    await setDoc(reviewOrderRef, {
-                       ...this.order,
-                       status: "in Review",
-                       submitedCoverFile: downloadURL,
-                       submitedCoverFileName: this.$store.state.orderFileName,
-                       submissionLink: this.submissionLink,
-                       date: timestamp,
-
-                    });
-
-                    //updating clients status to be on review
-                    const orderClientRef = doc(db, 'users', this.order.client);
-                    const orderClientOrdersRef = collection(orderClientRef, 'orders');   
-                    const orderClientDocRef = doc(orderClientOrdersRef, this.order.id);
-                    await updateDoc(orderClientDocRef, {
+                    //adding to admins/reviewer reviews
+                    const ordersRef = collection(db, 'inreview_orders');
+                    const newOrderRef = doc(ordersRef, this.order.id);
+                        await setDoc(newOrderRef, {
+                        ...this.order,
                         status: "in Review",
-                    }); 
-
-                    //updating orders collection
-                    const ordersColRef = collection(db, 'orders');   
-                    const docRef = doc(ordersColRef, this.order.id);
-                    await updateDoc(docRef, {
                         submitedCoverFile: downloadURL,
                         submitedCoverFileName: this.$store.state.orderFileName,
                         submissionLink: this.submissionLink,
-                        status: "in Review",
-                    }); 
-                    // delete the document from incomplete_orders
-                  const incompleteordersRef = collection(db, 'incomplete_orders');
-                  const incompleteOrderRef = doc(incompleteordersRef, this.order.id);
-                  await deleteDoc(incompleteOrderRef);
+                        date: timestamp,
 
-                    //delete the document from freelancer incomplete
-                const incompleteRef = collection(orderFreelancerRef, 'incomplete');
-                const incompletedocRef = doc(incompleteRef, this.order.id);
-                await deleteDoc(incompletedocRef); 
+                        });
 
-                  await this.$store.dispatch("getInReview");
-                  this.loading = false;
-                  this.$router.push("/freelancer-dashboard");
-               
-                }
-              );
-              return;
-            }
-             else {
-                const db = getFirestore();
-                  const timestamp = await Date.now();
-                  const ordersRef = collection(db, 'inreview_orders');
-                  const newOrderRef = doc(ordersRef, this.order.id);
-                    await setDoc(newOrderRef, {
-                       ...this.order,
-                       status: "in Review",
-                       submissionLink: this.submissionLink,
-                       date: timestamp,
-
-                    });
-
-                    //adding to freelancer reviews
-                    try {
+                        //adding to freelancer reviews
                         const orderFreelancerRef = doc(db, 'users', this.order.freelancer);
+                    
                         const reviewsRef = collection(orderFreelancerRef, 'inReview');
                         const reviewOrderRef = doc(reviewsRef, this.order.id);
-                        
                         await setDoc(reviewOrderRef, {
-                            ...this.order,
-                            status: "in Review",
-                            submissionLink: this.submissionLink,
-                            date: timestamp,
+                        ...this.order,
+                        status: "in Review",
+                        submitedCoverFile: downloadURL,
+                        submitedCoverFileName: this.$store.state.orderFileName,
+                        submissionLink: this.submissionLink,
+                        date: timestamp,
+
                         });
-                     } catch (error) {
-                        console.error("Error occurred:", error);
-                     }
 
+                        //updating clients status to be on review
+                        const orderClientRef = doc(db, 'users', this.order.client);
+                        const orderClientOrdersRef = collection(orderClientRef, 'orders');   
+                        const orderClientDocRef = doc(orderClientOrdersRef, this.order.id);
+                        await updateDoc(orderClientDocRef, {
+                            status: "in Review",
+                        }); 
 
-                    const orderClientRef = doc(db, 'users', this.order.client);
-                    const orderClientOrdersRef = collection(orderClientRef, 'orders');   
-                    const orderClientDocRef = doc(orderClientOrdersRef, this.order.id);
-                    await updateDoc(orderClientDocRef, {
-                        status: "in Review",
-                    }); 
-                    const incompleteClientOrdersRef = collection(orderClientRef, 'incomplete');   
-                    const incompleteClientDocRef = doc(incompleteClientOrdersRef, this.order.id);
-                    await updateDoc(incompleteClientDocRef, {
-                        status: "in Review",
-                    }); 
-                //delete the document from incomplete orders
-                  const incompleteordersRef = collection(db, 'incomplete_orders');
-                  const incompleteOrderRef = doc(incompleteordersRef, this.order.id);
-                  await deleteDoc(incompleteOrderRef);
+                        //updating orders collection
+                        const ordersColRef = collection(db, 'orders');   
+                        const docRef = doc(ordersColRef, this.order.id);
+                        await updateDoc(docRef, {
+                            submitedCoverFile: downloadURL,
+                            submitedCoverFileName: this.$store.state.orderFileName,
+                            submissionLink: this.submissionLink,
+                            status: "in Review",
+                        }); 
+                        // delete the document from incomplete_orders
+                    const incompleteordersRef = collection(db, 'incomplete_orders');
+                    const incompleteOrderRef = doc(incompleteordersRef, this.order.id);
+                    await deleteDoc(incompleteOrderRef);
 
-                  //delete the document from freelancer incomplete
-                const incompleteRef = collection(orderFreelancerRef, 'incomplete');
-                const incompletedocRef = doc(incompleteRef, this.order.id);
-                await deleteDoc(incompletedocRef); 
+                        //delete the document from freelancer incomplete
+                    const incompleteRef = collection(orderFreelancerRef, 'incomplete');
+                    const incompletedocRef = doc(incompleteRef, this.order.id);
+                    await deleteDoc(incompletedocRef); 
 
-                  await this.$store.dispatch("getInReview");
-                  this.loading = false;
-                  this.$router.push("/freelancer-dashboard");
+                    
+                     // delete the document from revisions
+                     const revisionsordersRef = collection(db, 'revisions');
+                    const revisionsOrderRef = doc(revisionsordersRef, this.order.id);
+                    await deleteDoc(revisionsOrderRef);
+
+                        //delete the document from freelancer onRevision
+                    const freelancerrevisionColRef = collection(orderFreelancerRef, 'onRevision');
+                    const freelancerrevisiondocRef = doc(freelancerrevisionColRef, this.order.id);
+                    await deleteDoc(freelancerrevisiondocRef); 
+
+                     //delete the document from client onRevision
+                     const clientrevisionColRef = collection(orderFreelancerRef, 'onRevision');
+                    const clientrevisiondocRef = doc(clientrevisionColRef, this.order.id);
+                    await deleteDoc(clientrevisiondocRef); 
+
+                    await this.$store.dispatch("getInReview");
+                    this.loading = false;
+                    this.$router.push("/freelancer-dashboard");
+                
+                    }
+                );
                 return;
-            }
+                }
+                else {
+                    const db = getFirestore();
+                    const timestamp = await Date.now();
 
-            
+                    //adding to admins/reviewer reviews
+                    const ordersRef = collection(db, 'inreview_orders');
+                    const newOrderRef = doc(ordersRef, this.order.id);
+                        await setDoc(newOrderRef, {
+                        ...this.order,
+                        status: "in Review",
+                        submissionLink: this.submissionLink,
+                        date: timestamp,
+
+                        });
+
+                        //adding to freelancer reviews
+                        const orderFreelancerRef = doc(db, 'users', this.order.freelancer);
+                    
+                        const reviewsRef = collection(orderFreelancerRef, 'inReview');
+                        const reviewOrderRef = doc(reviewsRef, this.order.id);
+                        await setDoc(reviewOrderRef, {
+                        ...this.order,
+                        status: "in Review",
+                        submissionLink: this.submissionLink,
+                        date: timestamp,
+
+                        });
+
+                        //updating clients status to be on review
+                        const orderClientRef = doc(db, 'users', this.order.client);
+                        const orderClientOrdersRef = collection(orderClientRef, 'orders');   
+                        const orderClientDocRef = doc(orderClientOrdersRef, this.order.id);
+                        await updateDoc(orderClientDocRef, {
+                            status: "in Review",
+                        }); 
+
+                        //updating orders collection
+                        const ordersColRef = collection(db, 'orders');   
+                        const docRef = doc(ordersColRef, this.order.id);
+                        await updateDoc(docRef, {
+                            submissionLink: this.submissionLink,
+                            status: "in Review",
+                        }); 
+                        // delete the document from incomplete_orders
+                    const incompleteordersRef = collection(db, 'incomplete_orders');
+                    const incompleteOrderRef = doc(incompleteordersRef, this.order.id);
+                    await deleteDoc(incompleteOrderRef);
+
+                        //delete the document from freelancer incomplete
+                    const incompleteRef = collection(orderFreelancerRef, 'incomplete');
+                    const incompletedocRef = doc(incompleteRef, this.order.id);
+                    await deleteDoc(incompletedocRef); 
+
+                     // delete the document from revisions
+                     const revisionsordersRef = collection(db, 'revisions');
+                    const revisionsOrderRef = doc(revisionsordersRef, this.order.id);
+                    await deleteDoc(revisionsOrderRef);
+
+                        //delete the document from freelancer onRevision
+                    const freelancerrevisionColRef = collection(orderFreelancerRef, 'onRevision');
+                    const freelancerrevisiondocRef = doc(freelancerrevisionColRef, this.order.id);
+                    await deleteDoc(freelancerrevisiondocRef); 
+
+                     //delete the document from client onRevision
+                     const clientrevisionColRef = collection(orderClientRef, 'onRevision');
+                    const clientrevisiondocRef = doc(clientrevisionColRef, this.order.id);
+                    await deleteDoc(clientrevisiondocRef); 
+
+                    await this.$store.dispatch("getInreview");
+                    this.loading = false;
+                    this.$router.push("/freelancer-dashboard");
+                
+                }
           }
           this.error = true;
           this.errorMsg = "Please ensure all fields necessary have been filled!";
@@ -658,7 +698,7 @@ export default {
                 }
                 return null; // Return null if `this.order` is `undefined` or `orderId` is falsy
             }
-            }
+        }
 
     },
     async created() {
@@ -702,9 +742,7 @@ export default {
             };
             }
         }
-        }
-
-
+    }
 }
 </script>
 

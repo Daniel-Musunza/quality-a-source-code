@@ -24,28 +24,29 @@
                                 <tbody>
                                     <tr v-for="(order, index) in done_orders" :key="order.id">
                                         <td>{{ index + 1 }}</td>
-                                        <td>{{ order.orderTitle}}</td>
-                                        <td>{{ order.orderCategory}}</td>
+                                        <td>{{ order.orderTitle }}</td>
+                                        <td>{{ order.orderCategory }}</td>
                                         <td>
                                             <span class="value-order-detail text-info">
-                            <i class="fa rating 
-                            fa-star rated"></i>
-                            <i class="fa rating 
-                            fa-star rated"></i>
-                            <i class="fa rating 
-                            fa-star rated"></i>
-                            <i class="fa rating 
-                            fa-star rated"></i>
-                            <i class="fa rating 
-                            fa-star rated"></i></span>
+                                                <i v-if="order.rating === 1 || order.rating === 2 || order.rating === 3 || order.rating === 4 || order.rating === 5" class="fa rating fa-star rated"></i>
+                                                <i v-if="order.rating === 2 || order.rating === 3 || order.rating === 4 || order.rating === 5" class="fa rating fa-star rated"></i>
+                                                <i v-if="order.rating === 3 || order.rating === 4 || order.rating === 5" class="fa rating fa-star rated"></i>
+                                                <i v-if="order.rating === 4 || order.rating === 5" class="fa rating fa-star rated"></i>
+                                                <i v-if="order.rating === 5" class="fa rating fa-star rated"></i>
+                                                <i v-if="!(order.rating === 1 || order.rating === 2 || order.rating === 3 || order.rating === 4 || order.rating === 5)" class="fa-regular fa-star"></i>
+                                                <i v-if="!(order.rating === 2 || order.rating === 3 || order.rating === 4 || order.rating === 5)" class="fa-regular fa-star"></i>
+                                                <i v-if="!(order.rating === 3 || order.rating === 4 || order.rating === 5)" class="fa-regular fa-star"></i>
+                                                <i v-if="!(order.rating === 4 || order.rating === 5)" class="fa-regular fa-star"></i>
+                                                <i v-if="!(order.rating === 5)" class="fa-regular fa-star"></i>
+                                            </span>
                                         </td>
-                                        <td> 
-                                            <router-link :to="{ name: 'client-order-view', params: {id: order.id}}">
-                                                    View Details
-                                                </router-link>
+                                        <td>
+                                            <router-link :to="{ name: 'client-order-view', params: { id: order.id }}">
+                                                View Details
+                                            </router-link>
                                         </td>
                                     </tr>
-                                  
+
                                 </tbody>
                             </table>
                         </div>

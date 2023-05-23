@@ -2,178 +2,383 @@
     <input type="checkbox" id="nav-toggle">
         <SideBar/>
         <div class="main-content">
+            <TheLoader v-show="loading" />
             <Header></Header>
             <main >
                 <div class="content-wrapper">
                     <div class="content-body">
-              <div class="row">
-                  <div class="col-md-9">
-                      
-              <div class="order-body-card">
-                  <div class="card">
-                      <div class="card-header">
-                          
-       
-                          <!-- order topic -->
-                          <h4>{{order.orderTitle}}</h4>
-                      </div>
-                  
-                      <div class="card-body">
-                          <!-- order body -->
-                          <div>
-                              <div class="pt-2 scrollable-div " >
-                                  <div  v-html="order.orderHTML"></div>
-                              </div>
-                          </div>
-                  
-                          
-                  
-                          <!-- attached files -->
-                          <!-- All files -->
-              <div>
-                  <div class="row" id="files-area">
-                      
-                      <div class="col-md-4" style="padding-top:1em;">
-                          <div>
-                              <h3>Attached files</h3>
-                          </div>
-                          <div class="files-area" style="width:fit-content">
-                                              
-                                              <p >
-                                              <i class="icon-doc"></i>
-                                              <a :href="order.orderCoverFile" download>
-                                                  {{order.orderCoverFileName}}
-                                              </a>
-                                              </p>
-                  
-                                                
-                        </div>
-                      </div>
-                      
-                  </div>
-              </div>
-         
-                                  
-                              
-                  
-                          
-                      </div>
-                  </div>
-              </div>
-                  </div>
-                  <div class="col-md-3">
-                      <div class="card">
-                  <div class="card-body">
-                      <div class="pb-1">
-                          <h4>Order detail</h4>
-                      </div>
-              
-                      <div class="order-detail">
-                          <label class="key-order-detail">Order ID:</label>
-                          <span class="value-order-detail text-info"><b>{{order.id}}</b></span>
-                      </div>
-                      <div class="order-detail">
-                          <label class="key-order-detail">Due Time:</label>
-                          <span class="value-order-detail text-info"><b>{{order.dueDate}},{{order.dueTime}}</b></span>
-                      </div>
-                 
-                      <div class="order-detail">
-                          <label class="key-order-detail">Category:</label>
-                          <span class="value-order-detail">{{order.orderCategory}}</span>
-                      </div>
-                      <div class="order-detail">
-                          <label class="key-order-detail">Level of Experience:</label>
-                          <span class="value-order-detail">{{order.experienceNeeded}}</span>
-                      </div>
-                                   <!-- seen by admin and client only -->
-                      <div class="order-detail">
-                          <label class="key-order-detail">Client Budget:</label>
-                          <span class="value-order-detail">${{order.budget}}</span>
-                      </div>
-                  
-                    <div class="order-detail">
-                        <label class="key-order-detail">Status:</label>
-                        <span class="value-order-detail">{{order.status}}</span>
+                    <div class="row">
+                        <div class="col-md-9">
+                            
+                    <div class="order-body-card">
+                        <div class="card">
+                            <div class="card-header">
+                                
+            
+                                <!-- order topic -->
+                                <h4>{{order.orderTitle}}</h4>
+                            </div>
                         
+                            <div class="card-body">
+                                <!-- order body -->
+                                <div>
+                                    <div class="pt-2 scrollable-div " >
+                                        <div  v-html="order.orderHTML"></div>
+                                    </div>
+                                </div>
+                        
+                                
+                        
+                                <!-- attached files -->
+                                <!-- All files -->
+                    <div>
+                        <div class="row" id="files-area">
+                            
+                            <div class="col-md-4" style="padding-top:1em;">
+                                <div>
+                                    <h3>Attached files</h3>
+                                </div>
+                                <div class="files-area" style="width:fit-content">
+                                                    
+                                                    <p >
+                                                    <i class="icon-doc"></i>
+                                                    <a :href="order.orderCoverFile" download>
+                                                        {{order.orderCoverFileName}}
+                                                    </a>
+                                                    </p>
+                        
+                                                        
+                                </div>
+                            </div>
+                            
+                        </div>
                     </div>
-                    <div class="order-detail">
-                        <h3 style="font-weight: 600; color:#041121">Submited Solution</h3>
-                     <div style="display:flex; flex-direction: column;">
-                        <label class="key-order-detail">Link:</label> <span> <a :href="order.submissionLink"> {{ order.submissionLink}} </a></span>
-                        <label class="key-order-detail">File:</label><span>  <a :href="order.submitedCoverFile" download>{{order.submitedCoverFileName}}</a></span>
+                
+                                        
+                                    
+                        
+                    <div style="padding-top:1em;">
+                        
+                        <!-- upto here -->
+                        <TheLoader v-show="loading"/>
+                        
+                    
+                        <!--  Modal -->
+                        <div class="modal fade" id="modal-bidding-form" tabindex="-1" role="dialog" aria-labelledby="biddingModalLabel"
+                            aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title" id="biddingModalLabel"><b>Your Reasons for Revision</b></h4>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                
+                                    <form id="form-request-order" method="POST">
+                                        <input type="hidden" name="csrfmiddlewaretoken" v-model="user">
+                                        <div class="modal-body">
+                                            <input type="hidden" name="order" v-model="orderid">
+                                            <div class="row">
+                                                
+                                                <div class="col-md-4 form-group">
+                                                    
+                                                    <input class="form-control" type="hidden"
+                                                        name="cpp" v-model='payment' required>
+                                                </div>
+                                                
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Message</label>
+                                                <textarea class="form-control" v-model="message" name="description" rows="5" required></textarea>
+                                                <input type="time" class="form-control" v-model="dueTime">
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn main-light" data-dismiss="modal">Cancel</button>
+                                            <button type="submit" @click.prevent="sendToRevision()" data-dismiss="modal" id="btn-request" class="btn btn-primary">Send</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>   
+                            </div>
+                        </div>
+                    </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card">
+                        <div class="card-body">
+                            <div class="pb-1">
+                                <h4>Order detail</h4>
+                            </div>
+                    
+                            <div class="order-detail">
+                                <label class="key-order-detail">Order ID:</label>
+                                <span class="value-order-detail text-info"><b>{{order.id}}</b></span>
+                            </div>
+                            <div class="order-detail">
+                                <label class="key-order-detail">Due Time:</label>
+                                <span class="value-order-detail text-info"><b>{{order.dueDate}},{{order.dueTime}}</b></span>
+                            </div>
+                        
+                            <div class="order-detail">
+                                <label class="key-order-detail">Category:</label>
+                                <span class="value-order-detail">{{order.orderCategory}}</span>
+                            </div>
+                            <div class="order-detail">
+                                <label class="key-order-detail">Level of Experience:</label>
+                                <span class="value-order-detail">{{order.experienceNeeded}}</span>
+                            </div>
+                                        <!-- seen by admin and client only -->
+                            <div class="order-detail">
+                                <label class="key-order-detail">Client Budget:</label>
+                                <span class="value-order-detail">${{order.budget}}</span>
+                            </div>
+                        
+                            <div class="order-detail">
+                                <label class="key-order-detail">Status:</label>
+                                <span class="value-order-detail">{{order.status}}</span>
+                                
+                            </div>
+                            <div class="order-detail">
+                                <h3 style="font-weight: 600; color:#041121">Submited Solution</h3>
+                            <div style="display:flex; flex-direction: column;">
+                                <label class="key-order-detail">Link:</label> <span> <a :href="order.submissionLink"> {{ order.submissionLink}} </a></span>
+                                <label class="key-order-detail">File:</label><span>  <a :href="order.submitedCoverFile" download>{{order.submitedCoverFileName}}</a></span>
+                            </div>
+                            </div>
+                            <div class="order-detail">
+                                <label class="key-order-detail">Rate Task:</label>
+                                <input type="number" placeholder="0 - 5" v-model="rating" min="0" max="5"/>
+                                <button @click.prevent="submitRating" type="submit">Rate</button>
+                                <br>
+                                <span class="value-order-detail text-info">
+                                                        <i v-if="order.rating === 1 || order.rating === 2 || order.rating === 3 || order.rating === 4 || order.rating === 5" class="fa rating fa-star rated"></i>
+                                                        <i v-if="order.rating === 2 || order.rating === 3 || order.rating === 4 || order.rating === 5" class="fa rating fa-star rated"></i>
+                                                        <i v-if="order.rating === 3 || order.rating === 4 || order.rating === 5" class="fa rating fa-star rated"></i>
+                                                        <i v-if="order.rating === 4 || order.rating === 5" class="fa rating fa-star rated"></i>
+                                                        <i v-if="order.rating === 5" class="fa rating fa-star rated"></i>
+                                                        <i v-if="!(order.rating === 1 || order.rating === 2 || order.rating === 3 || order.rating === 4 || order.rating === 5)" class="fa-regular fa-star"></i>
+                                                        <i v-if="!(order.rating === 2 || order.rating === 3 || order.rating === 4 || order.rating === 5)" class="fa-regular fa-star"></i>
+                                                        <i v-if="!(order.rating === 3 || order.rating === 4 || order.rating === 5)" class="fa-regular fa-star"></i>
+                                                        <i v-if="!(order.rating === 4 || order.rating === 5)" class="fa-regular fa-star"></i>
+                                                        <i v-if="!(order.rating === 5)" class="fa-regular fa-star"></i>
+                                </span>
+                                <button class="btn btn-info btn-take" id="btn-take" data-toggle="modal" data-target="#modal-bidding-form">
+                                    To be revised <i class="fa-solid fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                        </div>
                     </div>
                     </div>
-                  
-                  </div>
-              </div>
-                  </div>
-              </div>
-              
-              
-             
-              
-           
-              
-              
-                    </div>
-                  </div>
+                </div>
             </main>
             <!-- <main v-else>nothing</main> -->
         </div>
 </template>
 
 <script>
-import SideBar from "@/components/core/SideBar.vue";
-import Header from "@/components/core/Header.vue";
-import { mapState } from 'vuex'
-export default {
-    components: {
-        SideBar, 
-        Header
-    },
-    data () {
-        return {
-            available: null,
-            profileMenu: null,
-            //  currentClientOrder: null,
+    import SideBar from "@/components/core/SideBar.vue";
+    import Header from "@/components/core/Header.vue";
+    import TheLoader from "@/components/TheLoader";
+    import { getFirestore, doc, updateDoc, collection, getDoc, setDoc, deleteDoc } from "firebase/firestore";
+
+    import { mapState } from 'vuex'
+    export default {
+        components: {
+            SideBar, 
+            Header,
+            TheLoader,
+        },
+        data () {
+            return {
+                available: null,
+                profileMenu: null,
+                rating: null,
+                message: null,
+                dueTime: null,
+                rating: null,
+                loading: null,
+            }
+        },
+        methods: {
+            toggleAvailable(){
+                this.available= !this.available
+            },
+            toggleProfileMenu(){
+                this.profileMenu= !this.profileMenu
+            },
+            async submitRating() {
+                const orderId = this.order.id;
+                this.loading = true;
+                
+                try {
+                    const db = getFirestore();
+                    
+                    //update orders status
+                    const ordersCollectionRef = collection(db, "orders");
+                    const orderRef = doc(ordersCollectionRef, orderId);
+                    await updateDoc(orderRef, {
+                    rating: this.rating,
+                    }); 
+                    // Add the current order document to the "complete_orders" collection
+                    const completeOrdersCollectionRef = collection(db, "complete_orders");
+                    const completeOrderRef = doc(completeOrdersCollectionRef, orderId);
+                    
+                    await updateDoc(completeOrderRef, {
+                        rating: this.rating,
+                    });   
+
+                    //add done collection to freelancer
+                    const freelancerRef = doc(db, 'users', this.order.freelancer);
+                    const freelancerordersRef = collection(freelancerRef, 'done_orders');   
+                    const freelancerdocRef = doc(freelancerordersRef, orderId);
+                    await updateDoc(freelancerdocRef, {
+                        rating: this.rating,
+                    });   
+
+                    //update clients status
+                    const userRef = doc(db, 'users', this.order.client);
+                    const ordersRef = collection(userRef, 'orders');   
+                    const docRef = doc(ordersRef, orderId);
+                    await updateDoc(docRef, {
+                        rating: this.rating,
+                    }); 
+                    //add Complete collection to client
+                    const clientordersRef = collection(userRef, 'done_orders');   
+                    const clientdocRef = doc(clientordersRef, orderId);
+                    await updateDoc(clientdocRef, {
+                        rating: this.rating,
+                    });   
+                    this.loading = false;
+                } catch (error) {
+                    this.loading = false;
+                    console.error("Error rating order:", error);
+                }
+            },
+            async sendToRevision() {
+                const orderId = this.order.id;
+                this.loading = true;
+                
+                try {
+                    const db = getFirestore();
+                    //update clients status
+                    const userRef = doc(db, 'users', this.order.client);
+                    const ordersRef = collection(userRef, 'orders');   
+                    const docRef = doc(ordersRef, orderId);
+                    await updateDoc(docRef, {
+                        message: this.message,
+                        dueTime: this.dueTime,
+                        status: "on Revision"
+                    }); 
+                    //update orders status
+                    const ordersCollectionRef = collection(db, "orders");
+                    const orderRef = doc(ordersCollectionRef, orderId);
+                    await updateDoc(orderRef, {
+                    message: this.message,
+                    dueTime: this.dueTime,
+                    status: "on Revision"
+                    }); 
+                    // Add the current order document to the "complete_orders" collection
+                    const completeOrdersCollectionRef = collection(db, "revisions");
+                    const completeOrderRef = doc(completeOrdersCollectionRef, orderId);
+                    
+                    await setDoc(completeOrderRef, {
+                    ...this.order,
+                    message: this.message,
+                    dueTime: this.dueTime,
+                    status: "on Revision",
+                    date: new Date()
+                    });   
+
+                    //add done collection to freelancer
+                    const freelancerRef = doc(db, 'users', this.order.freelancer);
+                    const freelancerordersRef = collection(freelancerRef, 'onRevision');   
+                    const freelancerdocRef = doc(freelancerordersRef, orderId);
+                    await setDoc(freelancerdocRef, {
+                    ...this.order,
+                    message: this.message,
+                    dueTime: this.dueTime,
+                    status: "on Revision",
+                    date: new Date()
+                    });   
+
+                
+                    //add Complete collection to client
+                    const clientordersRef = collection(userRef, 'onRevision');   
+                    const clientdocRef = doc(clientordersRef, orderId);
+                    await setDoc(clientdocRef, {
+                    ...this.order,
+                    message: this.message,
+                    dueTime: this.dueTime,
+                    status: "on Revision",
+                    date: new Date()
+                    });   
+                    
+                    //delete the document from inreview_orders
+                    const inreviewordersRef = collection(db, 'complete_orders');
+                    const inreviewOrderRef = doc(inreviewordersRef, this.order.id);
+                    await deleteDoc(inreviewOrderRef);
+
+                    //delete the document from freelancer inReview
+                    const inreviewRef = collection(freelancerRef, 'done_orders');
+                    const inreviewdocRef = doc(inreviewRef, this.order.id);
+                    await deleteDoc(inreviewdocRef);
+
+                    //delete the document from client incomplete
+                    const clientincompleteRef = collection(userRef, 'done_orders');
+                    const clientincompletedocRef = doc(clientincompleteRef, this.order.id);
+                    await deleteDoc(clientincompletedocRef);
+
+                    alert("Order sent to be revised!");
+                    this.$router.push("/client/revision");
+                    
+                
+                } catch (error) {
+                    this.loading = false;
+                    console.error("Error sending to be revised order:", error);
+                }
+            }
+        },
+        computed: {
+        ...mapState(['clientOrders']),
+        ...mapState(['incomplete']),
+        ...mapState(['done_orders']),
+        ...mapState(['onRevision']),
+        order () {
+            const orderId = this.$route.params.id;
+            const clientOrders = this.clientOrders.find(order => order.id === orderId);
+            const incomplete = this.incomplete.find(order => order.id === orderId);
+            const done_orders = this.done_orders.find(order => order.id === orderId);
+            const onRevision = this.onRevision.find(order => order.id === orderId);
+            if (clientOrders) {
+                return clientOrders;
+            } else if (incomplete) {
+                return incomplete;
+            } else if (done_orders) {
+                return done_orders;
+            } else if (onRevision) {
+                return onRevision;
+            } 
+        
         }
-    },
-    methods: {
-        toggleAvailable(){
-            this.available= !this.available
-        },
-        toggleProfileMenu(){
-            this.profileMenu= !this.profileMenu
-        },
-    },
-    computed: {
-    ...mapState(['clientOrders']),
-    ...mapState(['incomplete']),
-    order () {
-        const orderId = this.$route.params.id;
-        const clientOrders = this.clientOrders.find(order => order.id === orderId);
-    const incomplete = this.incomplete.find(order => order.id === orderId);
-    if (clientOrders) {
-        return clientOrders;
-    } else if (incomplete) {
-        return incomplete;
-    } 
-    
+        }
     }
-  }
-
-// async mounted() {
-//     this.currentClientOrder = await this.$store.state.clientOrders.filter((order) => {
-//       return order.id === this.$route.params.orderid;
-//     })
-//     console.log(this.currentClientOrder);
-// }
-
-
-}
 </script>
 
 <style scoped>
+input{
+    border-radius: 5px;
+}
+button{
+    color:#fff;
+    background-color: #1c68c4;
+    border-radius: 5px;
+}
  :root {
     --main-color:#fff;
     --color-dark:#02060b;

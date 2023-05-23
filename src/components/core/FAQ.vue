@@ -4,17 +4,20 @@
     <div class="main-content">
       <Header></Header>
         <main>
-            <section id="reviews" class="service pos-r bg-effect o-hidden">
-                <div style="display: flex; flex-direction: column; text-align: center;">
-                    <div class="form-group">
-                <label>Ask a Question</label>
-                <textarea class="form-control" name="description" rows="5"></textarea>
+            <div style="display: flex; flex-direction: column; text-align: center; margin-top: 5px; align-items: center;">
+                 <div class="form-group">
+                <label>Ask a Question ?</label>
+                <textarea class="form-control" name="description" rows="1" style="width: 400px; @media only screen and (max-width: 768px)  {
+                    width: 200px;
+                    margin:5px;
+                }"></textarea>
                 </div>
+            </div>
+           
+                <div style="text-align: center; margin: 5px;">
+                    <label>FAQs</label>
                 </div>
-                <div style="text-align: center;">
-                    <label>FAQs?</label>
-                    </div>
-                <div class="container">
+                <div style="top:0px;" class="container">
                     <div class="row align-items-center">
                         <div class="col-lg-12 col-md-12 md-mt-5 order-lg-1" style="margin-right:10px">
                             <div class="row">
@@ -59,8 +62,6 @@
                         
                     </div>
                 </div>
-                
-            </section>
         </main>
     </div>
 </template>

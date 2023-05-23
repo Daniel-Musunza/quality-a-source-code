@@ -55,7 +55,7 @@
                     <router-link to="/freelancer/on-revision">
                         <i class="fa-sharp fa-solid fa-pen-to-square"></i>
                   Revision
-                    <span class="li-span">0</span>
+                    <span class="li-span">{{onRevision.length}}</span>
                     </router-link>
                 </li>
                 <li v-if="freelancer">
@@ -96,6 +96,7 @@
                         <router-link to="/admin/fowarded">Fowarded <span class="span">{{ forwarded_orders.length}}</span></router-link>
                         <router-link to="/admin/inreview-orders"> In Review <span class="span">{{ inreview_orders.length }}</span></router-link>
                     <router-link to="/admin/complete-orders"> Completed <span class="span">{{ complete_orders.length }}</span></router-link>
+                    <router-link to="/admin/revisions"> Revisions <span class="span">{{ revisions.length }}</span></router-link>
                     </div>
                 </li>
                 <li v-if="admin">
@@ -149,7 +150,7 @@
             </li>
             <li v-if="!admin&&!freelancer">
                 <router-link to="/client/revision"><i class="fa-solid fa-rotate"></i>
-               On Revision
+               On Revision <span class="span">{{onRevision.length}}</span>
                 </router-link>
             </li>
             <li v-if="!admin&&!freelancer">
@@ -193,8 +194,10 @@ export default {
         ...mapActions(['getForwardedOrders']),
         ...mapActions(['getTobebiddedOrders']),
         ...mapActions(['getCompleteOrders']),
+        ...mapActions(['getRevisions']),
         ...mapActions(['getInreviewOrders']),
         ...mapActions(['getDoneOrders']),
+        ...mapActions(['getOnRevision']),
         ...mapActions(['getInreview']),
         ...mapActions(['getMyBids']),
         ...mapActions(['getInvited']),
@@ -212,6 +215,8 @@ export default {
     ...mapState(['clientOrders']),
     ...mapState(['done_orders']),
     ...mapState(['complete_orders']),
+    ...mapState(['revisions']),
+    ...mapState(['onRevision']),
         admin() {
           return this.$store.state.profileAdmin;
      },
@@ -225,7 +230,9 @@ export default {
     this.getTobebiddedOrders();
     this.getInreviewOrders();
     this.getCompleteOrders();
+    this.getRevisions();
     this.getDoneOrders();
+    this.getOnRevision();
     this.getInreview();
     this.getMyBids();
     this.getInvited();

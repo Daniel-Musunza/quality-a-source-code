@@ -22,51 +22,16 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td>UI/UX Design</td>
-                                        <td>UI Team</td>
-                                        <td>9hrs 34min</td>
-                                        <td> 
-                                            <router-link to="/order-view">
+                                    <tr v-for="(order, index) in onRevision" :key="order.id">
+                                        <td>{{ index + 1 }}</td>
+                                        <td>{{ order.orderTitle }}</td>
+                                        <td>{{ order.orderCategory }}</td>
+                                        <td>{{ order.dueTime }}</td>
+                                        <td>
+                                            <router-link :to="{ name: 'client-order-view', params: { id: order.id }}">
                                                 View Details
                                             </router-link>
                                         </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Web Development</td>
-                                        <td>Frontend</td>
-                                        <td>9hrs 34min</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Ushop App</td>
-                                        <td>Mobile Team</td>
-                                        <td>34min</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Accademic Writing</td>
-                                        <td>Writing Team</td>
-                                        <td>56min</td>
-                                    </tr>
-                                    <tr>
-                                        <td>UI/UX Design</td>
-                                        <td>UI Team</td>
-                                        <td>34min</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Web Development</td>
-                                        <td>Frontend</td>
-                                        <td>9hrs 34min</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Ushop App</td>
-                                        <td>Mobile Team</td>
-                                        <td> 34min</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Accademic Writing</td>
-                                        <td>Writing Team</td>
-                                        <td>45min</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -81,6 +46,7 @@
 <script>
 import SideBar from "@/components/core/SideBar.vue";
 import Header from "@/components/core/Header.vue";
+import { mapState, mapActions } from 'vuex';
 export default {
     components: {
         SideBar, 
@@ -100,7 +66,14 @@ export default {
         toggleProfileMenu(){
             this.profileMenu= !this.profileMenu
         },
-    }
+        ...mapActions(['getOnRevision'])
+    },
+    computed: {
+    ...mapState(['onRevision'])
+  },
+  created() {
+    this.getOnRevision();
+  }
 }
 </script>
 

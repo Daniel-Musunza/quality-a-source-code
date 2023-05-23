@@ -24,6 +24,8 @@ export default createStore({
       profileInitials: null,
 
             // orders state
+            clients: [],
+            freelancers: [],
             clientOrders: [],
             orders: [],
             myBids: [],
@@ -31,11 +33,13 @@ export default createStore({
             incomplete: [],
             inReview: [],
             done_orders: [],
+            onRevision: [],
             forwarded_orders: [],
             tobebidded_orders: [],
             incomplete_orders: [],
             inreview_orders: [],
             complete_orders: [],
+            revisions: [],
             postloaded: null,
             orderHTML: 'write your instructions here...',
             orderTitle: "",
@@ -55,17 +59,21 @@ export default createStore({
   },
   getters: {
     // order getters
+    clients: state => state.clients,
+    freeelancers: state => state.freelancers,
     orders: state => state.orders,
     myBids: state => state.myBids,
     invited: state => state.invited,
     incomplete: state => state.incomplete,
     inReview: state => state.inReview,
     done_orders: state => state.done_orders,
+    onRevision: state => state.onRevision,
     forwarded_orders: state => state.forwarded_orders,
     tobebidded_orders: state => state.tobebidded_orders, 
     incomplete_orders: state => state.incomplete_orders,
     inreview_orders: state => state.inreview_orders,
     complete_orders: state => state.complete_orders,
+    revisions: state => state.revisions,
     clientOrders: state => state.clientOrders,
     user(state){
       return state.user
@@ -123,6 +131,12 @@ export default createStore({
       setOrderState(state, payload) {
             state.orders= payload;  
       },
+      setClientState(state, payload) {
+        state.clients= payload;  
+      },
+      setFreelancerState(state, payload) {
+        state.freelancers= payload;  
+      },
       setClientOrderState(state, payload){
             state.clientOrders = payload;
       },
@@ -141,8 +155,14 @@ export default createStore({
 setCompleteOrderState(state, payload){
   state.complete_orders = payload;
 },
+setRevisionsOrderState(state, payload){
+  state.revisions = payload;
+},
 setDoneOrderState(state, payload){
   state.done_orders = payload;
+},
+setOnRevisionOrderState(state, payload){
+  state.onRevision = payload;
 },
       setMyBidsState(state, payload){
             state.myBids = payload;
@@ -249,6 +269,17 @@ setDoneOrderState(state, payload){
         const data = querySnapshot.docs.map((doc) => doc.data());
         commit('setOrderState', data);
       },
+      async getClients({ commit }) {
+        const querySnapshot = await getDocs(collection(db, "users"));
+        const data = querySnapshot.docs.map((doc) => doc.data());
+        commit("setClientState", data);
+      },
+      async getFreelancers({ commit }) {
+
+        const querySnapshot = await getDocs(collection(db, "freelancers"));
+        const data = querySnapshot.docs.map((doc) => doc.data());
+        commit("setFreelancerState", data);
+      },
       async getForwardedOrders({ commit }) {
 
         const querySnapshot = await getDocs(collection(db, "forwarded_orders"));
@@ -277,6 +308,11 @@ setDoneOrderState(state, payload){
         const querySnapshot = await getDocs(collection(db, "complete_orders"));
         const data = querySnapshot.docs.map((doc) => doc.data());
         commit('setCompleteOrderState', data);
+      },
+      async getRevisions({ commit }) {
+        const querySnapshot = await getDocs(collection(db, "revisions"));
+        const data = querySnapshot.docs.map((doc) => doc.data());
+        commit('setRevisionsOrderState', data);
       },
       async getMyBids({ commit}) {
         onAuthStateChanged(getAuth(), async (user) => {
@@ -363,6 +399,23 @@ setDoneOrderState(state, payload){
           }
         });
       },   
+      async getOnRevision({ commit}) {
+        onAuthStateChanged(getAuth(), async (user) => {
+          if (user) {
+            const userRef = doc(db, 'users', user.uid);
+            const ordersRef = collection(userRef, 'onRevision');   
+            try {
+              const querySnapshot = await getDocs(ordersRef);
+              const data = querySnapshot.docs.map((doc) => doc.data());
+              commit('setOnRevisionOrderState', data);
+            } catch (error) {
+              console.error(error);
+            }
+          } else {
+            console.log('No user is currently logged in.');
+          }
+        });
+      }, 
       async getClientOrders({ commit }) {
         onAuthStateChanged(getAuth(), async (user) => {
           if (user) {

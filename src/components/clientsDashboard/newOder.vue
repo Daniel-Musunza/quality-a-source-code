@@ -1,14 +1,15 @@
 <template>
     <input type="checkbox" id="nav-toggle">
    <SideBar></SideBar>
-    <div class="main-content">
+    <div class="main-content" >
         <Header>
         </Header>
-        <div style="margin-top: 120px;  margin-left: 30px">
-            <h4>Welcome Our Beloved Client</h4>
-        <p>Kindly give Detailed instructions to Ensure Quality work</p>
-        </div>
-                        <form class="form" action="" >
+      
+                        <form class="form" action=""  >
+                           
+                                <h4 style="margin-top: 100px; text-align: center;">Welcome Our Beloved Client</h4>
+                                <p style="text-align: center; padding: 20px;">Kindly give Detailed instructions to Ensure Quality work</p>
+                            
                             <TheLoader v-show="loading" />
                             <div class="container" >
                                 <div :class="{ invisible: !error }" class="err-message">
@@ -397,6 +398,7 @@ export default {
 
 
 <style scoped>
+
  :root {
     --main-color:#fff;
     --color-dark:#02060b;

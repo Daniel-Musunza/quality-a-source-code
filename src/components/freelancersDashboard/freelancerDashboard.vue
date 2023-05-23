@@ -8,7 +8,7 @@
                     <!-- admin begin -->
                     <router-link to="/admin/clients" v-if="admin" class="card-single">
                         <div>
-                            <h1>54</h1>
+                            <h1>{{ clients.length }}</h1>
                             <span>Clients</span>
                         </div>
                         <div>
@@ -44,7 +44,7 @@
                     </div>
                     <router-link to="/admin/freelancers" v-if="admin" class="card-single">
                         <div>
-                            <h1>24</h1>
+                            <h1>{{freelancers.length}}</h1>
                             <span>Freelancers</span>
                         </div>
                         <div>
@@ -120,7 +120,7 @@
                     </router-link>
                     <router-link to="/freelancer/on-revision" v-if="freelancer" class="card-single">
                         <div>
-                            <h1>0</h1>
+                            <h1>{{ onRevision.length }}</h1>
                             <span>Revision</span>
                         </div>
                         <div>
@@ -216,60 +216,18 @@
                         </router-link>
                         </div>
                         <div class="card-body">
-                            <div class="customer">
+                            <div class="customer" v-for="freelancer in freelancers" :key="freelancer.id">
                                 <div class="info">
-                                    <img src="images/BuyoneFree_65.jpg" class="img" width="40px" height="40px" alt="">
+                                    <img src="../../assets/images/BuyoneFree_65.jpg" class="img" width="40px" height="40px" alt="">
                                     <div>
-                                        <h5> Musunza festus</h5>
-                                        <small>SEO Expert</small>
+                                        <h5> {{ freelancer.firstName }} {{ freelancer.lastName }}</h5>
+                                        <small>{{ freelancer.niche }}</small>
                                     </div>
                                 </div>
                                 <div class="contact">
                                 <span><i class="fa-solid fa-circle-user"></i></span>
                                 <span><i class="fa-solid fa-comment"></i></span>
-                                <span><i class="fa-solid fa-phone"></i></span>
-                                </div>
-                            </div>
-                            <div class="customer">
-                                <div class="info">
-                                    <img src="images/BuyoneFree_65.jpg" class="img" width="40px" height="40px" alt="">
-                                    <div>
-                                        <h5> Musunza festus</h5>
-                                        <small>SEO Expert</small>
-                                    </div>
-                                </div>
-                                <div class="contact">
-                                <span><i class="fa-solid fa-circle-user"></i></span>
-                                <span><i class="fa-solid fa-comment"></i></span>
-                                <span><i class="fa-solid fa-phone"></i></span>
-                                </div>
-                            </div>
-                            <div class="customer">
-                                <div class="info">
-                                    <img src="images/BuyoneFree_65.jpg" class="img" width="40px" height="40px" alt="">
-                                    <div>
-                                        <h5> Musunza festus</h5>
-                                        <small>SEO Expert</small>
-                                    </div>
-                                </div>
-                                <div class="contact">
-                                <span><i class="fa-solid fa-circle-user"></i></span>
-                                <span><i class="fa-solid fa-comment"></i></span>
-                                <span><i class="fa-solid fa-phone"></i></span>
-                                </div>
-                            </div>
-                            <div class="customer">
-                                <div class="info">
-                                    <img src="images/BuyoneFree_65.jpg" class="img" width="40px" height="40px" alt="">
-                                    <div>
-                                        <h5> Musunza festus</h5>
-                                        <small>SEO Expert</small>
-                                    </div>
-                                </div>
-                                <div class="contact">
-                                <span><i class="fa-solid fa-circle-user"></i></span>
-                                <span><i class="fa-solid fa-comment"></i></span>
-                                <span><i class="fa-solid fa-phone"></i></span>
+                                <a :href="'tel:' + freelancer.phoneNumber"><span><i class="fa-solid fa-phone"></i></span></a>
                                 </div>
                             </div>
                         </div>
@@ -386,6 +344,10 @@ export default {
          ...mapActions(['getCompleteOrders']),
          ...mapActions(['getDoneOrders']),
          ...mapActions(['getIncomplete']),
+         ...mapActions(['getOnRevision']),
+         ...mapActions(['getInreview']),
+         ...mapActions(['getClients']),
+         ...mapActions(['getFreelancers']),
     },
     computed: {
         admin() {
@@ -399,8 +361,11 @@ export default {
         ...mapState(['incomplete_orders']),
         ...mapState(['complete_orders']),
         ...mapState(['done_orders']),
+        ...mapState(['onRevision']),
         ...mapState(['incomplete']),
-        ...mapState(['inReview'])
+        ...mapState(['inReview']),
+        ...mapState(['clients']),
+        ...mapState(['freelancers'])
   },
 
   created() {
@@ -410,6 +375,10 @@ export default {
     this.getCompleteOrders();
     this.getDoneOrders();
     this.getIncomplete();
+    this.getOnRevision();
+    this.getInreview();
+    this.getClients();
+    this.getFreelancers();
   }
  
 }

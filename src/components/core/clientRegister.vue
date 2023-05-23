@@ -161,6 +161,14 @@ export default {
                     phoneNumber: this.phoneNumber,
                     id: dataBase.id
                  });
+                const clientdataBase = doc(db, "clients", result.user.uid);
+                await setDoc(clientdataBase, {
+                    firstName: this.firstName,
+                    lastName: this.lastName,
+                    email: this.email,
+                    phoneNumber: this.phoneNumber,
+                    id: dataBase.id,
+                 });
                 this.$router.push('/client-dashboard');
                 this.loading = false;
                 return;
