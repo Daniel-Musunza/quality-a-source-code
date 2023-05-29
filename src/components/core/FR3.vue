@@ -37,7 +37,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <h6>Other Roles</h6>
+                                        <h6 style="margin-left:50px;"> Add other roles</h6>
                                         <div style="display: flex; flex-direction: row; margin:10px 0; flex-wrap: wrap;">
                                             <ul class="list-unstyled list-icon mb-4">
                                     
@@ -185,4 +185,7 @@ label {
         margin-left: 10px;
 }
 
+.row{
+        margin-left: 40px;
+}
 </style>

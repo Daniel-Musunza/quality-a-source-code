@@ -151,7 +151,7 @@ export default {
         
               
                 const createUser = await createUserWithEmailAndPassword(getAuth(), this.email, this.password);
-               const result = await createUser;
+                const result = await createUser;
                 const db = getFirestore();
                 const dataBase = doc(db, "users", result.user.uid);
                 await setDoc(dataBase, {

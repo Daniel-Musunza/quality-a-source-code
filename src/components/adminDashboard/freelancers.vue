@@ -15,7 +15,7 @@
                                 <tr>
                                     <td>NO:</td>
                                     <td>Profile Picture</td>
-                                    <td>Username</td>
+                                    <td>Name</td>
                                     <td>Niche</td>
                                     <td>Email</td>
                                     <td>Phone Number</td>
@@ -23,79 +23,28 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td><img src="images/BuyoneFree_65.jpg" class="img" width="30px" height="30px" alt=""></td>        
-                                     <td>John</td>
-                                    <td>
-                                       Frontend Developer
-                                    </td>
-                                    <td>johnwashington@gmail.com</td>
-                                    <td>+6546789008957</td>
+                                <tr  
+                                    v-for="(freelancer, index) in freelancers"
+                                    :key="freelancer.id"
+                                    >
+                                        <td>{{index +1}}</td>
+                                        <td><img :src="freelancer.profile" class="img" width="30px" height="30px" alt=""></td>
+                                        <td>
+                                            <router-link
+                                                v-if="freelancer.freelancerData"
+                                                :to="{
+                                                name: 'client-view',
+                                                params: { id: freelancer.freelancerData?.id, orderId: freelancer.freelancerData?.firstName }
+                                                }"
+                                            >
+                                                {{ freelancer.freelancerData?.firstName }}  {{freelancer.freelancerData?.lastName }}
+                                            </router-link> 
+                                        </td>
+                                        <td>{{ freelancer.niche }}</td>
+                                        <td>{{ freelancer.email }}</td>
+                                        <td>{{ freelancer.phoneNumber }}</td>
                                 </tr>
-                                <tr>
-                                    <td><img src="images/BuyoneFree_65.jpg" class="img" width="30px" height="30px" alt=""></td>
-                                    <td>michael</td>
-                                    <td>
-                                        Graphic Designer
-                                    </td>
-                                    <td>james@gmail.com</td>
-                                    <td>+9114476849</td>
-                                </tr>
-                                <tr>
-                                    <td><img src="images/BuyoneFree_65.jpg" class="img" width="30px" height="30px" alt=""></td>        
-                                     <td>John</td>
-                                    <td>
-                                       Frontend Developer
-                                    </td>
-                                    <td>johnwashington@gmail.com</td>
-                                    <td>+6546789008957</td>
-                                </tr>
-                                <tr>
-                                    <td><img src="images/BuyoneFree_65.jpg" class="img" width="30px" height="30px" alt=""></td>
-                                    <td>michael</td>
-                                    <td>
-                                        Graphic Designer
-                                    </td>
-                                    <td>james@gmail.com</td>
-                                    <td>+9114476849</td>
-                                </tr>
-                                <tr>
-                                    <td><img src="images/BuyoneFree_65.jpg" class="img" width="30px" height="30px" alt=""></td>        
-                                     <td>John</td>
-                                    <td>
-                                       Frontend Developer
-                                    </td>
-                                    <td>johnwashington@gmail.com</td>
-                                    <td>+6546789008957</td>
-                                </tr>
-                                <tr>
-                                    <td><img src="images/BuyoneFree_65.jpg" class="img" width="30px" height="30px" alt=""></td>
-                                    <td>michael</td>
-                                    <td>
-                                        Graphic Designer
-                                    </td>
-                                    <td>james@gmail.com</td>
-                                    <td>+9114476849</td>
-                                </tr>
-                                <tr>
-                                    <td><img src="images/BuyoneFree_65.jpg" class="img" width="30px" height="30px" alt=""></td>        
-                                     <td>John</td>
-                                    <td>
-                                       Frontend Developer
-                                    </td>
-                                    <td>johnwashington@gmail.com</td>
-                                    <td>+6546789008957</td>
-                                </tr>
-                                <tr>
-                                    <td><img src="images/BuyoneFree_65.jpg" class="img" width="30px" height="30px" alt=""></td>
-                                    <td>michael</td>
-                                    <td>
-                                        Graphic Designer
-                                    </td>
-                                    <td>james@gmail.com</td>
-                                    <td>+9114476849</td>
-                                </tr>
+                 
                             </tbody>
                         </table>
                     </div>
@@ -108,6 +57,7 @@
 <script>
 import SideBar from "@/components/core/SideBar.vue";
 import Header from "@/components/core/Header.vue";
+import {getDoc, getDocs, doc, getFirestore, collection } from 'firebase/firestore';
 export default {
     components: {
         SideBar, 
@@ -117,7 +67,8 @@ export default {
         return {
             available: null,
             profileMenu: null,
-
+            freelancers: [],
+            freelancerData: null,
         }
     },
     methods: {
@@ -127,7 +78,37 @@ export default {
         toggleProfileMenu(){
             this.profileMenu= !this.profileMenu
         },
-    }
+    },
+    async created() {
+        const db = getFirestore();
+        const orderRef = collection(db, 'freelancers');
+        const snapshot = await getDocs(orderRef);
+        const freelancers = snapshot.docs.map(doc => doc.data());
+
+        const promises = freelancers.map(async freelancer => {
+            if (freelancer.id) {
+            const userRef = doc(collection(db, "users"), freelancer.id);
+            const userSnapshot = await getDoc(userRef);
+            const freelancerData = userSnapshot.data();
+
+            freelancer.freelancerData = {
+                firstName: freelancerData.firstName,
+                lastName: freelancerData.lastName,
+                phoneNumber:freelancerData.phoneNumber,
+                email: freelancerData.email,
+                id: freelancerData.id,
+            };
+            } else {
+            console.log("no userID");
+            }
+        });
+
+        // Wait for all promises to resolve
+        await Promise.all(promises);
+
+        // Assign the completed data to the component property
+        this.freelancers= freelancers;
+        }
 }
 </script>
 

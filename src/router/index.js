@@ -64,7 +64,13 @@ import revisions from '../components/adminDashboard/revisions.vue'
 import suspendedFreelancers from '../components/adminDashboard/suspendedFreelancers.vue'
 import transactions from '../components/adminDashboard/transactions.vue'
 import unpaidOrders from '../components/adminDashboard/unpaidOrders.vue'
+import AdminDone from '../components/adminDashboard/done.vue'
+import AdminIncomplete from '../components/adminDashboard/incomplete.vue'
+import  AdminRevision from '../components/adminDashboard/revision.vue'
+import  AdminReviews from '../components/adminDashboard/reviews.vue'
+import  AdminDisputed from '../components/adminDashboard/disputed.vue'
 import OrderBids from '../components/adminDashboard/OrderBids.vue'
+
 const routes = [
   {
     path: '/',
@@ -546,6 +552,51 @@ const routes = [
     component: unpaidOrders,
     meta: {
       title: "Unpaid Orders",
+      requiresAuth: false,
+    }
+  },
+  {
+    path: '/admin/done/:id',
+    name: 'admin/done',
+    component: AdminDone,
+    meta: {
+      title: "Done",
+      requiresAuth: false,
+    }
+  },
+  {
+    path: '/admin/incomplete/:id',
+    name: 'admin/incomplete',
+    component: AdminIncomplete,
+    meta: {
+      title: "Incomplete",
+      requiresAuth: false,
+    }
+  },
+  {
+    path: '/admin/revision/:id',
+    name: 'admin/revision',
+    component: AdminRevision,
+    meta: {
+      title: "Revision",
+      requiresAuth: false,
+    }
+  },
+  {
+    path: '/admin/reviews/:id',
+    name: 'admin/reviews',
+    component: AdminReviews,
+    meta: {
+      title: "Reviews",
+      requiresAuth: false,
+    }
+  },
+  {
+    path: '/admin/disputed/:id',
+    name: 'admin/disputed',
+    component: AdminDisputed,
+    meta: {
+      title: "Disputed",
       requiresAuth: false,
     }
   },

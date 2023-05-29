@@ -1,293 +1,213 @@
-
-
 <template>
     <input type="checkbox" id="nav-toggle">
- 
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <img id="logo-img" class="img-center" src="@/assets/client/images/logo.png" alt="" >
+        </div>
+        <div class="sidebar-menu" style="height: 500px;">
+            <ul id="navbar" style="margin-left: 5px;">
+                <li>
+                    <router-link :to="{ name: 'client-view', params: { id: clientId, orderId: clientId } }">
+                      <i class="fa-solid fa-user"></i>
+                    <span>Profile</span>
+                    </router-link>
+                </li>
+                <!-- freelancer begin -->
+                <li>
+                    <router-link  to="/freelancer-dashboard">
+                    <i class="fa fa-book" aria-hidden="true"></i>
+                    <span>Dashboard</span>
+                    </router-link>
+                </li>
+                <li>
+                    <router-link to="/">
+                        <i class="fa-solid fa-house"></i>
+                    <span>Home</span>
+                    </router-link>
+                </li>
+               <!-- <li>
+                    <router-link to="/client-view">
+                      <i class="fa-solid fa-user"></i>
+                    <span>Profile</span>
+                    </router-link>
+                </li> -->
+               <li >
+                <router-link :to="{ name: 'admin/incomplete', params: { id: clientId } }">
+
+                        <i class="fa-sharp fa-solid fa-pen"></i>
+                    <span>Incomplete</span>
+                    <span class="li-span">{{ incomplete.length }}</span>
+                    </router-link>
+                </li>
+                <li >
+                <router-link :to="{ name: 'admin/reviews', params: { id: clientId} }">
+                        <i class="fa-sharp fa-solid fa-font-awesome"></i>
+                    <span>In review</span>
+                    <span class="li-span">{{ reviews.length }}</span>
+                    </router-link>
+                </li>
+                <li >
+                    <router-link :to="{ name: 'admin/done', params: { id: clientId } }">
+                        <i class="fa fa-clipboard" aria-hidden="true"></i>
+                    <span>Done</span>
+                    <span class="li-span">{{ done_orders.length }}</span>
+                    </router-link>
+                </li>
+                <li >
+                <router-link :to="{ name: 'admin/revision', params: { id: clientId} }">
+                        <i class="fa-sharp fa-solid fa-pen-to-square"></i>
+                    <span>Revision</span>
+                    <span class="li-span">{{ revision.length }}</span>
+                    </router-link>
+                </li>
+                <li >
+
+             <router-link :to="{ name: 'admin/disputed', params: { id: clientId } }">
+                        <i class="fa-sharp fa-solid fa-thumbs-down"></i>
+                    <span>Disputed</span>
+                    <span class="li-span">{{ disputed.length }}</span>
+                    </router-link>
+                </li>
+            </ul>
+        </div>
+    </div>
     <div class="main-content">
-        
-    <div class="container">
-      <ModalItem v-if="modalActive" :modalMessage="modalMessage" v-on:close-modal="closeModal" />
-        <!-- <img src="../assets/client/images/logo.png" style="height:200px;" class="logo" > -->
-          <div class="row">
-            <div class="col-md-6 offset-md-3">
-            <div class="col-md-12">
-              <div>
-                <div>
-                  <h2>Account Settings</h2>
-                  <hr />
-                </div>
-                <div class="initials">
-                  <div>
-                  {{ $store.state.profileInitials }}
-                  </div>
-                
-                </div>
-                <span @click="openPreview" :class="{ 'button-inactive': !this.$store.state.profilePhotoFileURL}" style>{{ this.$store.state.profilePhotoName}}</span>
-                <div v-if="admin" class="admin-badge">
-                 <span> <i class="fa-solid fa-user"></i> Admin</span>
-                </div>
-                <form>
-                  <TheLoader v-if="loading"/>
-                  <div class="form-group">
-                    <label for="firstName">First Name</label>
-                    <input
-                    type="text"
-                    class="form-control"
-                    id="firstName" v-model.trim="firstName"
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label for="lastName" >Last Name</label>
-                    <input
-                    type="text"
-                    class="form-control"
-                    id="lastName" v-model.trim="lastName"
-                   />
-                  </div>
-                  <div class="form-group">
-                    <label for="username">Username</label>
-                    <input
-                    type="text"
-                    class="form-control"
-                    id="username" v-model.trim="username"
-                  />
-                  </div>
-                  <div class="form-group">
-                    <label for="phoneNumber">Phone Number</label>
-                    <input
-                    type="text"
-                    class="form-control"
-                    id="phoneNumber" v-model.trim="phoneNumber"
-                   />
-                  </div>
-                  <div class="form-group">
-                    <label for="niche">Niche</label>
-                    <input
-                    type="text"
-                    class="form-control"
-                    id="username" v-model.trim="niche"
-                    />
-                  </div>
-                  <div class="row">
-                                            <div class="col-sm-12 pd-left">
-                                                <div class="form-group">
-                                                    <label for="avatar">Profile picture</label>
-                                                    <input type="file" name="avatar"  ref="orderFile" id="order-file" @change="fileChange" class="form-control">
-                                                </div>
-                                            </div>
-                                        </div>
-                  <div class="form-group">
-                    <label for="email" >Email</label>
-                    <input
-                    disabled
-                    type="email"
-                    class="form-control"
-                    id="email" v-model.trim="email"
-                    />
-                  </div>
-                  <div class="my-3">
-                    <button @click.prevent="updateProfile">Save Changes</button>
-                  </div>
-                </form>
-              </div>
-             </div>
+       <Header></Header>
+        <main>
+            <div class="recent-grid ">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Incomplete Orders</h2>
+                        </div>
+                        <div class="card-body">
+                        <div class="table-responsive">
+                            <table width="100%">
+                                <thead>
+                                    <tr>
+                                        <td>NO:</td>
+                                        <td>Order Title</td>
+                                        <td>Category</td>
+                                        <td>Due Time</td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(order, index) in incomplete" :key="order.id">
+                                        <td>{{ index + 1 }}</td>
+                                        <td>{{ order.orderTitle}}</td>
+                                        <td>{{ order.orderCategory}}</td>
+                                        <td>{{ order.dueDate}}, {{ order.dueTime}}</td>
+                                        <td> 
+                                            <router-link :to="{ name: 'client-order-view', params: {id: order.id}}">
+                                                    View Details
+                                                </router-link>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        </div>
+                    </div>
             </div>
-          </div>
+        </main>
     </div>
-    </div>
-    </template>
-    
-    <script>
+</template>
+
+
+<script>
 import SideBar from "@/components/core/SideBar.vue";
 import Header from "@/components/core/Header.vue";
-import { getFirestore, doc, updateDoc, collection, getDoc, } from "firebase/firestore";
-import { getStorage ,ref, getDownloadURL, uploadBytesResumable} from "firebase/storage"; 
-    import ModalItem from "@/components/ModalItem"
-    import TheLoader from "@/components/TheLoader"
-    import { getAuth} from "firebase/auth";
-    export default {
+import {getDoc, getDocs, doc, getFirestore, collection } from 'firebase/firestore';
+export default {
     components: {
         SideBar, 
         Header
     },
-        name: "ProfileView",
-        data () {
+    data () {
         return {
             available: null,
             profileMenu: null,
-            modalMessage: "Changes were saved!",
-            modalActive: false,
-            photoAvailable: null,
-            loading: null,
-            file: null,
-            firstName: this.firstName,
-            lastName: this.lastName,
-            phoneNumber: this.phoneNumber,
-            username: this.username,
-            niche: this.niche,
-          
-
+            clientId:  this.$route.params.id,
+            done_orders: [],
+            disputed: [],
+            incomplete: [],
+            revision: [],
+            reviews: [],
         }
     },
-
-        components :{
-            ModalItem,
-            TheLoader,
-            // ProfilePhotoPreview
-            
-        },
-     
-        methods: {
-            toggleAvailable(){
+    methods: {
+        toggleAvailable(){
             this.available= !this.available
         },
         toggleProfileMenu(){
             this.profileMenu= !this.profileMenu
         },
-          closeModal() {
-            this.modalActive = !this.modalActive;
-          },
-          fileChange() {
-            if (this.$refs.orderFile && this.$refs.orderFile.files.length > 0) {
-                this.file = this.$refs.orderFile.files[0];
-                const fileName = this.file.name;
-                this.$store.commit("orderFileNameChange", fileName);
-                this.$store.commit("createOrderFileURL", URL.createObjectURL(this.file));
-            }else {
-                console.log("no file");
-            }
-        },
-       async updateProfile(){
-          this.loading = true;
-          if (this.file) {
-                
-                this.loading = true;
-                    const storage = getStorage();
-                    const storageRef = ref(
-                    storage,
-                    `documents/profiles/${this.$store.state.orderFileName}`
-                    );
-                    const uploadTask = uploadBytesResumable(storageRef, this.file);
-                    uploadTask.on(
-                    "state_changed",
-                    (snapshot) => {
-                        console.log(snapshot);
-                    },
-                    (err) => {
-                        console.log(err);
-                        this.loading = false;
-                    },
-                    async () => {
-                    const downloadURL = await getDownloadURL(storageRef);
-                    const db = getFirestore();
-                    const timestamp = await Date.now();
+  },
+  async created() {
+        const db = getFirestore();
+        const userRef = doc(db, 'users', this.clientId);
 
-                   
+        const doneorderRef = collection(userRef, 'done_orders');
+        const donesnapshot = await getDocs(doneorderRef);
+        const done_orders = donesnapshot.docs.map(doc => doc.data());
+        this.done_orders = done_orders;
 
-                        //updating clients status to be on review
-                        const auth = getAuth();
-                        const firestore = getFirestore();
+        const disputedorderRef = collection(userRef, 'disputed');
+        const disputedsnapshot = await getDocs(disputedorderRef);
+        const disputed = disputedsnapshot.docs.map(doc => doc.data());
+        this.disputed = disputed;
 
-                        const userRef= doc(collection(firestore, "users"), auth.currentUser.uid);
-                        await updateDoc(userRef, {
-                            firstName: this.firstName,
-                            lastName: this.lastName,
-                            phoneNumber: this.phoneNumber,
-                            username: this.username,
-                            niche: this.niche,
-                            profileCoverFile: downloadURL,
-                            profileCoverFileName: this.$store.state.orderFileName,
-                        }); 
+        const incompleteorderRef = collection(userRef, 'incomplete');
+        const incompletesnapshot = await getDocs(incompleteorderRef);
+        const incomplete = incompletesnapshot.docs.map(doc => doc.data());
+        this.incomplete = incomplete;
 
-                
-                      }
-                );
-                this.loading = false;
-                this.modalActive = !this.modalActive;
-                return;
-                }
-                else {
-                    const db = getFirestore();
-                    const timestamp = await Date.now();
+        const revisionorderRef = collection(userRef, 'revision');
+        const revisionsnapshot = await getDocs(revisionorderRef);
+        const revision = revisionsnapshot.docs.map(doc => doc.data());
+        this.revision = revision;
 
-                    const auth = getAuth();
-                        const firestore = getFirestore();
+        const reviewsorderRef = collection(userRef, 'reviews');
+        const reviewssnapshot = await getDocs(reviewsorderRef);
+        const reviews= reviewssnapshot.docs.map(doc => doc.data());
+        this.reviews = reviews;
 
-                        const userRef= doc(collection(firestore, "users"), auth.currentUser.uid);
-                        await updateDoc(userRef, {
-                            firstName: this.firstName,
-                            lastName: this.lastName,
-                            phoneNumber: this.phoneNumber,
-                            username: this.username,
-                            niche: this.niche
-                        }); 
-                        this.loading = false;
-                        this.modalActive = !this.modalActive;
-                        return;
-                }
-       
-        },
-    
-     
-        },
-
-  computed: {
-  
-    firstName: {
-        get() {
-          return this.$store.state.profileFirstName;
-        },
-        set(payload){
-          this.$store.commit("changeFirstName", payload);
-        }
-      },
-      lastName: {
-        get() {
-          return this.$store.state.profileLastName;
-        },
-        set(payload){
-          this.$store.commit("changeLastName", payload);
-        }
-      },
-      username: {
-        get() {
-          return this.$store.state.profileUsername;
-        },
-        set(payload){
-          this.$store.commit("changeUsername", payload);
-        }
-      },
-      phoneNumber: {
-        get() {
-          return this.$store.state.profilePhoneNumber;
-        },
-        set(payload){
-          this.$store.commit("changePhoneNumber", payload);
-        }
-      },
-      email: {
-        get() {
-          return this.$store.state.profileEmail;
-        }
-      },
-      admin() {
-          return this.$store.state.profileAdmin;
-      }
-
- },
-
-async mounted() {
-  const auth = getAuth();
-   await auth.onAuthStateChanged(user => {
-     this.$store.dispatch("getCurrentUser", user);
-
-    });
-  
-  }
 }
-    </script>
+ 
+}
+</script>
+
+
+<style scoped>
     
-    <style scoped>
+table {
+    border-collapse:collapse;
+}
+thead tr {
+    border: 1px solid #1c68c4;;
+}
+tbody tr {
+    border: 1px solid #1c68c4;;
+}
+thead td {
+    font-weight: 700;
+}
+td {
+    padding: .5rem 1rem;
+    font-size: 15px;
+    color: #222;
+    border: 1px solid #1c68c4;;
+   
+}
+td i {
+    color: #1c68c4;
+    padding-right: 1rem;
+}
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
     label{
         margin-left:10px;
     }
@@ -302,16 +222,43 @@ async mounted() {
                 font-weight: 300;
                 font-size: 32px;
             }
-            .profile-info {
-                border-radius: 8px;
-                box-shadow: 0 4px 0px -1px rgba(0,0,0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.001);
-                padding: 32px;
-                background-color: #f1f1f1;
-                display: flex;
-                flex-direction: column;
-                max-width: 600px;
-                margin: 32px auto;
-            }
+          
+.profile {
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: #fff;
+    background-color: #303030;
+    float: right;
+  }
+.profile-menu {
+    position: absolute;
+    border-radius: 10px;
+    top: 60px;
+    right: 0; 
+    width: 270px;
+    background-color: #fff;
+    box-shadow: 0 4px 0px -1px #79aae6;
+  }
+  .info {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #fff;
+  }
+
+  .right {
+    flex: 1;
+    margin-left: 24;
+  }
+  i{
+    padding-right:10px;
+  }
             .col-md-12 {
               align-items: center;
             }
@@ -455,6 +402,26 @@ a .li-span{
     padding-top: 1rem;
     padding-bottom: 1rem;
 } 
+#navbar li a.router-link-exact-active {
+    color: #0773f7;
+  }
+#navbar li a:hover{
+color: #0773f7;
+}
+#navbar li a:hover,
+#navbar li a.active{
+    color: #0773f7;
+}
+#navbar li a.active::after,
+#navbar li a:hover::after{
+    content: "";
+    width: 30%;
+    height:2px;
+    background:  #0773f7;
+    position: absolute;
+    bottom: -4px;
+    left:20px;
+}
 .sidebar-menu a span:first-child {
     font-size: 1.5rem;
     padding-right: 1rem;

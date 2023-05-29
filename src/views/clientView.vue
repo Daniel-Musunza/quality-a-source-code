@@ -8,7 +8,12 @@
         </div>
         <div class="sidebar-menu" style="height: 500px;">
             <ul id="navbar" style="margin-left: 5px;">
-               
+                <li>
+                    <router-link :to="{ name: 'client-view', params: { id: clientId, orderId: clientId } }">
+                      <i class="fa-solid fa-user"></i>
+                    <span>Profile</span>
+                    </router-link>
+                </li>
                 <!-- freelancer begin -->
                 <li>
                     <router-link  to="/freelancer-dashboard">
@@ -29,65 +34,42 @@
                     </router-link>
                 </li> -->
                <li >
-                    <router-link to="/freelancer/in-progress">
+                <router-link :to="{ name: 'admin/incomplete', params: { id: clientId } }">
+
                         <i class="fa-sharp fa-solid fa-pen"></i>
-                    <span>In Progress</span>
-                    <span class="li-span">0</span>
+                    <span>Incomplete</span>
+                    <span class="li-span">{{ incomplete.length }}</span>
                     </router-link>
                 </li>
                 <li >
-                    <router-link to="/freelancer/in-review">
+                <router-link :to="{ name: 'admin/reviews', params: { id: clientId} }">
                         <i class="fa-sharp fa-solid fa-font-awesome"></i>
                     <span>In review</span>
-                    <span class="li-span">1</span>
+                    <span class="li-span">{{ reviews.length }}</span>
                     </router-link>
                 </li>
                 <li >
-                    <router-link to="/freelancer/completed"><i class="fa fa-clipboard" aria-hidden="true"></i>
+                    <router-link :to="{ name: 'admin/done', params: { id: clientId } }">
+                        <i class="fa fa-clipboard" aria-hidden="true"></i>
                     <span>Done</span>
-                    <span class="li-span">0</span>
+                    <span class="li-span">{{ done_orders.length }}</span>
                     </router-link>
                 </li>
                 <li >
-                    <router-link to="/freelancer/on-revision">
+                <router-link :to="{ name: 'admin/revision', params: { id: clientId} }">
                         <i class="fa-sharp fa-solid fa-pen-to-square"></i>
                     <span>Revision</span>
-                    <span class="li-span">0</span>
+                    <span class="li-span">{{ revision.length }}</span>
                     </router-link>
                 </li>
                 <li >
-                    <router-link to="/freelancer/disputed"><i class="fa-sharp fa-solid fa-thumbs-down"></i>
+
+             <router-link :to="{ name: 'admin/disputed', params: { id: clientId } }">
+                        <i class="fa-sharp fa-solid fa-thumbs-down"></i>
                     <span>Disputed</span>
-                    <span class="li-span">0</span>
+                    <span class="li-span">{{ disputed.length }}</span>
                     </router-link>
                 </li>
-               
-                 
-                <!-- freelancer end -->
-                 <!-- client begin -->
-        <!--
-            <li >
-                <router-link to="/client/all-orders"><i class="fa fa-shopping-bag" aria-hidden="true"></i>
-                <span>All Orders</span>
-                </router-link>
-            </li>
-            <li >
-                <router-link to="/client/done">
-                    <i class="fa fa-clipboard" aria-hidden="true"></i>
-                <span>Completed</span>
-                </router-link>
-            </li>
-            <li >
-                <router-link to="/client/incomplete"><i class="fa-solid fa-sort"></i>
-                <span>Incomplete</span>
-                </router-link>
-            </li>
-            <li >
-                <router-link to="/client/revision"><i class="fa-solid fa-rotate"></i>
-                <span>On Revision</span>
-                </router-link>
-            </li>
-        -->
             </ul>
         </div>
     </div>
@@ -100,15 +82,10 @@
             </label>
           </h3>
         </div>
-        <!-- <div class="search-wrapper">
-            <span><i class="fa-solid fa-magnifying-glass"></i></span>
-             <input type="search" placeholder="search here" />
-           </div> -->
+     
           <div class="user-wrapper" >
             <span><i class="fa-sharp fa-solid fa-bell-slash"></i></span>
             <span><i class="fa-sharp fa-solid fa-comment"></i></span>
-         
-            <!-- <img src="images/BuyoneFree_65.jpg" class="img" width="30px" height="30px" alt=""> -->
             <div  @click="toggleProfileMenu" class="profile">
                 <span style="font-size:20px; padding-left: 25px;">{{ this.$store.state.profileInitials}}</span>
             </div>
@@ -233,7 +210,12 @@ import {getAuth} from "firebase/auth";
             bids: [],
             loading: null,
             file: null,
-        
+            clientId:  this.$route.params.id,
+            done_orders: [],
+            disputed: [],
+            incomplete: [],
+            revision: [],
+            reviews: [],
           
 
         }
@@ -354,32 +336,52 @@ import {getAuth} from "firebase/auth";
       },
         },
         async created() {
-          const db = getFirestore();
-          let clientId = this.$route.params.id;
-          const clientSnapshot = await getDoc(doc(db, 'users', clientId));
-          const clientData = clientSnapshot.data();
+            const db = getFirestore();
+            this.clientId = this.$route.params.id;
+            const clientSnapshot = await getDoc(doc(db, 'users', this.clientId));
+            const clientData = clientSnapshot.data();
             this.client = {
             firstName: clientData.firstName,
             lastName: clientData.lastName,
             email: clientData.email,
             phoneNumber: clientData.phoneNumber,
-            
             };
 
-
-       
-            const userRef = doc(db, 'users', clientId);
-            const ordersRef = collection(userRef, 'myBids');   
+            const userRef = doc(db, 'users', this.clientId);
+            const ordersRef = collection(userRef, 'myBids');
             try {
-              const querySnapshot = await getDocs(ordersRef);
-              this.bids = querySnapshot.docs.map((doc) => doc.data());
+            const querySnapshot = await getDocs(ordersRef);
+            this.bids = querySnapshot.docs.map((doc) => doc.data());
             } catch (error) {
-              console.error(error);
+            console.error(error);
             };
 
-          
+        const doneorderRef = collection(userRef, 'done_orders');
+        const donesnapshot = await getDocs(doneorderRef);
+        const done_orders = donesnapshot.docs.map(doc => doc.data());
+        this.done_orders = done_orders;
 
-      }, 
+        const disputedorderRef = collection(userRef, 'disputed');
+        const disputedsnapshot = await getDocs(disputedorderRef);
+        const disputed = disputedsnapshot.docs.map(doc => doc.data());
+        this.disputed = disputed;
+
+        const incompleteorderRef = collection(userRef, 'incomplete');
+        const incompletesnapshot = await getDocs(incompleteorderRef);
+        const incomplete = incompletesnapshot.docs.map(doc => doc.data());
+        this.incomplete = incomplete;
+
+        const revisionorderRef = collection(userRef, 'revision');
+        const revisionsnapshot = await getDocs(revisionorderRef);
+        const revision = revisionsnapshot.docs.map(doc => doc.data());
+        this.revision = revision;
+
+        const reviewsorderRef = collection(userRef, 'reviews');
+        const reviewssnapshot = await getDocs(reviewsorderRef);
+        const reviews= reviewssnapshot.docs.map(doc => doc.data());
+        this.reviews = reviews;
+        },
+        
 
   }
  

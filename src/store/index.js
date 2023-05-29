@@ -251,17 +251,7 @@ setOnRevisionOrderState(state, payload){
           await signOut(auth)
           context.commit('SET_USER', null)
       },
-      async updateUserSettings({commit, dispatch, state}) {
-        const dataBase = await setDoc(usersRef).doc(state.profileId);
-        await dataBase.update ({
-            firstName: state.profileFirstName,
-            lastName: state.profileLastName,
-            // username: state.profileUsername,
-            phoneNumber: state.profilePhoneNumber,
-        });
-        await dispatch("getCurrentUser");
-        commit("setProfileInitials");
-      },
+
         // orders actions
       async getOrders({ commit }) {
 
@@ -433,6 +423,7 @@ setOnRevisionOrderState(state, payload){
           }
         });
       },
+    
       async updatePost({ commit, dispatch }, payload) {
           commit('filterOrderPost', payload);
           await dispatch("getOrders");

@@ -15,88 +15,31 @@
                                     <tr>
                                         <td>NO:</td>
                                         <td>Profile Picture</td>
-                                        <td>First Name</td>
-                                        <td>Second Name</td>
+                                        <td>Name</td>
                                         <td>Email</td>
                                         <td>Phone Number</td>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td><img src="images/BuyoneFree_65.jpg" class="img" width="30px" height="30px" alt=""></td>                                            <td>John</td>
+                                    <tr  
+                                    v-for="(client, index) in clients"
+                                    :key="client.id"
+                                    >
+                                        <td>{{index +1}}</td>
+                                        <td><img :src="client.profile" class="img" width="30px" height="30px" alt=""></td>
                                         <td>
-                                           Washington
+                                            <router-link
+                                                v-if="client.clientData"
+                                                :to="{
+                                                name: 'client-view',
+                                                params: { id: client.clientData?.id, orderId: client.clientData?.firstName }
+                                                }"
+                                            >
+                                                {{ client.clientData?.firstName }}  {{client.clientData?.lastName }}
+                                            </router-link> 
                                         </td>
-                                        <td>johnwashington@gmail.com</td>
-                                        <td>+6546789008957</td>
-                                    </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td><img src="images/BuyoneFree_65.jpg" class="img" width="30px" height="30px" alt=""></td>
-                                        <td>michael</td>
-                                        <td>
-                                            james
-                                        </td>
-                                        <td>james@gmail.com</td>
-                                        <td>+9114476849</td>
-                                    </tr>
-                                    <tr>
-                                        <td>3</td>
-                                        <td><img src="images/BuyoneFree_65.jpg" class="img" width="30px" height="30px" alt=""></td>                                            <td>John</td>
-                                        <td>
-                                           Washington
-                                        </td>
-                                        <td>johnwashington@gmail.com</td>
-                                        <td>+6546789008957</td>
-                                    </tr>
-                                    <tr>
-                                        <td>4</td>
-                                        <td><img src="images/BuyoneFree_65.jpg" class="img" width="30px" height="30px" alt=""></td>
-                                        <td>michael</td>
-                                        <td>
-                                            james
-                                        </td>
-                                        <td>james@gmail.com</td>
-                                        <td>+9114476849</td>
-                                    </tr>
-                                    <tr>
-                                        <td>5</td>
-                                        <td><img src="images/BuyoneFree_65.jpg" class="img" width="30px" height="30px" alt=""></td>                                            <td>John</td>
-                                        <td>
-                                           Washington
-                                        </td>
-                                        <td>johnwashington@gmail.com</td>
-                                        <td>+6546789008957</td>
-                                    </tr>
-                                    <tr>
-                                        <td>6</td>
-                                        <td><img src="images/BuyoneFree_65.jpg" class="img" width="30px" height="30px" alt=""></td>
-                                        <td>michael</td>
-                                        <td>
-                                            james
-                                        </td>
-                                        <td>james@gmail.com</td>
-                                        <td>+9114476849</td>
-                                    </tr>
-                                    <tr>
-                                        <td>7</td>
-                                        <td><img src="images/BuyoneFree_65.jpg" class="img" width="30px" height="30px" alt=""></td>                                            <td>John</td>
-                                        <td>
-                                           Washington
-                                        </td>
-                                        <td>johnwashington@gmail.com</td>
-                                        <td>+6546789008957</td>
-                                    </tr>
-                                    <tr>
-                                        <td>8</td>
-                                        <td><img src="images/BuyoneFree_65.jpg" class="img" width="30px" height="30px" alt=""></td>
-                                        <td>michael</td>
-                                        <td>
-                                            james
-                                        </td>
-                                        <td>james@gmail.com</td>
-                                        <td>+9114476849</td>
+                                        <td>{{ client.email }}</td>
+                                        <td>{{ client.phoneNumber }}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -110,6 +53,7 @@
 <script>
 import SideBar from "@/components/core/SideBar.vue";
 import Header from "@/components/core/Header.vue";
+import {getDoc, getDocs, doc, getFirestore, collection } from 'firebase/firestore';
 export default {
     components: {
         SideBar, 
@@ -119,7 +63,8 @@ export default {
         return {
             available: null,
             profileMenu: null,
-
+            clients: [],
+            clientData: null,
         }
     },
     methods: {
@@ -129,7 +74,38 @@ export default {
         toggleProfileMenu(){
             this.profileMenu= !this.profileMenu
         },
-    }
+    },
+   
+    async created() {
+        const db = getFirestore();
+        const orderRef = collection(db, 'users');
+        const snapshot = await getDocs(orderRef);
+        const clients = snapshot.docs.map(doc => doc.data());
+
+        const promises = clients.map(async client => {
+            if (client.id) {
+            const userRef = doc(collection(db, "users"), client.id);
+            const userSnapshot = await getDoc(userRef);
+            const clientData = userSnapshot.data();
+
+            client.clientData = {
+                firstName: clientData.firstName,
+                lastName: clientData.lastName,
+                phoneNumber: clientData.phoneNumber,
+                email: clientData.email,
+                id: clientData.id,
+            };
+            } else {
+            console.log("no userID");
+            }
+        });
+
+        // Wait for all promises to resolve
+        await Promise.all(promises);
+
+        // Assign the completed data to the component property
+        this.clients = clients;
+        }
 }
 </script>
 
