@@ -138,6 +138,7 @@ export default {
         };
     },
     methods: {
+        
         fileChange() {
             if (this.$refs.orderFile && this.$refs.orderFile.files.length > 0) {
                 this.file = this.$refs.orderFile.files[0];

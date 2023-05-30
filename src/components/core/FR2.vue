@@ -80,9 +80,9 @@
                         <router-link class="btn btn-theme btn-circle" to="/freelancer-register" data-text="Previous">
                             <span>P</span><span>r</span><span>e</span><span>v</span><span>i</span><span>o</span><span>u</span><span>s</span>
                         </router-link>
-                        <router-link class="btn btn-theme btn-circle" to="/fr3" data-text="Next" >
+                        <div class="btn btn-theme btn-circle" @click.prevent="next()" data-text="Next" >
                             <span>N</span><span>e</span><span>x</span><span>t</span>
-                        </router-link>
+                        </div>
                         <input type="file" id="avatar" onchange="{append_avatar(event)}" style="display:none;">
                     </div>
                 </div>
@@ -96,8 +96,35 @@
 </template>
 
 <script>
-export default {
+import { mapState, mapActions } from 'vuex';
 
+export default {
+  name: 'FR2',
+  data() {
+    return {
+     firstName:null,
+     lastName: null,
+     phoneNumber: null,
+     email: null,
+     freelancing_field: null,
+    };
+  },
+  computed: {
+    ...mapState(['freelancerInfo']),
+  },
+  methods: {
+    next(){
+        const newData = {
+            firstName: this.firstName,
+            lastName:  this.lastName,
+            phoneNumber: this.phoneNumber,
+            email: this.email,
+            freelancing_field: this.freelancing_field,
+      };
+      this.$store.commit('setFreelancerInfo', [...this.freelancerInfo, newData]);
+    this.$router.push("/fr3");
+    }
+  },
 }
 </script>
 

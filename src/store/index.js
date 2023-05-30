@@ -21,9 +21,11 @@ export default createStore({
       profilePhoneNumber: null,
       profileNiche: null,
       profileCoverPhoto: null,
-             
+        freelancerInfo: [],
       profileId: null,
       profileInitials: null,
+      portfolioFileName: "",
+      portfolioFileURL: true,
 
             // orders state
             clients: [],
@@ -63,6 +65,7 @@ export default createStore({
     // order getters
     clients: state => state.clients,
     freeelancers: state => state.freelancers,
+    freelancerInfo: state => state.freelancerInfo,
     orders: state => state.orders,
     myBids: state => state.myBids,
     invited: state => state.invited,
@@ -120,6 +123,9 @@ export default createStore({
           state.profileNiche = null;
           state.profileCoverPhoto = null;
         }
+      },
+      setFreelancerInfo(state, payload) {
+        state.freelancerInfo = payload
       },
       setProfileInitials (state){
           state.profileInitials = state.profileFirstName.match(/(\b\S)?/g).join("")+ state.profileLastName.match(/(\b\S)?/g).join("");
@@ -227,6 +233,12 @@ setOnRevisionOrderState(state, payload){
       },
       createOrderFileURL (state, payload) {
             state.orderFileURL = payload;
+      },
+      portfolioFileNameChange (state, payload) {
+        state.portfolioFileName = payload;
+      },
+      createPortfolioFileURL (state, payload) {
+            state.portfolioFileURL = payload;
       },
   },
   actions: {
