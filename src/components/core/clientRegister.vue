@@ -82,7 +82,7 @@
                                 <div class="col-sm-12 pd-left">
                                     <div class="form-group">
                                         <label for="avatar">Profile picture</label>
-                                        <input type="file" name="avatar" class="form-control">
+                                        <input type="file" name="avatar"  ref="orderFile" id="order-file" @change="fileChange" class="form-control">
                                     </div>
                                 </div>
                             </div>
@@ -113,8 +113,8 @@
 
 <script>
 import TheLoader from "@/components/TheLoader";
-import { getFirestore } from "firebase/firestore";
-import {doc, setDoc} from "firebase/firestore"; 
+import { getFirestore, doc, setDoc, } from "firebase/firestore";
+import { getStorage ,ref, getDownloadURL, uploadBytesResumable} from "firebase/storage"; 
 import { getAuth, createUserWithEmailAndPassword} from 'firebase/auth';
 
 
@@ -133,10 +133,21 @@ export default {
           confirmPassword: "",
           errorMsg: "",
           error: null,
-          loading: null
+          loading: null,
+          file: null
         };
     },
     methods: {
+        fileChange() {
+            if (this.$refs.orderFile && this.$refs.orderFile.files.length > 0) {
+                this.file = this.$refs.orderFile.files[0];
+                const fileName = this.file.name;
+                this.$store.commit("orderFileNameChange", fileName);
+                this.$store.commit("createOrderFileURL", URL.createObjectURL(this.file));
+            }else {
+                console.log("no file");
+            }
+        },
       async register(err) {
         this.loading= true;
         if (
@@ -148,32 +159,89 @@ export default {
           this.phoneNumber !== ""
         ) {
             if (this.password == this.confirmPassword){
-        
-              
-                const createUser = await createUserWithEmailAndPassword(getAuth(), this.email, this.password);
-                const result = await createUser;
-                const db = getFirestore();
-                const dataBase = doc(db, "users", result.user.uid);
-                await setDoc(dataBase, {
-                    firstName: this.firstName,
-                    lastName: this.lastName,
-                    email: this.email,
-                    phoneNumber: this.phoneNumber,
-                    id: dataBase.id
-                 });
-                const clientdataBase = doc(db, "clients", result.user.uid);
-                await setDoc(clientdataBase, {
-                    firstName: this.firstName,
-                    lastName: this.lastName,
-                    email: this.email,
-                    phoneNumber: this.phoneNumber,
-                    id: dataBase.id,
-                 });
-                this.$router.push('/client-dashboard');
-                this.loading = false;
+            
+                
+                    const createUser = await createUserWithEmailAndPassword(getAuth(), this.email, this.password);
+                    const result = await createUser;
+                    
+                if (this.file) {
+                    
+                    this.loading = true;
+                        const storage = getStorage();
+                        const storageRef = ref(
+                        storage,
+                        `documents/profiles/${this.$store.state.orderFileName}`
+                        );
+                        const uploadTask = uploadBytesResumable(storageRef, this.file);
+                        uploadTask.on(
+                        "state_changed",
+                        (snapshot) => {
+                            console.log(snapshot);
+                        },
+                        (err) => {
+                            console.log(err);
+                            this.loading = false;
+                        },
+                        async () => {
+                        const downloadURL = await getDownloadURL(storageRef);
+
+                    
+
+                        const db = getFirestore();
+                        const dataBase = doc(db, "users", result.user.uid);
+                        await setDoc(dataBase, {
+                            firstName: this.firstName,
+                            lastName: this.lastName,
+                            email: this.email,
+                            phoneNumber: this.phoneNumber,
+                            profileCoverFile: downloadURL,
+                            profileCoverFileName: this.$store.state.orderFileName,
+                            id: dataBase.id
+                        });
+                        const clientdataBase = doc(db, "clients", result.user.uid);
+                        await setDoc(clientdataBase, {
+                            firstName: this.firstName,
+                            lastName: this.lastName,
+                            email: this.email,
+                            phoneNumber: this.phoneNumber,
+                            profileCoverFile: downloadURL,
+                            profileCoverFileName: this.$store.state.orderFileName,
+                            id: dataBase.id,
+                        });
+                        this.$store.commit("setProfileInitials");
+                        this.$store.dispatch("getCurrentUser", user);
+                        this.loading = false;
+                        this.$router.push('/client-dashboard');
+                
+                    return;
+                    }
+                );
+                }
+                else {
+                    const db = getFirestore();
+                    const dataBase = doc(db, "users", result.user.uid);
+                    await setDoc(dataBase, {
+                        firstName: this.firstName,
+                        lastName: this.lastName,
+                        email: this.email,
+                        phoneNumber: this.phoneNumber,
+                        id: dataBase.id
+                    });
+                    const clientdataBase = doc(db, "clients", result.user.uid);
+                    await setDoc(clientdataBase, {
+                        firstName: this.firstName,
+                        lastName: this.lastName,
+                        email: this.email,
+                        phoneNumber: this.phoneNumber,
+                        id: dataBase.id,
+                    });
+                    this.$store.commit("setProfileInitials");
+                    this.loading = false;
+                    this.$router.push('/client-dashboard');
                 return;
-         
-        }
+                }
+            
+            }
         this.error = true;
         this.errorMsg = "password doesn't match";
         this.loading = false;

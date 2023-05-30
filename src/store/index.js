@@ -19,6 +19,8 @@ export default createStore({
       profileLastName: null,
       profileUsername: null,
       profilePhoneNumber: null,
+      profileNiche: null,
+      profileCoverPhoto: null,
              
       profileId: null,
       profileInitials: null,
@@ -106,11 +108,17 @@ export default createStore({
           state.profileFirstName = payload.firstName;
           state.profileLastName = payload.lastName;
           state.profilePhoneNumber = payload.phoneNumber;
+          state.profileUsername = payload.username;
+          state.profileNiche = payload.niche;
+          state.profileCoverPhoto = payload.profileCoverFile;
         } else {
           state.profileEmail = null;
           state.profileFirstName = null;
           state.profileLastName = null;
           state.profilePhoneNumber = null;
+          state.profileUsername = null;
+          state.profileNiche = null;
+          state.profileCoverPhoto = null;
         }
       },
       setProfileInitials (state){
@@ -127,6 +135,9 @@ export default createStore({
       },
       changePhoneNumber(state, payload){
         state.profilePhoneNumber = payload
+      },
+      changeNiche(state, payload){
+        state.profileNiche = payload
       },
       setOrderState(state, payload) {
             state.orders= payload;  
@@ -232,6 +243,9 @@ setOnRevisionOrderState(state, payload){
                     firstName: userData.firstName,
                     lastName: userData.lastName,
                     phoneNumber: userData.phoneNumber,
+                    username: userData.username,
+                    niche: userData.niche,
+                    profileCoverFile: userData.profileCoverFile,
                     email: userData.email,
                   };
               context.commit("setProfileInfo", profileInfo);
@@ -251,7 +265,7 @@ setOnRevisionOrderState(state, payload){
           await signOut(auth)
           context.commit('SET_USER', null)
       },
-
+  
         // orders actions
       async getOrders({ commit }) {
 

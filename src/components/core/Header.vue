@@ -17,7 +17,9 @@
          
             <!-- <img src="images/BuyoneFree_65.jpg" class="img" width="30px" height="30px" alt=""> -->
             <div @click="toggleProfileMenu" class="profile">
-                <span style="font-size:20px; padding-left: 25px;">{{ this.$store.state.profileInitials}}</span>
+                <span style="font-size:20px; padding-left: 25px;"> 
+                    <img :src="this.$store.state.profileCoverPhoto" :alt="this.$store.state.profileInitials">
+                </span>
             </div>
             <span @click="toggleProfileMenu" class="down"><i class="fa-sharp fa-solid fa-angle-down"></i></span>
           </div>
@@ -88,6 +90,10 @@ export default {
 
 
 <style scoped>
+  img{
+      width: 50px;
+      border-radius: 50px;
+    }
  :root {
     --main-color:#fff;
     --color-dark:#02060b;

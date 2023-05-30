@@ -30,34 +30,34 @@
                 </div>
                 <div class="card-content">
                     <div class="card-body">
-                        <form class="form-horizontal form-simple" method="POST"
-                            enctype="multipart/form-data">
+                        <form class="form-horizontal form-simple">
+                            <TheLoader v-if="loading"/>
                             <input type="hidden" name="_token">                     
-                            <div class="row">
+                                   <div class="row">
                                 <div class="col-sm-6 pd-right">
                                     <div class="form-group">
                                         <input type="text" name="first_name" class="form-control"
-                                            placeholder="First name" required="">
+                                            placeholder="First name" required="" v-model.trim="firstName">
                                     </div>
                                 </div>
                                 <div class="col-sm-6 pd-left">
                                     <div class="form-group">
-                                        <input type="text" name="last_name" class="form-control" placeholder="Last name"
-                                            required="">
+                                        <input type="text"  class="form-control" placeholder="Last name"
+                                            required="" v-model.trim="lastName">
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-sm-6 pd-right">
                                     <div class="form-group">
-                                        <input type="email" name="email" id="input-email" class="form-control"
-                                            placeholder="Email" required="">
+                                        <input type="email"  class="form-control"
+                                            placeholder="Email" required="" v-model.trim="email">
                                     </div>
                                 </div>
                                 <div class="col-sm-6 pd-left">
                                     <div class="form-group">
-                                        <input type="text" name="phone" class="form-control" placeholder="Phone"
-                                            required="">
+                                        <input type="text" class="form-control" placeholder="Phone"
+                                            required="" v-model.trim="phoneNumber">
                                     </div>
                                 </div>
                             </div>
@@ -65,12 +65,13 @@
                                 
                                 <div class="col pd-right">
                                     <div class="form-group">
-                                        <select name="field" class="form-control" required>
-                                            <option value="">Freelancing Field</option>
-                                            <option value="academic">Writing</option>
-                                            <option value="article">Graphic Design</option>
-                                            <option value="article">Development</option>
-                                            <option value="article">Data Science</option>
+                                        <option value="">Freelancing Field</option>
+                                        <select name="field"  v-model="freelancing_field" class="form-control" required>
+                                            <option value="writing">Writing</option>
+                                            <option value="design">Graphic Design</option>
+                                            <option value="website">Web Development</option>
+                                            <option value="mobile_app">App Development</option>
+                                            <option value="data_science">Data Science</option>
                                         </select>
                                     </div>
                                 </div>

@@ -16,13 +16,12 @@
                   <h2>Account Settings</h2>
                   <hr />
                 </div>
-                <div class="initials">
+                <div class="initials" >
                   <div>
-                  {{ $store.state.profileInitials }}
+                    <img :src="profileCoverPhoto" :alt="this.$store.state.profileInitials">
                   </div>
-                
+                 
                 </div>
-                <span @click="openPreview" :class="{ 'button-inactive': !this.$store.state.profilePhotoFileURL}" style>{{ this.$store.state.profilePhotoName}}</span>
                 <div v-if="admin" class="admin-badge">
                  <span> <i class="fa-solid fa-user"></i> Admin</span>
                 </div>
@@ -65,7 +64,7 @@
                     <input
                     type="text"
                     class="form-control"
-                    id="username" v-model.trim="niche"
+                    id="niche" v-model.trim="niche"
                     />
                   </div>
                   <div class="row">
@@ -120,12 +119,6 @@ import { getStorage ,ref, getDownloadURL, uploadBytesResumable} from "firebase/s
             photoAvailable: null,
             loading: null,
             file: null,
-            firstName: this.firstName,
-            lastName: this.lastName,
-            phoneNumber: this.phoneNumber,
-            username: this.username,
-            niche: this.niche,
-          
 
         }
     },
@@ -179,8 +172,6 @@ import { getStorage ,ref, getDownloadURL, uploadBytesResumable} from "firebase/s
                     },
                     async () => {
                     const downloadURL = await getDownloadURL(storageRef);
-                    const db = getFirestore();
-                    const timestamp = await Date.now();
 
                    
 
@@ -190,7 +181,7 @@ import { getStorage ,ref, getDownloadURL, uploadBytesResumable} from "firebase/s
 
                         const userRef= doc(collection(firestore, "users"), auth.currentUser.uid);
                         await updateDoc(userRef, {
-                            firstName: this.firstName,
+                          firstName: this.firstName,
                             lastName: this.lastName,
                             phoneNumber: this.phoneNumber,
                             username: this.username,
@@ -198,21 +189,20 @@ import { getStorage ,ref, getDownloadURL, uploadBytesResumable} from "firebase/s
                             profileCoverFile: downloadURL,
                             profileCoverFileName: this.$store.state.orderFileName,
                         }); 
+                        this.$store.commit("setProfileInitials");
+                        this.$store.dispatch("getCurrentUser", userRef);
 
                 
                       }
                 );
+              
                 this.loading = false;
                 this.modalActive = !this.modalActive;
                 return;
                 }
                 else {
-                    const db = getFirestore();
-                    const timestamp = await Date.now();
-
                     const auth = getAuth();
                         const firestore = getFirestore();
-
                         const userRef= doc(collection(firestore, "users"), auth.currentUser.uid);
                         await updateDoc(userRef, {
                             firstName: this.firstName,
@@ -221,6 +211,9 @@ import { getStorage ,ref, getDownloadURL, uploadBytesResumable} from "firebase/s
                             username: this.username,
                             niche: this.niche
                         }); 
+                        this.$store.commit("setProfileInitials");
+                        this.$store.dispatch("getCurrentUser", userRef);
+
                         this.loading = false;
                         this.modalActive = !this.modalActive;
                         return;
@@ -265,6 +258,19 @@ import { getStorage ,ref, getDownloadURL, uploadBytesResumable} from "firebase/s
           this.$store.commit("changePhoneNumber", payload);
         }
       },
+      niche: {
+        get() {
+          return this.$store.state.profileNiche;
+        },
+        set(payload){
+          this.$store.commit("changeNiche", payload);
+        }
+      },
+      profileCoverPhoto: {
+        get() {
+          return this.$store.state.profileCoverPhoto;
+        }
+      },
       email: {
         get() {
           return this.$store.state.profileEmail;
@@ -288,6 +294,10 @@ async mounted() {
     </script>
     
     <style scoped>
+    img{
+      width: 100px;
+      border-radius: 50px;
+    }
     label{
         margin-left:10px;
     }
