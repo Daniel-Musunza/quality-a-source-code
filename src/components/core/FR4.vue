@@ -27,25 +27,17 @@
                                 <h6 class="card-subtitle line-on-side text-muted text-center font-small-3 pt-2">
                                     <span>Freelancer Account Registration</span>
                                 </h6>
-                                <div class="video-item">
-                                   {{freelancerInfo}}
-                                   {{freelancerInfo.niche}}
-                                   {{freelancerInfo.other_roles}}
-                                </div>
                                 <h6 class="portfolio">Portfolio</h6>
-                                <div class="row">
-                                    <div class="col-sm-6 pd-right">
-                                        <div class="form-group">
-                                            <input type="text" name="portfolio" class="form-control"
-                                                placeholder="LINK TO YOUR PORTFOLIO" v-model="portfolio_link">
+                                <TheLoader v-if="loading"/>
+                                        <div class="row">
+                                            <div class="col-sm-12 pd-right">
+                                                <div class="form-group">
+                                                    <input type="text" name="portfolio" class="form-control"
+                                                        placeholder="LINK TO YOUR PORTFOLIO" v-model="portfolio_link">
+                                                </div>
+                                            </div>
+                                        
                                         </div>
-                                    </div>
-                                    <div class="col-sm-6 pd-left">
-                                        <div class="form-group">
-                                            <input type="file" name="avatar"  ref="portfolioFile" id="portfolio-file" @change="portfolioUpload" class="form-control">
-                                        </div>
-                                    </div>
-                                </div>
                                         <div class="row">
                                             <div class="col-sm-12 pd-left">
                                                 <div class="form-group">
@@ -108,6 +100,13 @@ export default {
   },
     data() {
         return {
+            firstName:null,
+            lastName: null,
+            phoneNumber: null,
+            email: null,
+            freelancing_field: null,
+          niche:null,
+          other_roles: [],
           portfolio_link: "",
           password: "",
           confirmPassword: "",
@@ -118,16 +117,7 @@ export default {
         };
     },
     methods: {
-        portfolioUpload() {
-            if (this.$refs.portfolioFile && this.$refs.portfolioFile.files.length > 0) {
-                this.file = this.$refs.portfolioFile.files[0];
-                const fileName = this.file.name;
-                this.$store.commit("portfolioFileNameChange", fileName);
-                this.$store.commit("createPortfolioFileURL", URL.createObjectURL(this.file));
-            }else {
-                console.log("no file");
-            }
-        },
+
         fileChange() {
             if (this.$refs.orderFile && this.$refs.orderFile.files.length > 0) {
                 this.file = this.$refs.orderFile.files[0];
@@ -174,9 +164,6 @@ export default {
                         },
                         async () => {
                         const downloadURL = await getDownloadURL(storageRef);
-
-                    
-
                         const db = getFirestore();
                         const dataBase = doc(db, "users", result.user.uid);
                         await setDoc(dataBase, {
@@ -184,23 +171,30 @@ export default {
                             lastName: this.lastName,
                             email: this.email,
                             phoneNumber: this.phoneNumber,
+                            freelancing_field: this.freelancing_field,
+                            niche: this.niche,
+                            other_roles: this.other_roles,
+                            portfolio_link: this.portfolio_link,
                             profileCoverFile: downloadURL,
                             profileCoverFileName: this.$store.state.orderFileName,
                             id: dataBase.id
                         });
-                        const clientdataBase = doc(db, "clients", result.user.uid);
+                        const clientdataBase = doc(db, "freelancers", result.user.uid);
                         await setDoc(clientdataBase, {
                             firstName: this.firstName,
                             lastName: this.lastName,
                             email: this.email,
                             phoneNumber: this.phoneNumber,
+                            freelancing_field: this.freelancing_field,
+                            niche: this.niche,
+                            other_roles: this.other_roles,
+                            portfolio_link: this.portfolio_link,
                             profileCoverFile: downloadURL,
                             profileCoverFileName: this.$store.state.orderFileName,
                             id: dataBase.id,
                         });
-                        this.$store.commit("setProfileInitials");
-                        this.$store.dispatch("getCurrentUser", user);
                         this.loading = false;
+                        alert("success!! we will review your Details and get back to you.");
                         this.$router.push('/client-dashboard');
                 
                     return;
@@ -215,18 +209,26 @@ export default {
                         lastName: this.lastName,
                         email: this.email,
                         phoneNumber: this.phoneNumber,
+                        freelancing_field: this.freelancing_field,
+                        niche: this.niche,
+                        other_roles: this.other_roles,
+                        portfolio_link: this.portfolio_link,
                         id: dataBase.id
                     });
-                    const clientdataBase = doc(db, "clients", result.user.uid);
+                    const clientdataBase = doc(db, "freelancers", result.user.uid);
                     await setDoc(clientdataBase, {
                         firstName: this.firstName,
                         lastName: this.lastName,
                         email: this.email,
                         phoneNumber: this.phoneNumber,
+                        freelancing_field: this.freelancing_field,
+                        niche: this.niche,
+                        other_roles: this.other_roles,
+                        portfolio_link: this.portfolio_link,
                         id: dataBase.id,
                     });
-                    this.$store.commit("setProfileInitials");
                     this.loading = false;
+                    alert("success!! we will review your Details and get back to you.")
                     this.$router.push('/client-dashboard');
                 return;
                 }
@@ -247,9 +249,34 @@ export default {
     ...mapState(['freelancerInfo']),
    
     },
-    created(){
-        console.log(this.freelancerInfo[1].niche);
+    created() {
+        if (this.freelancerInfo[0]) {
+            this.firstName = this.freelancerInfo[0].firstName ?? '';
+            this.lastName = this.freelancerInfo[0].lastName ?? '';
+            this.phoneNumber = this.freelancerInfo[0].phoneNumber ?? '';
+            this.email = this.freelancerInfo[0].email ?? '';
+            this.freelancing_field = this.freelancerInfo[0].freelancing_field ?? '';
+        } else {
+            // Handle null case for freelancerInfo[0]
+            // Set default values or handle the error accordingly
+            this.firstName = '';
+            this.lastName = '';
+            this.phoneNumber = '';
+            this.email = '';
+            this.freelancing_field = '';
+        }
+
+        if (this.freelancerInfo[1]) {
+            this.niche = this.freelancerInfo[1].niche ?? '';
+            this.other_roles = this.freelancerInfo[1].other_roles ?? '';
+        } else {
+            // Handle null case for freelancerInfo[1]
+            // Set default values or handle the error accordingly
+            this.niche = '';
+            this.other_roles = '';
+        }
     }
+
 };
 </script>
 

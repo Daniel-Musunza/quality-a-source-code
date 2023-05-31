@@ -1,6 +1,6 @@
 import { createStore } from 'vuex';
 import {db} from "../firebase";
-import {setDoc, getDocs, doc, getDoc, getFirestore, collection} from 'firebase/firestore';
+import {getDocs, doc, getDoc, getFirestore, collection} from 'firebase/firestore';
 import { getAuth, onAuthStateChanged} from "firebase/auth";
 
 export default createStore({
@@ -20,12 +20,13 @@ export default createStore({
       profileUsername: null,
       profilePhoneNumber: null,
       profileNiche: null,
+      profileFreelancing_field: null,
+      other_roles: [],
+      profilePortfolioLink: null,
       profileCoverPhoto: null,
         freelancerInfo: [],
       profileId: null,
       profileInitials: null,
-      portfolioFileName: "",
-      portfolioFileURL: true,
 
             // orders state
             clients: [],
@@ -113,6 +114,9 @@ export default createStore({
           state.profilePhoneNumber = payload.phoneNumber;
           state.profileUsername = payload.username;
           state.profileNiche = payload.niche;
+          state.profileFreelancing_field = payload.freelancing_field;
+          state.profilePortfolioLink = payload.portfolioLink;
+          state.other_roles = payload.other_roles;
           state.profileCoverPhoto = payload.profileCoverFile;
         } else {
           state.profileEmail = null;
@@ -144,6 +148,15 @@ export default createStore({
       },
       changeNiche(state, payload){
         state.profileNiche = payload
+      },
+      changeFreelancing_field(state, payload){
+        state.profileFreelancing_field = payload
+      },
+      changeOther_Roles(state, payload){
+        state.other_roles = payload
+      },
+      changePortfolioLink(state, payload){
+        state.profilePortfolioLink = payload
       },
       setOrderState(state, payload) {
             state.orders= payload;  
@@ -234,12 +247,6 @@ setOnRevisionOrderState(state, payload){
       createOrderFileURL (state, payload) {
             state.orderFileURL = payload;
       },
-      portfolioFileNameChange (state, payload) {
-        state.portfolioFileName = payload;
-      },
-      createPortfolioFileURL (state, payload) {
-            state.portfolioFileURL = payload;
-      },
   },
   actions: {
       // auth actions
@@ -286,7 +293,7 @@ setOnRevisionOrderState(state, payload){
         commit('setOrderState', data);
       },
       async getClients({ commit }) {
-        const querySnapshot = await getDocs(collection(db, "users"));
+        const querySnapshot = await getDocs(collection(db, "clients"));
         const data = querySnapshot.docs.map((doc) => doc.data());
         commit("setClientState", data);
       },

@@ -78,13 +78,13 @@ export default {
    
     async created() {
         const db = getFirestore();
-        const orderRef = collection(db, 'users');
+        const orderRef = collection(db, 'clients');
         const snapshot = await getDocs(orderRef);
         const clients = snapshot.docs.map(doc => doc.data());
 
         const promises = clients.map(async client => {
             if (client.id) {
-            const userRef = doc(collection(db, "users"), client.id);
+            const userRef = doc(collection(db, "clients"), client.id);
             const userSnapshot = await getDoc(userRef);
             const clientData = userSnapshot.data();
 

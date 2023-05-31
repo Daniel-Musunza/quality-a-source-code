@@ -218,7 +218,7 @@
                         <div class="card-body">
                             <div class="customer" v-for="freelancer in freelancers" :key="freelancer.id">
                                 <div class="info">
-                                    <img src="../../assets/images/BuyoneFree_65.jpg" class="img" width="40px" height="40px" alt="">
+                                    <img :src="freelancer.profileCoverFile" class="img" width="40px" height="40px" alt="">
                                     <div>
                                         <h5> {{ freelancer.firstName }} {{ freelancer.lastName }}</h5>
                                         <small>{{ freelancer.niche }}</small>
