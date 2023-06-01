@@ -264,8 +264,11 @@ setOnRevisionOrderState(state, payload){
                     phoneNumber: userData.phoneNumber,
                     username: userData.username,
                     niche: userData.niche,
+                    freelancing_field: userData.freelancing_field,
+                    portfolioLink: userData.portfolioLink,
                     profileCoverFile: userData.profileCoverFile,
                     email: userData.email,
+                    other_roles: userData.other_roles,
                   };
               context.commit("setProfileInfo", profileInfo);
               context.commit("setProfileInitials");

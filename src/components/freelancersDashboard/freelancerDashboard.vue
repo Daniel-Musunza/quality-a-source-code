@@ -218,7 +218,8 @@
                         <div class="card-body">
                             <div class="customer" v-for="freelancer in freelancers" :key="freelancer.id">
                                 <div class="info">
-                                    <img :src="freelancer.profileCoverFile" class="img" width="40px" height="40px" alt="">
+                                    <img v-if="freelancer.profileCoverFile" :src="freelancer.profileCoverFile" class="img" alt=''/>
+                                    <i v-if="!freelancer.profileCoverFile" style="font-size: 30px;" class="fa-solid fa-user"></i>
                                     <div>
                                         <h5> {{ freelancer.firstName }} {{ freelancer.lastName }}</h5>
                                         <small>{{ freelancer.niche }}</small>
@@ -385,6 +386,11 @@ export default {
 </script>
 
 <style scoped>
+.img{
+    height:40px;
+    border-radius: 50%;
+}
+   
  :root {
     --main-color:#fff;
     --color-dark:#02060b;

@@ -28,7 +28,9 @@
                                     :key="freelancer.id"
                                     >
                                         <td>{{index +1}}</td>
-                                        <td><img :src="freelancer.profile" class="img" width="30px" height="30px" alt=""></td>
+                                        <td><img v-if="freelancer.profileCoverFile" :src="freelancer.profileCoverFile" class="img" alt=''/>
+                                          <i v-if="!freelancer.profileCoverFile" style="font-size: 30px;" class="fa-solid fa-user"></i>
+                                        </td>
                                         <td>
                                             <router-link
                                                 v-if="freelancer.freelancerData"
@@ -95,9 +97,11 @@ export default {
                 firstName: freelancerData.firstName,
                 lastName: freelancerData.lastName,
                 phoneNumber:freelancerData.phoneNumber,
+                profileCoverFile:freelancerData.profileCoverFile,
                 email: freelancerData.email,
                 id: freelancerData.id,
             };
+            
             } else {
             console.log("no userID");
             }
@@ -106,6 +110,7 @@ export default {
         // Wait for all promises to resolve
         await Promise.all(promises);
 
+      
         // Assign the completed data to the component property
         this.freelancers= freelancers;
         }
@@ -113,6 +118,10 @@ export default {
 </script>
 
 <style scoped>
+.img{
+    height:40px;
+    border-radius: 50%;
+}
  :root {
     --main-color:#fff;
     --color-dark:#02060b;

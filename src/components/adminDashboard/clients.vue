@@ -26,7 +26,9 @@
                                     :key="client.id"
                                     >
                                         <td>{{index +1}}</td>
-                                        <td><img :src="client.profile" class="img" width="30px" height="30px" alt=""></td>
+                                        <td><img v-if="client.profileCoverFile" :src="client.profileCoverFile" class="img" alt=''/>
+                                    <i v-if="!client.profileCoverFile" style="font-size: 40px;" class="fa-solid fa-user"></i></td>
+                               
                                         <td>
                                             <router-link
                                                 v-if="client.clientData"
@@ -92,6 +94,7 @@ export default {
                 firstName: clientData.firstName,
                 lastName: clientData.lastName,
                 phoneNumber: clientData.phoneNumber,
+                profileCoverFile: clientData.profileCoverFile,
                 email: clientData.email,
                 id: clientData.id,
             };
@@ -110,6 +113,10 @@ export default {
 </script>
 
 <style scoped>
+.img{
+    height:40px;
+    border-radius: 50%;
+}
  :root {
     --main-color:#fff;
     --color-dark:#02060b;

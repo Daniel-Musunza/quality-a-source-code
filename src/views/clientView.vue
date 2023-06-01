@@ -79,7 +79,7 @@
           <h3>
             <label for="nav-toggle">
                 <span><i class="fa-solid fa-bars"></i></span>
-            </label>
+            :</label>
           </h3>
         </div>
      
@@ -130,33 +130,51 @@
                 <form>
                  
                   <div class="form-group">
-                    <label for="firstName">First Name</label>
+                    <label for="firstName">First Name:</label>
                    {{ client.firstName }}
                   </div>
                   <div class="form-group">
-                    <label for="lastName" >Last Name</label>
+                    <label for="lastName" >Last Name:</label>
                     {{ client.lastName }}
                   </div>
                   <div class="form-group">
-                    <label for="username">Username</label>
+                    <label for="username">Username:</label>
                     {{ client.username }}
                   </div>
                   <div class="form-group">
-                    <label for="phoneNumber">Phone Number</label>
+                    <label for="phoneNumber">Phone Number:</label>
                     {{ client.phoneNumber }}
                   </div>
                   <div class="form-group">
-                    <label for="niche">Niche</label>
+                    <label for="niche">Niche:</label>
                     {{ client.niche }}
+                  </div>
+            
+                  <div  v-if="freelancer||admin" class="form-group">
+                    <label for="freelancing_field">Freelancing Field:</label>
+                      {{ client.freelancing_field }}
+
+                  </div>
+                  <div  v-if="freelancer||admin" class="form-group">
+                    <label for="portfolio_link">Portfolio Link:</label>
+                    <a :href="client.portfolio_link" >{{ client.portfolio_link }}</a>
+                  </div>
+                  <div v-if="freelancer||admin" class="form-group">
+                    <label>Other Roles:</label>
+                    <ol>
+                    <li v-for="role in client.other_roles" :key="role">
+                        {{ role }}
+                    </li>
+                </ol>
                   </div>
                  
                   <div class="form-group">
-                    <label for="email" >Email</label>
+                    <label for="email" >Email:</label>
                     {{ client.email }}
                   </div>
                   
                   <div class="form-group">
-                    <label for="email" >Bids</label>
+                    <label for="email" >Bids:</label>
                     <table>
                         <thead>
                         <tr>
@@ -181,6 +199,10 @@
                   <div class="my-3">
                     <button @click.prevent="assignTask($route.params.id)">Assign Task {{ orderId }}</button>
                   </div>
+                  <div class="my-3">
+                    <button @click.prevent="addFreelancer()">Add To Freelancers</button>
+                  </div>
+                 
                 </form>
               </div>
              </div>
@@ -196,7 +218,7 @@ import { getFirestore, doc, collection, setDoc, getDoc,updateDoc, getDocs, delet
 import {getAuth} from "firebase/auth";
     import ModalItem from "@/components/ModalItem"
     import TheLoader from "@/components/TheLoader"
-   
+    import { getFunctions, httpsCallable } from "firebase/functions";
     export default {
         name: "ProfileView",
         data () {
@@ -216,6 +238,7 @@ import {getAuth} from "firebase/auth";
             incomplete: [],
             revision: [],
             reviews: [],
+            functionMsg: null,
           
 
         }
@@ -235,6 +258,7 @@ import {getAuth} from "firebase/auth";
         toggleProfileMenu(){
             this.profileMenu= !this.profileMenu
         },
+      
           closeModal() {
             this.modalActive = !this.modalActive;
           },
@@ -319,6 +343,13 @@ import {getAuth} from "firebase/auth";
             // window.location.reload();
             this.$router.replace('/');
         },
+        async addFreelancer() {
+            const functions = getFunctions();
+            const addFreelancer = httpsCallable(functions, 'addFreelancerRole');
+            const result = await addFreelancer({ email:  this.client.email});
+            this.functionMsg = result.data.message;
+            alert(this.functionMsg);
+        }
      
         },
         computed: {
@@ -345,6 +376,12 @@ import {getAuth} from "firebase/auth";
             lastName: clientData.lastName,
             email: clientData.email,
             phoneNumber: clientData.phoneNumber,
+            niche:  clientData.niche,
+            freelancing_field:  clientData.freelancing_field,
+            other_roles:  clientData.other_roles,
+            portfolio_link:  clientData.portfolio_link,
+            profileCoverFile:  clientData.profileCoverFile,
+            profileCoverFileName:  clientData.profileCoverFileName,
             };
 
             const userRef = doc(db, 'users', this.clientId);

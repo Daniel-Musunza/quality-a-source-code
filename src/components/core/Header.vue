@@ -3,8 +3,7 @@
         <div>
           <h3>
             <label for="nav-toggle">
-                <span><i class="fa-solid fa-bars"></i></span>
-            </label>
+                <span><i class="fa-solid fa-bars"></i></span></label>
           </h3>
         </div>
         <!-- <div class="search-wrapper">

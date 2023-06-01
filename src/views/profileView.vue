@@ -24,8 +24,11 @@
                 </div>
                 <div v-if="admin" class="admin-badge">
                  <span> <i class="fa-solid fa-user"></i> Admin</span>
+          
                 </div>
                 <form>
+               <strong>   {{ firstName }} {{ lastName }}</strong>
+                  <br/>
                   {{ niche }}
                   <TheLoader v-if="loading"/>
                   <div class="form-group">
@@ -69,32 +72,24 @@
                     />
                   </div>
                   <div  v-if="freelancer||admin" class="form-group">
-                      <option value="">Freelancing Field</option>
-                      <select name="field"  v-model="freelancing_field" class="form-control" required>
-                         <option value="writing">Writing</option>
-                         <option value="design">Graphic Design</option>
-                         <option value="website">Web Development</option>
-                         <option value="mobile_app">App Development</option>
-                         <option value="data_science">Data Science</option>
-                      </select>
+                    <label for="freelancing_field">Freelancing Field:</label>
+                      {{ freelancing_field }}
 
                   </div>
                   <div  v-if="freelancer||admin" class="form-group">
-                    <label for="niche">Portfolio Link</label>
-                    <input
-                    type="text"
-                    class="form-control"
-                    id="niche" v-model.trim="portfolio_link"
-                    />
+                    <label for="portfolio_link">Portfolio Link:</label>
+                    <a :href="portfolio_link" >{{ portfolio_link }}</a>
                   </div>
                   <div v-if="freelancer||admin" class="form-group">
-                    <label >Other Roles</label>
-                    <div>
-                      <strong v-for="(role, index) in other_roles" :key="index">
-                      {{role.index}}
-                      </strong>
-                    </div>
-                    <button @click="toggleOtherRoles()"
+                    <label>Other Roles:</label>
+                    <ol>
+                    <li v-for="role in other_roles" :key="role">
+                        {{ role }}
+                    </li>
+                </ol>
+                  </div>
+                  <div v-if="freelancer||admin" class="form-group">
+                    <button @click.prevent="toggleOtherRoles()"
                     class="form-control"
                     >Add Other Roles</button>
 
@@ -531,20 +526,16 @@ import { getStorage ,ref, getDownloadURL, uploadBytesResumable} from "firebase/s
                         const firestore = getFirestore();
 
                         const userRef= doc(collection(firestore, "users"), auth.currentUser.uid);
-                        await updateDoc(userRef, {
+                       
+                        if(!this.freelancer){
+                          await updateDoc(userRef, {
                           firstName: this.firstName,
                             lastName: this.lastName,
                             phoneNumber: this.phoneNumber,
-                            username: this.username,
-                            niche: this.niche,
-                            freelancing_field: this.freelancing_field,
-                            niche: this.niche,
-                            // other_roles: this.other_roles,
-                            portfolio_link: this.portfolio_link,
                             profileCoverFile: downloadURL,
                             profileCoverFileName: this.$store.state.orderFileName,
                         }); 
-                        if(!this.freelancer){
+
                           const clientRef= doc(collection(firestore, "clients"), auth.currentUser.uid);
                           await updateDoc(clientRef, {
                             firstName: this.firstName,
@@ -555,6 +546,20 @@ import { getStorage ,ref, getDownloadURL, uploadBytesResumable} from "firebase/s
                           }); 
                        };
                        if(this.freelancer){
+
+                        await updateDoc(userRef, {
+                          firstName: this.firstName,
+                            lastName: this.lastName,
+                            phoneNumber: this.phoneNumber,
+                            username: this.username,
+                            niche: this.niche,
+                            freelancing_field: this.freelancing_field,
+                            // other_roles: this.other_roles,
+                            portfolio_link: this.portfolio_link,
+                            profileCoverFile: downloadURL,
+                            profileCoverFileName: this.$store.state.orderFileName,
+                        }); 
+
                           const freelancerRef= doc(collection(firestore, "freelancers"), auth.currentUser.uid);
                           await updateDoc(freelancerRef, {
                             firstName: this.firstName,
@@ -583,6 +588,22 @@ import { getStorage ,ref, getDownloadURL, uploadBytesResumable} from "firebase/s
                     const auth = getAuth();
                         const firestore = getFirestore();
                         const userRef= doc(collection(firestore, "users"), auth.currentUser.uid);
+                       
+                        if(!this.freelancer){
+                          await updateDoc(userRef, {
+                          firstName: this.firstName,
+                          lastName: this.lastName,
+                          phoneNumber: this.phoneNumber,
+                        }); 
+
+                          const clientRef= doc(collection(firestore, "clients"), auth.currentUser.uid);
+                          await updateDoc(clientRef, {
+                            firstName: this.firstName,
+                            lastName: this.lastName,
+                            phoneNumber: this.phoneNumber,
+                          }); 
+                       };
+                       if(this.freelancer){
                         await updateDoc(userRef, {
                           firstName: this.firstName,
                           lastName: this.lastName,
@@ -592,15 +613,7 @@ import { getStorage ,ref, getDownloadURL, uploadBytesResumable} from "firebase/s
                           // other_roles: this.other_roles,
                           portfolio_link: this.portfolio_link,
                         }); 
-                        if(!this.freelancer){
-                          const clientRef= doc(collection(firestore, "clients"), auth.currentUser.uid);
-                          await updateDoc(clientRef, {
-                            firstName: this.firstName,
-                            lastName: this.lastName,
-                            phoneNumber: this.phoneNumber,
-                          }); 
-                       };
-                       if(this.freelancer){
+
                           const freelancerRef= doc(collection(firestore, "freelancers"), auth.currentUser.uid);
                           await updateDoc(freelancerRef, {
                             firstName: this.firstName,
@@ -711,6 +724,7 @@ import { getStorage ,ref, getDownloadURL, uploadBytesResumable} from "firebase/s
  },
 
 async mounted() {
+  
   const auth = getAuth();
    await auth.onAuthStateChanged(user => {
      this.$store.dispatch("getCurrentUser", user);

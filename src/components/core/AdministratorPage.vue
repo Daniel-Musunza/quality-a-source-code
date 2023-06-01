@@ -75,7 +75,9 @@ import { getFunctions, httpsCallable } from "firebase/functions";
                     const functions = getFunctions();
                     const addFreelancer = httpsCallable(functions, 'addFreelancerRole');
                     const result = await addFreelancer({ email: this.adminEmail });
+
                     this.functionMsg = result.data.message;
+                    alert(this.functionMsg);
                   }
                 },
          
