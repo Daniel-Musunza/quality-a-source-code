@@ -225,31 +225,36 @@
                     <div class="order-detail">
                      <input v-if="admin" type="number" v-model="payment" name="payment" placeholder="Freelancer Payment" style="border-radius: 5px; width:170px; height: 40px">
                      </div>
-                     <div  style="background-color:#71affb; color:rgb(11, 10, 10);" v-if="freelancer&&inprogress" class="order-detail">
-                        <h3 style="align-item: center;  font-weight: 600;">Submit</h3>
-                        <form type="submit">
-                            <input type="file" ref="orderFile" id="order-file" @change="fileChange"  name="avatar" class="form-control">
-                            <input type="text" class="form-control form-control-lg input-lg " placeholder="Paste the link here if available" 
-                            v-model="submissionLink">
-                            <button @click.prevent="submitTask()" class="btn btn-info btn-take">
-                                Submit
-                            </button>
-                         </form>
-                    </div>
-                    <div class="order-detail">
-                        <h3 style="font-weight: 600; color:#041121">Submited Solution</h3>
-                     <div style="display:flex; flex-direction: column;">
-                        <label class="key-order-detail">Link:</label> <span> <a :href="order.submissionLink"> {{ order.submissionLink}} </a></span>
-                        <label class="key-order-detail">File:</label><span>  <a :href="order.submitedCoverFile" download>{{order.submitedCoverFileName}}</a></span>
-                        <button v-if="admin||reviewer" @click.prevent="submitToClient()" class="btn btn-info btn-take">
-                                Submit To Client
-                            </button>
-                    </div>
+
+                    <button  class="order-detail btn-blue btn-info btn-take" v-if="!solution" @click="toggleSolution()">Solution</button>
+                    <div v-if="solution">
+                        <div style="background-color:#71affb; color:rgb(11, 10, 10);" v-if="freelancer&&inprogress" class="order-detail">
+                            <h3 style="align-item: center;  font-weight: 600;">Submit</h3>
+                            <form type="submit">
+                                <input type="file" ref="orderFile" id="order-file" @change="fileChange"  name="avatar" class="form-control">
+                                <input type="text" class="form-control form-control-lg input-lg " placeholder="Paste the link here if available" 
+                                v-model="submissionLink">
+                                <button @click.prevent="submitTask()" class="btn btn-info btn-take">
+                                    Submit
+                                </button>
+                            </form>
+                        </div>
+                        <div class="order-detail">
+                            <h3 style="font-weight: 600; color:#041121">Submited Solution</h3>
+                        <div style="display:flex; flex-direction: column;">
+                            <label class="key-order-detail">Link:</label> <span> <a :href="order.submissionLink"> {{ order.submissionLink}} </a></span>
+                            <label class="key-order-detail">File:</label><span>  <a :href="order.submitedCoverFile" download>{{order.submitedCoverFileName}}</a></span>
+                            <button v-if="admin||reviewer" @click.prevent="submitToClient()" class="btn btn-info btn-take">
+                                    Submit To Client
+                                </button>
+                        </div>
+                        </div>
                     </div>
                     <div class="order-detail">
                         <label for="">Client's message: </label>
                         <p>{{ order.message }}</p>
                     </div>
+
                     <div class="order-detail">
                         <label class="key-order-detail">Task Ratings:</label>
                         <br>
@@ -306,9 +311,13 @@ export default {
              order: null,
              submissionLink: null,
              file:null,
+             solution: null,
         }
     },
     methods: {
+        toggleSolution() {
+            this.solution =!this.solution;
+        },
         toggleAvailable(){
             this.available= !this.available
         },
