@@ -120,7 +120,7 @@
                             </div>
                             <div class="order-detail">
                                 <label class="key-order-detail">Due Time:</label>
-                                <span class="value-order-detail text-info"><b>{{order.dueDate}},{{order.dueTime}}</b></span>
+                                <span class="value-order-detail text-info"><b>{{ calculateTimeRemaining(order.dueDate, order.dueTime) }}</b></span>
                             </div>
                         
                             <div class="order-detail">
@@ -342,7 +342,21 @@
                     this.loading = false;
                     console.error("Error sending to be revised order:", error);
                 }
-            }
+            },
+            calculateTimeRemaining(dueDate, dueTime) {
+                const dueDateTime = new Date(`${dueDate}T${dueTime}`);
+                const currentTime = new Date();
+                if(dueDateTime <currentTime){
+                    return "Duration Ended";
+                };
+                const timeRemaining = dueDateTime - currentTime;
+                const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+                return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        }
         },
         computed: {
         ...mapState(['clientOrders']),

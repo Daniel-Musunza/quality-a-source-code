@@ -34,7 +34,7 @@
                                         <td>
                                             {{order.budget}}
                                         </td>
-                                        <td>{{order.dueDate}}, {{order.dueTime}}</td>
+                                        <td>{{ calculateTimeRemaining(order.dueDate, order.dueTime) }}</td>
                                         <td> 
                                             <router-link :to="{ name: 'order-view', params: {id: order.id}}">
                                                     View Details
@@ -75,10 +75,25 @@ export default {
         toggleProfileMenu(){
             this.profileMenu= !this.profileMenu
         },  
-         ...mapActions(['getOrders'])
+         ...mapActions(['getOrders']),
+         calculateTimeRemaining(dueDate, dueTime) {
+            const dueDateTime = new Date(`${dueDate}T${dueTime}`);
+            const currentTime = new Date();
+            if(dueDateTime <currentTime){
+                return "Duration Ended";
+            };
+            const timeRemaining = dueDateTime - currentTime;
+            const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+            return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+     }
     },
     computed: {
-    ...mapState(['orders'])
+    ...mapState(['orders']),
+  
   },
   created() {
     this.getOrders();
