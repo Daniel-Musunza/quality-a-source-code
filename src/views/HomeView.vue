@@ -99,7 +99,7 @@
                     <p class="lead mb-4 wow fadeInUp" data-wow-duration="2s" data-wow-delay="0.3s">
                         QualityA has emerged to a plartform where Quality Freelancers across the globe help do tasks for Clients remotely. 
                         <!-- The popular features currently are posting orders to the System, Management assigns orders to freelancers and digital payment. -->
-                            It still remains to be a tool for you to track the records of your oders effeciently. It provides the ability to track payments and balances, and many other amazing great features.All conveniently packaged for you to make sure your business operations execute without a hitch. </p>
+                            It still remains to be a tool for you to track the records of your orders effeciently. It provides the ability to track payments and balances, and many other amazing great features.All conveniently packaged for you to make sure your business operations execute without a hitch. </p>
                         <h5>why you should choose  us</h5>
                         <ol>
                             <li>Quality Services</li>

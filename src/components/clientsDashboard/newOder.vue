@@ -207,10 +207,22 @@ export default {
                   const auth = getAuth();
                   let orderID = 1000;
                   const querySnapshot = await getDocs(collection(db, "orders"), orderBy("orderID", "desc"), limit(1));
-                    if (!querySnapshot.empty) {
-                    const lastOrder = querySnapshot.docs[0].data();
-                    orderID = lastorder.id + 1;
+                  if (!querySnapshot.empty) {
+                        // Sort the querySnapshot by date in descending order
+                        const sortedOrders = querySnapshot.docs.sort((a, b) => {
+                            const dateA = a.data().date;
+                            const dateB = b.data().date;
+                            return dateB - dateA;
+                        });
+                        
+                        // Get the most recent order
+                        const mostRecentOrder = sortedOrders[0].data();
+
+                        // Calculate the new orderID
+                        orderID = parseInt(mostRecentOrder.id) + 1;
                     };
+
+
                 const userRef = doc(db, 'users', auth.currentUser.uid);
                 const ordersCollectionRef = collection(db, "orders");
                 const orderRef = doc(ordersCollectionRef, orderID.toString());
@@ -237,17 +249,17 @@ export default {
                   const newOrderRef = doc(ordersRef, orderRef.id);
                     await setDoc(newOrderRef, {
                         id: newOrderRef.id,
-                     orderCoverFile: downloadURL,
-                     orderCoverFileName: this.$store.state.orderFileName,
-                    orderHTML: this.orderHTML,
-                    orderTitle: this.orderTitle,
-                    orderCategory: this.orderCategory,
-                    experienceNeeded: this.experienceNeeded,
-                    status: "incomplete",
-                    budget: this.budget,
-                    dueTime: this.dueTime,
-                    dueDate: this.dueDate,
-                    date: timestamp,
+                        orderCoverFile: downloadURL,
+                        orderCoverFileName: this.$store.state.orderFileName,
+                        orderHTML: this.orderHTML,
+                        orderTitle: this.orderTitle,
+                        orderCategory: this.orderCategory,
+                        experienceNeeded: this.experienceNeeded,
+                        status: "incomplete",
+                        budget: this.budget,
+                        dueTime: this.dueTime,
+                        dueDate: this.dueDate,
+                        date: timestamp,
                     });
 
                
@@ -269,9 +281,21 @@ export default {
                 const querySnapshot = await getDocs(collection(db, "orders"), orderBy("orderID", "desc"), limit(1));
                 
                 if (!querySnapshot.empty) {
-                    const lastOrder = querySnapshot.docs[0].data();
-                    orderID = parseInt(lastorder.id) + 1;
-                }
+                    // Sort the querySnapshot by date in descending order
+                    const sortedOrders = querySnapshot.docs.sort((a, b) => {
+                        const dateA = a.data().date;
+                        const dateB = b.data().date;
+                        return dateB - dateA;
+                    });
+                    
+                    // Get the most recent order
+                    const mostRecentOrder = sortedOrders[0].data();
+
+                    // Calculate the new orderID
+                    orderID = parseInt(mostRecentOrder.id) + 1;
+                };
+
+
                 
                 const userRef = doc(db, "users", auth.currentUser.uid);
                 const client = auth.currentUser.uid;
