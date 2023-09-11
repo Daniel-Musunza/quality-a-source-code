@@ -72,7 +72,7 @@
 <script>
 import SideBar from "@/components/core/SideBar.vue";
 import Header from "@/components/core/Header.vue";
-import {getDoc, getDocs, doc, getFirestore, collection } from 'firebase/firestore';
+import {getDocs, doc, getDoc, query, orderBy, getFirestore, collection} from 'firebase/firestore';
 export default {
     components: {
         SideBar, 
@@ -98,7 +98,9 @@ export default {
     async created() {
         const db = getFirestore();
         const orderRef = collection(db, 'complete_orders');
-        const snapshot = await getDocs(orderRef);
+        const snapshot = await getDocs(
+            query(orderRef, orderBy("id", "desc"))
+            );
         const completeOrders = snapshot.docs.map(doc => doc.data());
 
         const promises = completeOrders.map(async order => {

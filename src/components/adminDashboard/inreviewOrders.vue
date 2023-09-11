@@ -72,7 +72,7 @@
 <script>
 import SideBar from "@/components/core/SideBar.vue";
 import Header from "@/components/core/Header.vue";
-import {getDoc, getDocs, doc, getFirestore, collection } from 'firebase/firestore';
+import {getDocs, doc, getDoc, query, orderBy, getFirestore, collection} from 'firebase/firestore';
 export default {
     components: {
         SideBar, 

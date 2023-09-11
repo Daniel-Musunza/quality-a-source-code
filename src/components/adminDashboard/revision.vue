@@ -117,7 +117,7 @@
 <script>
 import SideBar from "@/components/core/SideBar.vue";
 import Header from "@/components/core/Header.vue";
-import {getDoc, getDocs, doc, getFirestore, collection } from 'firebase/firestore';
+import {getDocs, doc, getDoc, query, orderBy, getFirestore, collection} from 'firebase/firestore';
 export default {
     components: {
         SideBar, 
@@ -148,27 +148,37 @@ export default {
         const userRef = doc(db, 'users', this.clientId);
 
         const doneorderRef = collection(userRef, 'done_orders');
-        const donesnapshot = await getDocs(doneorderRef);
+        const donesnapshot = await getDocs(
+            query(doneorderRef, orderBy("id", "desc"))
+            );
         const done_orders = donesnapshot.docs.map(doc => doc.data());
         this.done_orders = done_orders;
 
         const disputedorderRef = collection(userRef, 'disputed');
-        const disputedsnapshot = await getDocs(disputedorderRef);
+        const disputedsnapshot = await getDocs(
+            query(disputedorderRef, orderBy("id", "desc"))
+            );
         const disputed = disputedsnapshot.docs.map(doc => doc.data());
         this.disputed = disputed;
 
         const incompleteorderRef = collection(userRef, 'incomplete');
-        const incompletesnapshot = await getDocs(incompleteorderRef);
+        const incompletesnapshot = await getDocs(
+            query(incompleteorderRef, orderBy("id", "desc"))
+            );
         const incomplete = incompletesnapshot.docs.map(doc => doc.data());
         this.incomplete = incomplete;
 
         const revisionorderRef = collection(userRef, 'revision');
-        const revisionsnapshot = await getDocs(revisionorderRef);
+        const revisionsnapshot = await getDocs(
+            query(revisionorderRef, orderBy("id", "desc"))
+            );
         const revision = revisionsnapshot.docs.map(doc => doc.data());
         this.revision = revision;
 
         const reviewsorderRef = collection(userRef, 'reviews');
-        const reviewssnapshot = await getDocs(reviewsorderRef);
+        const reviewssnapshot = await getDocs(
+            query(reviewsorderRef, orderBy("id", "desc"))
+            );
         const reviews= reviewssnapshot.docs.map(doc => doc.data());
         this.reviews = reviews;
 

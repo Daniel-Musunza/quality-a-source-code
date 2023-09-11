@@ -1,6 +1,6 @@
 import { createStore } from 'vuex';
 import {db} from "../firebase";
-import {getDocs, doc, getDoc, getFirestore, collection} from 'firebase/firestore';
+import {getDocs, doc, getDoc, query, orderBy, getFirestore, collection} from 'firebase/firestore';
 import { getAuth, onAuthStateChanged} from "firebase/auth";
 
 export default createStore({
@@ -290,53 +290,71 @@ setOnRevisionOrderState(state, payload){
   
         // orders actions
       async getOrders({ commit }) {
-
-        const querySnapshot = await getDocs(collection(db, "orders"));
-        const data = querySnapshot.docs.map((doc) => doc.data());
-        commit('setOrderState', data);
+          const querySnapshot = await getDocs(
+              query(collection(db, "orders"), orderBy("id", "desc"))
+          );
+      
+          const data = querySnapshot.docs.map((doc) => doc.data());
+          commit('setOrderState', data);
       },
       async getClients({ commit }) {
-        const querySnapshot = await getDocs(collection(db, "clients"));
+        const querySnapshot = await getDocs(
+          collection(db, "clients")
+          );
         const data = querySnapshot.docs.map((doc) => doc.data());
         commit("setClientState", data);
       },
       async getFreelancers({ commit }) {
 
-        const querySnapshot = await getDocs(collection(db, "freelancers"));
+        const querySnapshot = await getDocs(
+          collection(db, "freelancers")
+          );
         const data = querySnapshot.docs.map((doc) => doc.data());
         commit("setFreelancerState", data);
       },
       async getForwardedOrders({ commit }) {
 
-        const querySnapshot = await getDocs(collection(db, "forwarded_orders"));
+        const querySnapshot = await getDocs(
+          query(collection(db, "forwarded_orders"), orderBy("id", "desc"))
+          );
         const data = querySnapshot.docs.map((doc) => doc.data());
         commit('setForwardedOrderState', data);
       },
       async getTobebiddedOrders({ commit }) {
 
-        const querySnapshot = await getDocs(collection(db, "tobebidded_orders"));
+        const querySnapshot = await getDocs(
+          query(collection(db, "tobebidded_orders"), orderBy("id", "desc"))
+          );
         const data = querySnapshot.docs.map((doc) => doc.data());
         commit('setTobebiddedOrderState', data);
       },
       async getIncompleteOrders({ commit }) {
 
-        const querySnapshot = await getDocs(collection(db, "incomplete_orders"));
+        const querySnapshot = await getDocs(
+          query(collection(db, "incomplete_orders"), orderBy("id", "desc"))
+          );
         const data = querySnapshot.docs.map((doc) => doc.data());
         commit('setIncompleteOrderState', data);
       },
       async getInreviewOrders({ commit }) {
 
-        const querySnapshot = await getDocs(collection(db, "inreview_orders"));
+        const querySnapshot = await getDocs(
+          query(collection(db, "inreview_orders"), orderBy("id", "desc"))
+        );
         const data = querySnapshot.docs.map((doc) => doc.data());
         commit('setInreviewOrderState', data);
       },
       async getCompleteOrders({ commit }) {
-        const querySnapshot = await getDocs(collection(db, "complete_orders"));
+        const querySnapshot = await getDocs(
+          query(collection(db, "complete_orders"), orderBy("id", "desc"))
+          );
         const data = querySnapshot.docs.map((doc) => doc.data());
         commit('setCompleteOrderState', data);
       },
       async getRevisions({ commit }) {
-        const querySnapshot = await getDocs(collection(db, "revisions"));
+        const querySnapshot = await getDocs(
+          query(collection(db, "revisions"), orderBy("id", "desc"))
+          );
         const data = querySnapshot.docs.map((doc) => doc.data());
         commit('setRevisionsOrderState', data);
       },
@@ -363,7 +381,9 @@ setOnRevisionOrderState(state, payload){
             const userRef = doc(db, 'users', user.uid);
             const ordersRef = collection(userRef, 'invited');   
             try {
-              const querySnapshot = await getDocs(ordersRef);
+              const querySnapshot = await getDocs(
+                query(ordersRef, orderBy("id", "desc"))
+                );
               const data = querySnapshot.docs.map((doc) => doc.data());
               commit('setInvitedState', data);
             } catch (error) {
@@ -380,7 +400,9 @@ setOnRevisionOrderState(state, payload){
             const userRef = doc(db, 'users', user.uid);
             const ordersRef = collection(userRef, 'incomplete');   
             try {
-              const querySnapshot = await getDocs(ordersRef);
+              const querySnapshot = await getDocs(
+                query(ordersRef, orderBy("id", "desc"))
+                );
               const data = querySnapshot.docs.map((doc) => doc.data());
               commit('setIncompleteState', data);
             } catch (error) {
@@ -397,7 +419,9 @@ setOnRevisionOrderState(state, payload){
             const userRef = doc(db, 'users', user.uid);
             const ordersRef = collection(userRef, 'inReview');   
             try {
-              const querySnapshot = await getDocs(ordersRef);
+              const querySnapshot = await getDocs(
+                query(ordersRef, orderBy("id", "desc"))
+                );
               const data = querySnapshot.docs.map((doc) => doc.data());
               commit('setInreviewState', data);
             } catch (error) {
@@ -414,7 +438,9 @@ setOnRevisionOrderState(state, payload){
             const userRef = doc(db, 'users', user.uid);
             const ordersRef = collection(userRef, 'done_orders');   
             try {
-              const querySnapshot = await getDocs(ordersRef);
+              const querySnapshot = await getDocs(
+                query(ordersRef, orderBy("id", "desc"))
+                );
               const data = querySnapshot.docs.map((doc) => doc.data());
               commit('setDoneOrderState', data);
             } catch (error) {
@@ -431,7 +457,9 @@ setOnRevisionOrderState(state, payload){
             const userRef = doc(db, 'users', user.uid);
             const ordersRef = collection(userRef, 'onRevision');   
             try {
-              const querySnapshot = await getDocs(ordersRef);
+              const querySnapshot = await getDocs(
+                query(ordersRef, orderBy("id", "desc"))
+                );
               const data = querySnapshot.docs.map((doc) => doc.data());
               commit('setOnRevisionOrderState', data);
             } catch (error) {
@@ -448,7 +476,9 @@ setOnRevisionOrderState(state, payload){
             const userRef = doc(db, 'users', user.uid);
             const ordersRef = collection(userRef, 'orders');   
             try {
-              const querySnapshot = await getDocs(ordersRef);
+              const querySnapshot = await getDocs(
+                query(ordersRef, orderBy("id", "desc"))
+                );
               const data = querySnapshot.docs.map((doc) => doc.data());
               commit('setClientOrderState', data);
             } catch (error) {
