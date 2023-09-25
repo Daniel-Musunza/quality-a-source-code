@@ -158,9 +158,9 @@
                 Post a review
                 </router-link>
             </li>
-            <li v-if="!admin&&!freelancer">
+            <li>
                 <router-link to="/chat"><i class="fa-sharp fa-solid fa-comments"></i>
-                General Chat
+                Chat
                 </router-link>
             </li>
             <li v-if="!admin||!freelancer">
