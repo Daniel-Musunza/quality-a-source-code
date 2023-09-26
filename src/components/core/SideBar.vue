@@ -158,10 +158,11 @@
                 Post a review
                 </router-link>
             </li>
-            <li>
-                <router-link to="/chat"><i class="fa-sharp fa-solid fa-comments"></i>
+            <li v-if="!admin">
+                <router-link :to="{ name: 'chat', params: {id: receiver}}"><i class="fa-sharp fa-solid fa-comments"></i>
                 Chat
                 </router-link>
+                
             </li>
             <li v-if="!admin||!freelancer">
                 <router-link to="/faq"><i class="fa-sharp fa-solid fa-question"></i>
@@ -180,7 +181,9 @@ export default {
         return {
             available: null,
             profileMenu: null,
-             currentOrder: null,
+            currentOrder: null,
+            receiver: "admin",
+            isAdmin: null,
         }
     },
     methods: {
@@ -201,7 +204,9 @@ export default {
         ...mapActions(['getInreview']),
         ...mapActions(['getMyBids']),
         ...mapActions(['getInvited']),
-        ...mapActions(['getIncomplete'])
+        ...mapActions(['getIncomplete']),
+
+       
     },
     computed: {
     ...mapState(['orders']),
@@ -217,27 +222,31 @@ export default {
     ...mapState(['complete_orders']),
     ...mapState(['revisions']),
     ...mapState(['onRevision']),
-        admin() {
+
+    user() {
+          return this.$store.state.user;
+     },
+    admin() {
           return this.$store.state.profileAdmin;
      },
      freelancer() {
           return this.$store.state.profileFreelancer;
     },
     },
-    created() {
-    this.getOrders();
-    this.getForwardedOrders();
-    this.getTobebiddedOrders();
-    this.getInreviewOrders();
-    this.getCompleteOrders();
-    this.getRevisions();
-    this.getDoneOrders();
-    this.getOnRevision();
-    this.getInreview();
-    this.getMyBids();
-    this.getInvited();
-    this.getIncomplete();
-  }
+    async created() {
+        this.getOrders();
+        this.getForwardedOrders();
+        this.getTobebiddedOrders();
+        this.getInreviewOrders();
+        this.getCompleteOrders();
+        this.getRevisions();
+        this.getDoneOrders();
+        this.getOnRevision();
+        this.getInreview();
+        this.getMyBids();
+        this.getInvited();
+        this.getIncomplete();
+    }
 
 }
 </script>

@@ -411,7 +411,7 @@ const routes = [
     }
   },
   {
-    path: '/chat',
+    path: '/chat/:id',
     name: 'chat',
     component: chat,
     meta: {

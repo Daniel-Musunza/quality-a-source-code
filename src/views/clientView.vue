@@ -63,12 +63,16 @@
                     </router-link>
                 </li>
                 <li >
-
-             <router-link :to="{ name: 'admin/disputed', params: { id: clientId } }">
-                        <i class="fa-sharp fa-solid fa-thumbs-down"></i>
+                 <router-link :to="{ name: 'admin/disputed', params: { id: clientId } }">
+                     <i class="fa-sharp fa-solid fa-thumbs-down"></i>
                     <span>Disputed</span>
                     <span class="li-span">{{ disputed.length }}</span>
-                    </router-link>
+                 </router-link>
+                </li>
+                <li>
+                    <router-link :to="{ name: 'chat', params: { id:  clientId }}"><i class="fa-sharp fa-solid fa-comments"></i>
+                    Chat
+                    </router-link> 
                 </li>
             </ul>
         </div>
@@ -130,33 +134,33 @@
                 <form>
                  
                   <div class="form-group">
-                    <label for="firstName">First Name:</label>
+                    <label >First Name:</label>
                    {{ client.firstName }}
                   </div>
                   <div class="form-group">
-                    <label for="lastName" >Last Name:</label>
+                    <label  >Last Name:</label>
                     {{ client.lastName }}
                   </div>
                   <div class="form-group">
-                    <label for="username">Username:</label>
+                    <label >Username:</label>
                     {{ client.username }}
                   </div>
                   <div class="form-group">
-                    <label for="phoneNumber">Phone Number:</label>
+                    <label >Phone Number:</label>
                     {{ client.phoneNumber }}
                   </div>
                   <div class="form-group">
-                    <label for="niche">Niche:</label>
+                    <label >Niche:</label>
                     {{ client.niche }}
                   </div>
             
                   <div  v-if="freelancer||admin" class="form-group">
-                    <label for="freelancing_field">Freelancing Field:</label>
+                    <label >Freelancing Field:</label>
                       {{ client.freelancing_field }}
 
                   </div>
                   <div  v-if="freelancer||admin" class="form-group">
-                    <label for="portfolio_link">Portfolio Link:</label>
+                    <label >Portfolio Link:</label>
                     <a :href="client.portfolio_link" >{{ client.portfolio_link }}</a>
                   </div>
                   <div v-if="freelancer||admin" class="form-group">
@@ -169,12 +173,12 @@
                   </div>
                  
                   <div class="form-group">
-                    <label for="email" >Email:</label>
+                    <label >Email:</label>
                     {{ client.email }}
                   </div>
                   
                   <div class="form-group">
-                    <label for="email" >Bids:</label>
+                    <label  >Bids:</label>
                     <table>
                         <thead>
                         <tr>
@@ -214,7 +218,7 @@
     
     <script>
 
-import { getFirestore, doc, collection, setDoc, getDoc,updateDoc, getDocs, deleteDoc} from "firebase/firestore";
+import { getFirestore, doc, collection, setDoc, orderBy, query, getDoc,updateDoc, getDocs, deleteDoc} from "firebase/firestore";
 import {getAuth} from "firebase/auth";
     import ModalItem from "@/components/ModalItem"
     import TheLoader from "@/components/TheLoader"
@@ -238,11 +242,10 @@ import {getAuth} from "firebase/auth";
             incomplete: [],
             revision: [],
             reviews: [],
-            functionMsg: null,
-          
+            functionMsg: null
 
         }
-    },
+         },
 
         components :{
             ModalItem,
@@ -253,104 +256,105 @@ import {getAuth} from "firebase/auth";
      
         methods: {
             toggleAvailable(){
-            this.available= !this.available
-        },
-        toggleProfileMenu(){
-            this.profileMenu= !this.profileMenu
-        },
-      
-          closeModal() {
-            this.modalActive = !this.modalActive;
-          },
-          async assignTask(clientId) {
-            this.loading = true;
-            try {
-                const db = getFirestore();
-                const userRef = doc(db, 'users', clientId);
+                this.available= !this.available
+            },
+            toggleProfileMenu(){
+                this.profileMenu= !this.profileMenu
+            },
+        
+            closeModal() {
+                this.modalActive = !this.modalActive;
+            },
+            async assignTask(clientId) {
+                this.loading = true;
+                try {
+                    const db = getFirestore();
+                    const userRef = doc(db, 'users', clientId);
 
-                const ordersRef = collection(userRef, 'myBids');   
-                const task = await getDoc(doc(ordersRef, this.orderId));
-            
-                if (task.exists()) {
-                const tobeAssignedTask = task.data();
+                    const ordersRef = collection(userRef, 'myBids');   
+                    const task = await getDoc(doc(ordersRef, this.orderId));
                 
-                // rest of the method
-                const invitedCollectionRef = collection(userRef, "invited");
-                
-                const invitedOrderRef = doc(invitedCollectionRef, this.orderId);
-                await setDoc(invitedOrderRef, {
-                    ...tobeAssignedTask,
-                    status: "in progress",
-                    date: new Date(),
-                });
+                    if (task.exists()) {
+                    const tobeAssignedTask = task.data();
+                    
+                    // rest of the method
+                    const invitedCollectionRef = collection(userRef, "invited");
+                    
+                    const invitedOrderRef = doc(invitedCollectionRef, this.orderId);
+                    await setDoc(invitedOrderRef, {
+                        ...tobeAssignedTask,
+                        status: "in progress",
+                        date: new Date(),
+                    });
 
-                const ordersCollectionRef = collection(db, "forwarded_orders");
-                const orderRef = doc(ordersCollectionRef, this.orderId);
-                await setDoc( orderRef,{
-                    ...tobeAssignedTask,
-                    freelancer: clientId,
-                    status: "in progress",
-                    date: new Date(),
-                });
+                    const ordersCollectionRef = collection(db, "forwarded_orders");
+                    const orderRef = doc(ordersCollectionRef, this.orderId);
+                    await setDoc( orderRef,{
+                        ...tobeAssignedTask,
+                        freelancer: clientId,
+                        status: "in progress",
+                        date: new Date(),
+                    });
 
-                //update clients status
-                const orderClientRef = doc(db, 'users', tobeAssignedTask.client);
-                const orderClientOrdersRef = collection(orderClientRef, 'orders');   
-                const orderClientDocRef = doc(orderClientOrdersRef, this.orderId);
-                await updateDoc(orderClientDocRef, {
-                    status: "in progress",
-                }); 
-                
-                const ordersColRef = collection(db, 'orders');   
-                const orderDocRef = doc(ordersColRef, this.orderId);
-                await updateDoc(orderDocRef, {
-                    freelancer: clientId,
-                    status: "in progress",
-                }); 
+                    //update clients status
+                    const orderClientRef = doc(db, 'users', tobeAssignedTask.client);
+                    const orderClientOrdersRef = collection(orderClientRef, 'orders');   
+                    const orderClientDocRef = doc(orderClientOrdersRef, this.orderId);
+                    await updateDoc(orderClientDocRef, {
+                        status: "in progress",
+                    }); 
+                    
+                    const ordersColRef = collection(db, 'orders');   
+                    const orderDocRef = doc(ordersColRef, this.orderId);
+                    await updateDoc(orderDocRef, {
+                        freelancer: clientId,
+                        status: "in progress",
+                    }); 
 
-                const inprogress = await getDoc(doc(orderClientOrdersRef, this.orderId));
-                const inprogressCollectionRef = collection(orderClientRef, "incomplete");
-                const inprogressRef = doc(inprogressCollectionRef, this.orderId);
-                await setDoc(inprogressRef, {
-                    ...inprogress.data(),
-                    status: "in progress",
-                    date: new Date(),
-                });
+                    const inprogress = await getDoc(doc(orderClientOrdersRef, this.orderId));
+                    const inprogressCollectionRef = collection(orderClientRef, "incomplete");
+                    const inprogressRef = doc(inprogressCollectionRef, this.orderId);
+                    await setDoc(inprogressRef, {
+                        ...inprogress.data(),
+                        status: "in progress",
+                        date: new Date(),
+                    });
 
-                // // Delete the current order document from the "myBids" collection
-                const deleteMyBids = doc(ordersRef, this.orderId);
-                await deleteDoc(deleteMyBids);
+                    // // Delete the current order document from the "myBids" collection
+                    const deleteMyBids = doc(ordersRef, this.orderId);
+                    await deleteDoc(deleteMyBids);
 
-                // Delete the current order document from the "tobebidded_orders" collection
-                const tobebidded_ordersRef = collection(db, 'tobebidded_orders'); 
-                const tobebidded_ordersref = doc(tobebidded_ordersRef, this.orderId);
-                await deleteDoc(tobebidded_ordersref);
+                    // Delete the current order document from the "tobebidded_orders" collection
+                    const tobebidded_ordersRef = collection(db, 'tobebidded_orders'); 
+                    const tobebidded_ordersref = doc(tobebidded_ordersRef, this.orderId);
+                    await deleteDoc(tobebidded_ordersref);
 
-                this.loading = false;
-                alert("Order has been assigned successfully!");
-                this.$router.push("/admin/all-bids");
-                } else {
-                console.error("Error in assigning task: Task does not exist");
-                }
-            } catch (error) {
-                this.loading = false;
-                console.error("Error in assigning task:", error);
-            }      
+                    this.loading = false;
+                    alert("Order has been assigned successfully!");
+                    this.$router.push("/admin/all-bids");
+                    } else {
+                    console.error("Error in assigning task: Task does not exist");
+                    }
+                } catch (error) {
+                    this.loading = false;
+                    console.error("Error in assigning task:", error);
+                }      
             },
 
-        signOut() {
-            getAuth().signOut();
-            // window.location.reload();
-            this.$router.replace('/');
-        },
-        async addFreelancer() {
-            const functions = getFunctions();
-            const addFreelancer = httpsCallable(functions, 'addFreelancerRole');
-            const result = await addFreelancer({ email:  this.client.email});
-            this.functionMsg = result.data.message;
-            alert(this.functionMsg);
-        }
-     
+            signOut() {
+                getAuth().signOut();
+                // window.location.reload();
+                this.$router.replace('/');
+            },
+            async addFreelancer() {
+                const functions = getFunctions();
+                const addFreelancer = httpsCallable(functions, 'addFreelancerRole');
+                const result = await addFreelancer({ email:  this.client.email});
+                this.functionMsg = result.data.message;
+                alert(this.functionMsg);
+            },
+            
+        
         },
         computed: {
           admin() {
@@ -427,6 +431,9 @@ import {getAuth} from "firebase/auth";
             );
         const reviews= reviewssnapshot.docs.map(doc => doc.data());
         this.reviews = reviews;
+
+
+        
         },
         
 

@@ -9,42 +9,65 @@
         
           <div class="messages-area">
             <div
-              class="message"
-              v-for="(message, index) in messages"
-              :key="index"
-              :class="{ 'sent': message.sender === 'user', 'received': message.sender === 'other' }"
-            >
-              {{ message.text }}
-            </div>
+            class="message"
+            v-for="(message, index) in messages
+              .filter(
+                (item) =>
+                  (item.sender === this.user.uid && item.receiver === 'admin') ||
+                  (item.sender === 'admin' && item.receiver === this.receiver) ||
+                  (item.receiver === this.user.uid && item.sender === 'admin')  ||
+                  (item.receiver === 'admin' && item.sender === this.receiver)
+              )"
+            :key="index"
+            :class="{
+              'sent':
+                message.sender === this.user.uid || (message.sender === 'admin' && message.receiver === this.receiver),
+              'received': message.sender !== this.user.uid && message.sender !== 'admin'
+            }"
+          >
+            {{ message.text }}
           </div>
+
+
+          </div>
+          <form @submit.prevent="sendMessage">
           <div class="sender-area">
-            <div class="input-place">
+           
+              <div class="input-place">
               <input placeholder="Send a message." class="send-input" type="text" v-model="newMessage">
-              <div class="send" @click="sendMessage">
-                <svg
-                  class="send-icon"
-                  version="1.1"
-                  id="Capa_1"
-                  xmlns="http://www.w3.org/2000/svg"
-                  xmlns:xlink="http://www.w3.org/1999/xlink"
-                  x="0px"
-                  y="0px"
-                  viewBox="0 0 512 512"
-                  style="enable-background:new 0 0 512 512;"
-                  xml:space="preserve"
-                >
-                  <g>
-                    <g>
-                      <path
-                        fill="#6B6C7B"
-                        d="M481.508,210.336L68.414,38.926c-17.403-7.222-37.064-4.045-51.309,8.287C2.86,59.547-3.098,78.551,1.558,96.808 L38.327,241h180.026c8.284,0,15.001,6.716,15.001,15.001c0,8.284-6.716,15.001-15.001,15.001H38.327L1.558,415.193 c-4.656,18.258,1.301,37.262,15.547,49.595c14.274,12.357,33.937,15.495,51.31,8.287l413.094-171.409 C500.317,293.862,512,276.364,512,256.001C512,235.638,500.317,218.139,481.508,210.336z"
-                      ></path>
-                    </g>
-                  </g>
-                </svg>
+              
+                <div class="send">
+                  <button type="submit">
+                    <svg
+                      class="send-icon"
+                      version="1.1"
+                      id="Capa_1"
+                      xmlns="http://www.w3.org/2000/svg"
+                      xmlns:xlink="http://www.w3.org/1999/xlink"
+                      x="0px"
+                      y="0px"
+                      viewBox="0 0 512 512"
+                      style="enable-background:new 0 0 512 512;"
+                      xml:space="preserve"
+                    >
+                      <g>
+                        <g>
+                          <path
+                            fill="#6B6C7B"
+                            d="M481.508,210.336L68.414,38.926c-17.403-7.222-37.064-4.045-51.309,8.287C2.86,59.547-3.098,78.551,1.558,96.808 L38.327,241h180.026c8.284,0,15.001,6.716,15.001,15.001c0,8.284-6.716,15.001-15.001,15.001H38.327L1.558,415.193 c-4.656,18.258,1.301,37.262,15.547,49.595c14.274,12.357,33.937,15.495,51.31,8.287l413.094-171.409 C500.317,293.862,512,276.364,512,256.001C512,235.638,500.317,218.139,481.508,210.336z"
+                          ></path>
+                        </g>
+                      </g>
+                    </svg>
+                  </button>
+                </div>
+             
+              
               </div>
+           
+           
             </div>
-          </div>
+          </form>
           <div>
 
           </div>
@@ -59,69 +82,76 @@ import SideBar from "@/components/core/SideBar.vue";
 import Header from "@/components/core/Header.vue";
 import { ref, onMounted } from "vue";
 import { getAuth } from "firebase/auth";
-import { getDatabase, ref as dbRef, push } from "firebase/database";
+import { getDatabase, ref as dbRef, push, onValue } from "firebase/database";
 
 export default {
-  components: {
-    SideBar,
-    Header,
-  },
   data() {
     return {
       messages: [],
       newMessage: "",
       user: null,
       receiver: null,
+      sender: null
     };
+  },
+  components: {
+    SideBar,
+    Header,
   },
   computed: {
     admin() {
-          return this.$store.state.profileAdmin;
-      },
+      return this.$store.state.profileAdmin;
+    },
   },
   methods: {
-  sendMessage() {
-    if (this.newMessage.trim() !== "") {
-      const database = getDatabase();
-      const messagesRef = dbRef(database, "messages");
-      if (!this.admin) { // Corrected: Added 'this' to access the computed property
-        this.receiver = "3Wwxi05qxiSXRUicozOWiEStSIm2"; // Also, add 'this' here
+    sendMessage() {
+      if (this.newMessage.trim() !== "") {
+        const database = getDatabase();
+        const messagesRef = dbRef(database, "messages");
+        if (this.admin)
+        {
+          this.sender = "admin"
+        } else {
+          this.sender = this.user ? this.user.uid : "anonymous";
+        }
+
+        // Push the new message to the database
+        push(messagesRef, {
+          text: this.newMessage,
+          sender: this.sender,
+          receiver: this.receiver,
+          timestamp: new Date().toISOString(),
+        });
+
+        this.newMessage = ""; // Clear the input field
       }
-
-      // Push the new message to the database
-      push(messagesRef, {
-        text: this.newMessage,
-        sender: this.user ? this.user.uid : "anonymous",
-        receiver: this.receiver,
-        timestamp: new Date().toISOString(),
-      });
-
-      this.newMessage = ""; // Clear the input field
-    }
+    },
   },
-},
-
-
-  async mounted() {
+  mounted() {
     const auth = getAuth();
-    auth.onAuthStateChanged(async (authUser) => {
+    auth.onAuthStateChanged((authUser) => {
       if (authUser) {
         this.user = authUser;
 
         const database = getDatabase();
         const messagesRef = dbRef(database, "messages");
 
+        
+
         // Listen for changes in the messages collection
-        messagesRef.on("child_added", (snapshot) => {
-          const message = snapshot.val();
-          this.messages.push(message);
+        onValue(messagesRef, (snapshot) => {
+          const data = snapshot.val();
+          if (data) {
+            const messageArray = Object.values(data);
+            this.messages = messageArray;
+          }
         });
-      } else {
-        alert("please log in ...")
-        // Handle when the user is not authenticated
       }
     });
   },
+  created() {
+    this.receiver = this.$route.params.id;
+  }
 };
 </script>
 
@@ -235,8 +265,8 @@ main{
 }
 .chat-container {
   width: 450px;
-  height: 70%;
-  background-color: #343541;
+  height: 90vh;
+  background-color: #6B6C7B;
   border-radius: 8px;
   display: flex;
   flex-direction: column;
@@ -273,14 +303,18 @@ main{
   overflow-y: scroll;
   overflow-x: none;
   background-color: #6B6C7B;
-  width: 90%;
-  height: 210px;
+  width: 80vh;
+  width: 100%;
+  height: 100%;
+  margin-bottom: 100px;
 }
 
 .sender-area {
+  position: fixed;
+  bottom:40px;
   background-color: #343541;
-  width: 100%;
-  height: 70px;
+  width: 450px;
+  height: fit-content;
   display: flex;
   border-radius: 8px;
 }
@@ -290,8 +324,8 @@ main{
   background-color: #02060b;
   color:#fff;
   border-radius: 10px;
-  height: 40px;
-  padding: 3px;
+  min-height: 40px;
+  padding: 10px;
   margin: 10px;
 
 }
@@ -365,9 +399,7 @@ main{
   .main-content {
     margin-left: 0;
 }
-.chat-container{
-  min-height: 600px;
-}
+
 .input-place {
   position: fixed;
   bottom:40px;
@@ -375,7 +407,6 @@ main{
 }
 .messages-area{
   width: 100%;
-  height: 700px;
 }
 }
 .sent {
