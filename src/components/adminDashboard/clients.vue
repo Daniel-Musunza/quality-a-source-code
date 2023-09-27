@@ -34,7 +34,7 @@
                                                 v-if="client.clientData"
                                                 :to="{
                                                 name: 'client-view',
-                                                params: { id: client.clientData?.id, orderId: client.clientData?.firstName }
+                                                params: { id: client.clientData?.id.trim(), orderId: client.clientData?.firstName }
                                                 }"
                                             >
                                                 {{ client.clientData?.firstName }}  {{client.clientData?.lastName }}

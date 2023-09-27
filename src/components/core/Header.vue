@@ -12,7 +12,11 @@
            </div> -->
           <div class="user-wrapper" >
             <span><i class="fa-sharp fa-solid fa-bell-slash"></i></span>
-            <span><i class="fa-sharp fa-solid fa-comment"></i></span>
+            <span v-show="!admin">
+                <router-link :to="{ name: 'chat', params: {id: receiver}}"><i class="fa-sharp fa-solid fa-comment"></i>
+                </router-link>
+                
+            </span>
          
             <!-- <img src="images/BuyoneFree_65.jpg" class="img" width="30px" height="30px" alt=""> -->
             <div @click="toggleProfileMenu" class="profile">
@@ -56,6 +60,7 @@ export default {
             available: null,
             profileMenu: null,
              currentOrder: null,
+             receiver: "admin",
         }
     },
     methods: {

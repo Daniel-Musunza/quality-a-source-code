@@ -71,7 +71,7 @@
                 </li>
                 <li>
                     <router-link :to="{ name: 'chat', params: { id:  clientId }}"><i class="fa-sharp fa-solid fa-comments"></i>
-                    Chat
+                      Chat
                     </router-link> 
                 </li>
             </ul>
@@ -236,7 +236,7 @@ import {getAuth} from "firebase/auth";
             bids: [],
             loading: null,
             file: null,
-            clientId:  this.$route.params.id,
+            clientId:  null,
             done_orders: [],
             disputed: [],
             incomplete: [],

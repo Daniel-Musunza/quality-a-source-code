@@ -425,7 +425,7 @@ export default {
             }
         },
         async submitTask() {
-          if (this.submissionLink.length !== 0 || !this.file) {
+          if (this.submissionLink !== "" || this.file) {
             this.loading = true;     
                 if (this.file) {
                 
