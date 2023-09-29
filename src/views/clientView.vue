@@ -1,5 +1,3 @@
-
-
 <template>
     <input type="checkbox" id="nav-toggle">
     <div class="sidebar">
@@ -214,234 +212,232 @@
           </div>
     <!-- </div> -->
     </div>
-    </template>
-    
-    <script>
+</template>   
+<script>
 
-import { getFirestore, doc, collection, setDoc, orderBy, query, getDoc,updateDoc, getDocs, deleteDoc} from "firebase/firestore";
-import {getAuth} from "firebase/auth";
-    import ModalItem from "@/components/ModalItem"
-    import TheLoader from "@/components/TheLoader"
-    import { getFunctions, httpsCallable } from "firebase/functions";
-    export default {
-        name: "ProfileView",
-        data () {
-        return {
-            available: null,
-            profileMenu: null,
-            modalMessage: "Changes were saved!",
-            modalActive: false,
-            photoAvailable: null,
-            client: null,
-            bids: [],
-            loading: null,
-            file: null,
-            clientId:  null,
-            done_orders: [],
-            disputed: [],
-            incomplete: [],
-            revision: [],
-            reviews: [],
-            functionMsg: null
+        import { getFirestore, doc, collection, setDoc, orderBy, query, getDoc,updateDoc, getDocs, deleteDoc} from "firebase/firestore";
+        import {getAuth} from "firebase/auth";
+            import ModalItem from "@/components/ModalItem"
+            import TheLoader from "@/components/TheLoader"
+            import { getFunctions, httpsCallable } from "firebase/functions";
+        export default {
+                name: "ProfileView",
+                data () {
+                return {
+                    available: null,
+                    profileMenu: null,
+                    modalMessage: "Changes were saved!",
+                    modalActive: false,
+                    photoAvailable: null,
+                    client: null,
+                    bids: [],
+                    loading: null,
+                    file: null,
+                    clientId:  null,
+                    done_orders: [],
+                    disputed: [],
+                    incomplete: [],
+                    revision: [],
+                    reviews: [],
+                    functionMsg: null
+
+                }
+                },
+
+                components :{
+                    ModalItem,
+                    TheLoader,
+                    // ProfilePhotoPreview
+                    
+                },
+            
+                methods: {
+                    toggleAvailable(){
+                        this.available= !this.available
+                    },
+                    toggleProfileMenu(){
+                        this.profileMenu= !this.profileMenu
+                    },
+                
+                    closeModal() {
+                        this.modalActive = !this.modalActive;
+                    },
+                    async assignTask(clientId) {
+                        this.loading = true;
+                        try {
+                            const db = getFirestore();
+                            const userRef = doc(db, 'users', clientId);
+
+                            const ordersRef = collection(userRef, 'myBids');   
+                            const task = await getDoc(doc(ordersRef, this.orderId));
+                        
+                            if (task.exists()) {
+                            const tobeAssignedTask = task.data();
+                            
+                            // rest of the method
+                            const invitedCollectionRef = collection(userRef, "invited");
+                            
+                            const invitedOrderRef = doc(invitedCollectionRef, this.orderId);
+                            await setDoc(invitedOrderRef, {
+                                ...tobeAssignedTask,
+                                status: "in progress",
+                                date: new Date(),
+                            });
+
+                            const ordersCollectionRef = collection(db, "forwarded_orders");
+                            const orderRef = doc(ordersCollectionRef, this.orderId);
+                            await setDoc( orderRef,{
+                                ...tobeAssignedTask,
+                                freelancer: clientId,
+                                status: "in progress",
+                                date: new Date(),
+                            });
+
+                            //update clients status
+                            const orderClientRef = doc(db, 'users', tobeAssignedTask.client);
+                            const orderClientOrdersRef = collection(orderClientRef, 'orders');   
+                            const orderClientDocRef = doc(orderClientOrdersRef, this.orderId);
+                            await updateDoc(orderClientDocRef, {
+                                status: "in progress",
+                            }); 
+                            
+                            const ordersColRef = collection(db, 'orders');   
+                            const orderDocRef = doc(ordersColRef, this.orderId);
+                            await updateDoc(orderDocRef, {
+                                freelancer: clientId,
+                                status: "in progress",
+                            }); 
+
+                            const inprogress = await getDoc(doc(orderClientOrdersRef, this.orderId));
+                            const inprogressCollectionRef = collection(orderClientRef, "incomplete");
+                            const inprogressRef = doc(inprogressCollectionRef, this.orderId);
+                            await setDoc(inprogressRef, {
+                                ...inprogress.data(),
+                                status: "in progress",
+                                date: new Date(),
+                            });
+
+                            // // Delete the current order document from the "myBids" collection
+                            const deleteMyBids = doc(ordersRef, this.orderId);
+                            await deleteDoc(deleteMyBids);
+
+                            // Delete the current order document from the "tobebidded_orders" collection
+                            const tobebidded_ordersRef = collection(db, 'tobebidded_orders'); 
+                            const tobebidded_ordersref = doc(tobebidded_ordersRef, this.orderId);
+                            await deleteDoc(tobebidded_ordersref);
+
+                            this.loading = false;
+                            alert("Order has been assigned successfully!");
+                            this.$router.push("/admin/all-bids");
+                            } else {
+                            console.error("Error in assigning task: Task does not exist");
+                            }
+                        } catch (error) {
+                            this.loading = false;
+                            console.error("Error in assigning task:", error);
+                        }      
+                    },
+
+                    signOut() {
+                        getAuth().signOut();
+                        // window.location.reload();
+                        this.$router.replace('/');
+                    },
+                    async addFreelancer() {
+                        const functions = getFunctions();
+                        const addFreelancer = httpsCallable(functions, 'addFreelancerRole');
+                        const result = await addFreelancer({ email:  this.client.email});
+                        this.functionMsg = result.data.message;
+                        alert(this.functionMsg);
+                    },
+                    
+                
+                },
+                computed: {
+                admin() {
+                return this.$store.state.profileAdmin;
+                },
+                freelancer() {
+                        return this.$store.state.profileFreelancer;
+                },
+                reviewer() {
+                        return this.$store.state.profileReviewer;
+                },
+                orderId () {
+                return this.$route.params.orderId
+            },
+                },
+                async created() {
+                    const db = getFirestore();
+                    this.clientId = this.$route.params.id;
+                    const clientSnapshot = await getDoc(doc(db, 'users', this.clientId));
+                    const clientData = clientSnapshot.data();
+                    this.client = {
+                    firstName: clientData.firstName,
+                    lastName: clientData.lastName,
+                    email: clientData.email,
+                    phoneNumber: clientData.phoneNumber,
+                    niche:  clientData.niche,
+                    freelancing_field:  clientData.freelancing_field,
+                    other_roles:  clientData.other_roles,
+                    portfolio_link:  clientData.portfolio_link,
+                    profileCoverFile:  clientData.profileCoverFile,
+                    profileCoverFileName:  clientData.profileCoverFileName,
+                    };
+
+                    const userRef = doc(db, 'users', this.clientId);
+                    const ordersRef = collection(userRef, 'myBids');
+                    try {
+                    const querySnapshot = await getDocs(ordersRef);
+                    this.bids = querySnapshot.docs.map((doc) => doc.data());
+                    } catch (error) {
+                    console.error(error);
+                    };
+
+                const doneorderRef = collection(userRef, 'done_orders');
+                const donesnapshot = await getDocs(
+                    query(doneorderRef, orderBy("id", "desc"))
+                    );
+                const done_orders = donesnapshot.docs.map(doc => doc.data());
+                this.done_orders = done_orders;
+
+                const disputedorderRef = collection(userRef, 'disputed');
+                const disputedsnapshot = await getDocs(
+                    query(disputedorderRef, orderBy("id", "desc"))
+                    );
+                const disputed = disputedsnapshot.docs.map(doc => doc.data());
+                this.disputed = disputed;
+
+                const incompleteorderRef = collection(userRef, 'incomplete');
+                const incompletesnapshot = await getDocs(
+                    query(incompleteorderRef, orderBy("id", "desc"))
+                    );
+                const incomplete = incompletesnapshot.docs.map(doc => doc.data());
+                this.incomplete = incomplete;
+
+                const revisionorderRef = collection(userRef, 'revision');
+                const revisionsnapshot = await getDocs(
+                    query(revisionorderRef, orderBy("id", "desc"))
+                    );
+                const revision = revisionsnapshot.docs.map(doc => doc.data());
+                this.revision = revision;
+
+                const reviewsorderRef = collection(userRef, 'reviews');
+                const reviewssnapshot = await getDocs(
+                    query(reviewsorderRef, orderBy("id", "desc"))
+                    );
+                const reviews= reviewssnapshot.docs.map(doc => doc.data());
+                this.reviews = reviews;
+
+
+                
+                },
+                
 
         }
-         },
-
-        components :{
-            ModalItem,
-            TheLoader,
-            // ProfilePhotoPreview
-            
-        },
-     
-        methods: {
-            toggleAvailable(){
-                this.available= !this.available
-            },
-            toggleProfileMenu(){
-                this.profileMenu= !this.profileMenu
-            },
-        
-            closeModal() {
-                this.modalActive = !this.modalActive;
-            },
-            async assignTask(clientId) {
-                this.loading = true;
-                try {
-                    const db = getFirestore();
-                    const userRef = doc(db, 'users', clientId);
-
-                    const ordersRef = collection(userRef, 'myBids');   
-                    const task = await getDoc(doc(ordersRef, this.orderId));
-                
-                    if (task.exists()) {
-                    const tobeAssignedTask = task.data();
-                    
-                    // rest of the method
-                    const invitedCollectionRef = collection(userRef, "invited");
-                    
-                    const invitedOrderRef = doc(invitedCollectionRef, this.orderId);
-                    await setDoc(invitedOrderRef, {
-                        ...tobeAssignedTask,
-                        status: "in progress",
-                        date: new Date(),
-                    });
-
-                    const ordersCollectionRef = collection(db, "forwarded_orders");
-                    const orderRef = doc(ordersCollectionRef, this.orderId);
-                    await setDoc( orderRef,{
-                        ...tobeAssignedTask,
-                        freelancer: clientId,
-                        status: "in progress",
-                        date: new Date(),
-                    });
-
-                    //update clients status
-                    const orderClientRef = doc(db, 'users', tobeAssignedTask.client);
-                    const orderClientOrdersRef = collection(orderClientRef, 'orders');   
-                    const orderClientDocRef = doc(orderClientOrdersRef, this.orderId);
-                    await updateDoc(orderClientDocRef, {
-                        status: "in progress",
-                    }); 
-                    
-                    const ordersColRef = collection(db, 'orders');   
-                    const orderDocRef = doc(ordersColRef, this.orderId);
-                    await updateDoc(orderDocRef, {
-                        freelancer: clientId,
-                        status: "in progress",
-                    }); 
-
-                    const inprogress = await getDoc(doc(orderClientOrdersRef, this.orderId));
-                    const inprogressCollectionRef = collection(orderClientRef, "incomplete");
-                    const inprogressRef = doc(inprogressCollectionRef, this.orderId);
-                    await setDoc(inprogressRef, {
-                        ...inprogress.data(),
-                        status: "in progress",
-                        date: new Date(),
-                    });
-
-                    // // Delete the current order document from the "myBids" collection
-                    const deleteMyBids = doc(ordersRef, this.orderId);
-                    await deleteDoc(deleteMyBids);
-
-                    // Delete the current order document from the "tobebidded_orders" collection
-                    const tobebidded_ordersRef = collection(db, 'tobebidded_orders'); 
-                    const tobebidded_ordersref = doc(tobebidded_ordersRef, this.orderId);
-                    await deleteDoc(tobebidded_ordersref);
-
-                    this.loading = false;
-                    alert("Order has been assigned successfully!");
-                    this.$router.push("/admin/all-bids");
-                    } else {
-                    console.error("Error in assigning task: Task does not exist");
-                    }
-                } catch (error) {
-                    this.loading = false;
-                    console.error("Error in assigning task:", error);
-                }      
-            },
-
-            signOut() {
-                getAuth().signOut();
-                // window.location.reload();
-                this.$router.replace('/');
-            },
-            async addFreelancer() {
-                const functions = getFunctions();
-                const addFreelancer = httpsCallable(functions, 'addFreelancerRole');
-                const result = await addFreelancer({ email:  this.client.email});
-                this.functionMsg = result.data.message;
-                alert(this.functionMsg);
-            },
-            
-        
-        },
-        computed: {
-          admin() {
-          return this.$store.state.profileAdmin;
-          },
-          freelancer() {
-                return this.$store.state.profileFreelancer;
-          },
-          reviewer() {
-                return this.$store.state.profileReviewer;
-          },
-          orderId () {
-        return this.$route.params.orderId
-      },
-        },
-        async created() {
-            const db = getFirestore();
-            this.clientId = this.$route.params.id;
-            const clientSnapshot = await getDoc(doc(db, 'users', this.clientId));
-            const clientData = clientSnapshot.data();
-            this.client = {
-            firstName: clientData.firstName,
-            lastName: clientData.lastName,
-            email: clientData.email,
-            phoneNumber: clientData.phoneNumber,
-            niche:  clientData.niche,
-            freelancing_field:  clientData.freelancing_field,
-            other_roles:  clientData.other_roles,
-            portfolio_link:  clientData.portfolio_link,
-            profileCoverFile:  clientData.profileCoverFile,
-            profileCoverFileName:  clientData.profileCoverFileName,
-            };
-
-            const userRef = doc(db, 'users', this.clientId);
-            const ordersRef = collection(userRef, 'myBids');
-            try {
-            const querySnapshot = await getDocs(ordersRef);
-            this.bids = querySnapshot.docs.map((doc) => doc.data());
-            } catch (error) {
-            console.error(error);
-            };
-
-        const doneorderRef = collection(userRef, 'done_orders');
-        const donesnapshot = await getDocs(
-            query(doneorderRef, orderBy("id", "desc"))
-            );
-        const done_orders = donesnapshot.docs.map(doc => doc.data());
-        this.done_orders = done_orders;
-
-        const disputedorderRef = collection(userRef, 'disputed');
-        const disputedsnapshot = await getDocs(
-            query(disputedorderRef, orderBy("id", "desc"))
-            );
-        const disputed = disputedsnapshot.docs.map(doc => doc.data());
-        this.disputed = disputed;
-
-        const incompleteorderRef = collection(userRef, 'incomplete');
-        const incompletesnapshot = await getDocs(
-            query(incompleteorderRef, orderBy("id", "desc"))
-            );
-        const incomplete = incompletesnapshot.docs.map(doc => doc.data());
-        this.incomplete = incomplete;
-
-        const revisionorderRef = collection(userRef, 'revision');
-        const revisionsnapshot = await getDocs(
-            query(revisionorderRef, orderBy("id", "desc"))
-            );
-        const revision = revisionsnapshot.docs.map(doc => doc.data());
-        this.revision = revision;
-
-        const reviewsorderRef = collection(userRef, 'reviews');
-        const reviewssnapshot = await getDocs(
-            query(reviewsorderRef, orderBy("id", "desc"))
-            );
-        const reviews= reviewssnapshot.docs.map(doc => doc.data());
-        this.reviews = reviews;
-
-
-        
-        },
-        
-
-  }
  
-    </script>
-    
-    <style scoped>
+</script> 
+<style scoped>
     
 table {
     border-collapse:collapse;
@@ -966,4 +962,4 @@ main{
         grid-template-columns: 100%;
     }
  }
-    </style>
+</style>

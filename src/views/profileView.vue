@@ -1,5 +1,3 @@
-
-
 <template>
     <input type="checkbox" id="nav-toggle">
  
@@ -18,7 +16,7 @@
                 </div>
                 <div class="initials" >
                   <div>
-                    <img :src="profileCoverPhoto" :alt="this.$store.state.profileInitials">
+                    <img :src="profileCoverPhoto" :alt="this.$store.state.profileInitials" height="30px">
                   </div>
                  
                 </div>
@@ -430,192 +428,189 @@
                     <button @click.prevent="updateProfile">Save Changes</button>
                   </div>
                 </form>
+                <div class="payment-buttom" @click="toggleVisaCard()">
+                  <button>Verify Payment Details</button>
+                </div>
+                <div class="visacard" v-if="visacard">
+                  <button type="button" style="float: right"  @click="toggleVisaCard()">close</button>
+                  <VisaCard/>
+                </div>
               </div>
              </div>
             </div>
           </div>
     </div>
     </div>
-    </template>
+</template>
     
-    <script>
-import SideBar from "@/components/core/SideBar.vue";
-import Header from "@/components/core/Header.vue";
-import { getFirestore, doc, updateDoc, collection, getDoc, } from "firebase/firestore";
-import { getStorage ,ref, getDownloadURL, uploadBytesResumable} from "firebase/storage"; 
-    import ModalItem from "@/components/ModalItem"
-    import TheLoader from "@/components/TheLoader"
-    import { getAuth} from "firebase/auth";
-    export default {
-    components: {
-        SideBar, 
-        Header
-    },
-        name: "ProfileView",
-        data () {
-        return {
-            available: null,
-            profileMenu: null,
-            modalMessage: "Changes were saved!",
-            modalActive: false,
-            photoAvailable: null,
-            loading: null,
-            file: null,
-            otherRoles: null,
+<script>
+  import SideBar from "@/components/core/SideBar.vue";
+  import Header from "@/components/core/Header.vue";
+  import ModalItem from "@/components/ModalItem";
+  import TheLoader from "@/components/TheLoader";
+  import VisaCard from "@/components/core/VisaCard";
+  import { getFirestore, doc, updateDoc, collection, getDoc, } from "firebase/firestore";
+  import { getStorage ,ref, getDownloadURL, uploadBytesResumable} from "firebase/storage"; 
+  import { getAuth} from "firebase/auth";
+  export default {
+      components: {
+          SideBar, 
+          Header,
+          ModalItem,
+          TheLoader,
+          VisaCard
+      },
+          name: "ProfileView",
+          data () {
+          return {
+              available: null,
+              profileMenu: null,
+              modalMessage: "Changes were saved!",
+              modalActive: false,
+              photoAvailable: null,
+              loading: null,
+              file: null,
+              otherRoles: null,
+              visacard: null
 
-        }
-    },
+          }
+      },
 
-        components :{
-            ModalItem,
-            TheLoader,
-            // ProfilePhotoPreview
-            
-        },
-     
-        methods: {
-            toggleAvailable(){
-            this.available= !this.available
-        },
-        toggleProfileMenu(){
-            this.profileMenu= !this.profileMenu
-        },
-        toggleOtherRoles(){
-            this.otherRoles= !this.otherRoles
-        },
-          closeModal() {
-            this.modalActive = !this.modalActive;
+          methods: {
+            toggleVisaCard(){
+              this.visacard= !this.visacard
           },
-          fileChange() {
-            if (this.$refs.orderFile && this.$refs.orderFile.files.length > 0) {
-                this.file = this.$refs.orderFile.files[0];
-                const fileName = this.file.name;
-                this.$store.commit("orderFileNameChange", fileName);
-                this.$store.commit("createOrderFileURL", URL.createObjectURL(this.file));
-            }else {
-                console.log("no file");
-            }
-        },
-       async updateProfile(){
-          this.loading = true;
-          if (this.file) {
-                
-                this.loading = true;
-                    const storage = getStorage();
-                    const storageRef = ref(
-                    storage,
-                    `documents/profiles/${this.$store.state.orderFileName}`
-                    );
-                    const uploadTask = uploadBytesResumable(storageRef, this.file);
-                    uploadTask.on(
-                    "state_changed",
-                    (snapshot) => {
-                        console.log(snapshot);
-                    },
-                    (err) => {
-                        console.log(err);
-                        this.loading = false;
-                    },
-                    async () => {
-                    const downloadURL = await getDownloadURL(storageRef);
+              toggleAvailable(){
+              this.available= !this.available
+          },
+          toggleProfileMenu(){
+              this.profileMenu= !this.profileMenu
+          },
+          toggleOtherRoles(){
+              this.otherRoles= !this.otherRoles
+          },
+            closeModal() {
+              this.modalActive = !this.modalActive;
+            },
+            fileChange() {
+              if (this.$refs.orderFile && this.$refs.orderFile.files.length > 0) {
+                  this.file = this.$refs.orderFile.files[0];
+                  const fileName = this.file.name;
+                  this.$store.commit("orderFileNameChange", fileName);
+                  this.$store.commit("createOrderFileURL", URL.createObjectURL(this.file));
+              }else {
+                  console.log("no file");
+              }
+          },
+        async updateProfile(){
+            this.loading = true;
+            if (this.file) {
+                  
+                  this.loading = true;
+                      const storage = getStorage();
+                      const storageRef = ref(
+                      storage,
+                      `documents/profiles/${this.$store.state.orderFileName}`
+                      );
+                      const uploadTask = uploadBytesResumable(storageRef, this.file);
+                      uploadTask.on(
+                      "state_changed",
+                      (snapshot) => {
+                          console.log(snapshot);
+                      },
+                      (err) => {
+                          console.log(err);
+                          this.loading = false;
+                      },
+                      async () => {
+                      const downloadURL = await getDownloadURL(storageRef);
 
-                   
+                    
 
-                        //updating clients status to be on review
-                        const auth = getAuth();
-                        const firestore = getFirestore();
+                          //updating clients status to be on review
+                          const auth = getAuth();
+                          const firestore = getFirestore();
 
-                        const userRef= doc(collection(firestore, "users"), auth.currentUser.uid);
-                       
-                        if(!this.freelancer){
+                          const userRef= doc(collection(firestore, "users"), auth.currentUser.uid);
+                        
+                          if(!this.freelancer){
+                            await updateDoc(userRef, {
+                            firstName: this.firstName,
+                              lastName: this.lastName,
+                              phoneNumber: this.phoneNumber,
+                              profileCoverFile: downloadURL,
+                              profileCoverFileName: this.$store.state.orderFileName,
+                          }); 
+
+                            const clientRef= doc(collection(firestore, "clients"), auth.currentUser.uid);
+                            await updateDoc(clientRef, {
+                              firstName: this.firstName,
+                              lastName: this.lastName,
+                              phoneNumber: this.phoneNumber,
+                              profileCoverFile: downloadURL,
+                              profileCoverFileName: this.$store.state.orderFileName,
+                            }); 
+                        };
+                        if(this.freelancer){
+
                           await updateDoc(userRef, {
-                          firstName: this.firstName,
-                            lastName: this.lastName,
-                            phoneNumber: this.phoneNumber,
-                            profileCoverFile: downloadURL,
-                            profileCoverFileName: this.$store.state.orderFileName,
-                        }); 
-
-                          const clientRef= doc(collection(firestore, "clients"), auth.currentUser.uid);
-                          await updateDoc(clientRef, {
                             firstName: this.firstName,
-                            lastName: this.lastName,
-                            phoneNumber: this.phoneNumber,
-                            profileCoverFile: downloadURL,
-                            profileCoverFileName: this.$store.state.orderFileName,
+                              lastName: this.lastName,
+                              phoneNumber: this.phoneNumber,
+                              username: this.username,
+                              niche: this.niche,
+                              freelancing_field: this.freelancing_field,
+                              // other_roles: this.other_roles,
+                              portfolio_link: this.portfolio_link,
+                              profileCoverFile: downloadURL,
+                              profileCoverFileName: this.$store.state.orderFileName,
                           }); 
-                       };
-                       if(this.freelancer){
 
-                        await updateDoc(userRef, {
-                          firstName: this.firstName,
-                            lastName: this.lastName,
-                            phoneNumber: this.phoneNumber,
-                            username: this.username,
-                            niche: this.niche,
-                            freelancing_field: this.freelancing_field,
-                            // other_roles: this.other_roles,
-                            portfolio_link: this.portfolio_link,
-                            profileCoverFile: downloadURL,
-                            profileCoverFileName: this.$store.state.orderFileName,
-                        }); 
+                            const freelancerRef= doc(collection(firestore, "freelancers"), auth.currentUser.uid);
+                            await updateDoc(freelancerRef, {
+                              firstName: this.firstName,
+                              lastName: this.lastName,
+                              phoneNumber: this.phoneNumber,
+                              freelancing_field: this.freelancing_field,
+                              niche: this.niche,
+                              // other_roles: this.other_roles,
+                              portfolio_link: this.portfolio_link,
+                              profileCoverFile: downloadURL,
+                              profileCoverFileName: this.$store.state.orderFileName,
+                            }); 
+                        };
+                          this.$store.commit("setProfileInitials");
+                          this.$store.dispatch("getCurrentUser", userRef);
 
-                          const freelancerRef= doc(collection(firestore, "freelancers"), auth.currentUser.uid);
-                          await updateDoc(freelancerRef, {
-                            firstName: this.firstName,
-                            lastName: this.lastName,
-                            phoneNumber: this.phoneNumber,
-                            freelancing_field: this.freelancing_field,
-                            niche: this.niche,
-                            // other_roles: this.other_roles,
-                            portfolio_link: this.portfolio_link,
-                            profileCoverFile: downloadURL,
-                            profileCoverFileName: this.$store.state.orderFileName,
-                          }); 
-                       };
-                        this.$store.commit("setProfileInitials");
-                        this.$store.dispatch("getCurrentUser", userRef);
-
+                  
+                        }
+                  );
                 
-                      }
-                );
-              
-                this.loading = false;
-                this.modalActive = !this.modalActive;
-                return;
-                }
-                else {
-                    const auth = getAuth();
-                        const firestore = getFirestore();
-                        const userRef= doc(collection(firestore, "users"), auth.currentUser.uid);
-                       
-                        if(!this.freelancer){
-                          await updateDoc(userRef, {
-                          firstName: this.firstName,
-                          lastName: this.lastName,
-                          phoneNumber: this.phoneNumber,
-                        }); 
-
-                          const clientRef= doc(collection(firestore, "clients"), auth.currentUser.uid);
-                          await updateDoc(clientRef, {
+                  this.loading = false;
+                  this.modalActive = !this.modalActive;
+                  return;
+                  }
+                  else {
+                      const auth = getAuth();
+                          const firestore = getFirestore();
+                          const userRef= doc(collection(firestore, "users"), auth.currentUser.uid);
+                        
+                          if(!this.freelancer){
+                            await updateDoc(userRef, {
                             firstName: this.firstName,
                             lastName: this.lastName,
                             phoneNumber: this.phoneNumber,
                           }); 
-                       };
-                       if(this.freelancer){
-                        await updateDoc(userRef, {
-                          firstName: this.firstName,
-                          lastName: this.lastName,
-                          phoneNumber: this.phoneNumber,
-                          freelancing_field: this.freelancing_field,
-                          niche: this.niche,
-                          // other_roles: this.other_roles,
-                          portfolio_link: this.portfolio_link,
-                        }); 
 
-                          const freelancerRef= doc(collection(firestore, "freelancers"), auth.currentUser.uid);
-                          await updateDoc(freelancerRef, {
+                            const clientRef= doc(collection(firestore, "clients"), auth.currentUser.uid);
+                            await updateDoc(clientRef, {
+                              firstName: this.firstName,
+                              lastName: this.lastName,
+                              phoneNumber: this.phoneNumber,
+                            }); 
+                        };
+                        if(this.freelancer){
+                          await updateDoc(userRef, {
                             firstName: this.firstName,
                             lastName: this.lastName,
                             phoneNumber: this.phoneNumber,
@@ -624,118 +619,129 @@ import { getStorage ,ref, getDownloadURL, uploadBytesResumable} from "firebase/s
                             // other_roles: this.other_roles,
                             portfolio_link: this.portfolio_link,
                           }); 
-                       };
-                        this.$store.commit("setProfileInitials");
-                        this.$store.dispatch("getCurrentUser", userRef);
 
-                        this.loading = false;
-                        this.modalActive = !this.modalActive;
-                        return;
-                }
-       
-        },
+                            const freelancerRef= doc(collection(firestore, "freelancers"), auth.currentUser.uid);
+                            await updateDoc(freelancerRef, {
+                              firstName: this.firstName,
+                              lastName: this.lastName,
+                              phoneNumber: this.phoneNumber,
+                              freelancing_field: this.freelancing_field,
+                              niche: this.niche,
+                              // other_roles: this.other_roles,
+                              portfolio_link: this.portfolio_link,
+                            }); 
+                        };
+                          this.$store.commit("setProfileInitials");
+                          this.$store.dispatch("getCurrentUser", userRef);
+
+                          this.loading = false;
+                          this.modalActive = !this.modalActive;
+                          return;
+                  }
+        
+          },
+      
+      
+          },
+
+    computed: {
     
-     
+      firstName: {
+          get() {
+            return this.$store.state.profileFirstName;
+          },
+          set(payload){
+            this.$store.commit("changeFirstName", payload);
+          }
         },
+        lastName: {
+          get() {
+            return this.$store.state.profileLastName;
+          },
+          set(payload){
+            this.$store.commit("changeLastName", payload);
+          }
+        },
+        username: {
+          get() {
+            return this.$store.state.profileUsername;
+          },
+          set(payload){
+            this.$store.commit("changeUsername", payload);
+          }
+        },
+        phoneNumber: {
+          get() {
+            return this.$store.state.profilePhoneNumber;
+          },
+          set(payload){
+            this.$store.commit("changePhoneNumber", payload);
+          }
+        },
+        niche: {
+          get() {
+            return this.$store.state.profileNiche;
+          },
+          set(payload){
+            this.$store.commit("changeNiche", payload);
+          }
+        },
+        freelancing_field: {
+          get() {
+            return this.$store.state.profileFreelancing_field;
+          },
+          set(payload){
+            this.$store.commit("changeFreelancing_field", payload);
+          }
+        },  
+        other_roles: {
+          get() {
+            return this.$store.state.other_Roles;
+          },
+          set(payload){
+            this.$store.commit("changeOther_Roles", payload);
+          }
+        },
+        portfolio_link: {
+          get() {
+            return this.$store.state.profilePortfolioLink;
+          },
+          set(payload){
+            this.$store.commit("changePortfolioLink", payload);
+          }
+        },  
+        profileCoverPhoto: {
+          get() {
+            return this.$store.state.profileCoverPhoto;
+          }
+        },
+        email: {
+          get() {
+            return this.$store.state.profileEmail;
+          }
+        },
+        admin() {
+            return this.$store.state.profileAdmin;
+        },
+        freelancer() {
+            return this.$store.state.profileFreelancer;
+        }
 
-  computed: {
-  
-    firstName: {
-        get() {
-          return this.$store.state.profileFirstName;
-        },
-        set(payload){
-          this.$store.commit("changeFirstName", payload);
-        }
-      },
-      lastName: {
-        get() {
-          return this.$store.state.profileLastName;
-        },
-        set(payload){
-          this.$store.commit("changeLastName", payload);
-        }
-      },
-      username: {
-        get() {
-          return this.$store.state.profileUsername;
-        },
-        set(payload){
-          this.$store.commit("changeUsername", payload);
-        }
-      },
-      phoneNumber: {
-        get() {
-          return this.$store.state.profilePhoneNumber;
-        },
-        set(payload){
-          this.$store.commit("changePhoneNumber", payload);
-        }
-      },
-      niche: {
-        get() {
-          return this.$store.state.profileNiche;
-        },
-        set(payload){
-          this.$store.commit("changeNiche", payload);
-        }
-      },
-      freelancing_field: {
-        get() {
-          return this.$store.state.profileFreelancing_field;
-        },
-        set(payload){
-          this.$store.commit("changeFreelancing_field", payload);
-        }
-      },  
-      other_roles: {
-        get() {
-          return this.$store.state.other_Roles;
-        },
-        set(payload){
-          this.$store.commit("changeOther_Roles", payload);
-        }
-      },
-      portfolio_link: {
-        get() {
-          return this.$store.state.profilePortfolioLink;
-        },
-        set(payload){
-          this.$store.commit("changePortfolioLink", payload);
-        }
-      },  
-      profileCoverPhoto: {
-        get() {
-          return this.$store.state.profileCoverPhoto;
-        }
-      },
-      email: {
-        get() {
-          return this.$store.state.profileEmail;
-        }
-      },
-      admin() {
-          return this.$store.state.profileAdmin;
-      },
-      freelancer() {
-          return this.$store.state.profileFreelancer;
-      }
+  },
 
- },
+  async mounted() {
+    
+    const auth = getAuth();
+    await auth.onAuthStateChanged(user => {
+      this.$store.dispatch("getCurrentUser", user);
 
-async mounted() {
-  
-  const auth = getAuth();
-   await auth.onAuthStateChanged(user => {
-     this.$store.dispatch("getCurrentUser", user);
-
-    });
-  
+      });
+    
+    }
   }
-}
-    </script>
+</script>
     
-    <style scoped>
+<style scoped>
     img{
       width: 100px;
       border-radius: 50px;
@@ -1188,4 +1194,4 @@ main{
         grid-template-columns: 100%;
     }
  }
-    </style>
+</style>

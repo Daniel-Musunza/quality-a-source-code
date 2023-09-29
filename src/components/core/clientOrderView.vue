@@ -187,7 +187,7 @@
     import TheLoader from "@/components/TheLoader";
     import { getFirestore, doc, updateDoc, collection, getDoc, setDoc, deleteDoc } from "firebase/firestore";
 
-    import { mapState } from 'vuex'
+    import { mapState, mapActions } from 'vuex';
     export default {
         components: {
             SideBar, 
@@ -356,32 +356,25 @@
                 const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
 
                 return `${days}d ${hours}h ${minutes}m ${seconds}s`;
-        }
+        },
+        ...mapActions(['getOrders']),
+
         },
         computed: {
+        ...mapState(['orders']),
         ...mapState(['clientOrders']),
         ...mapState(['incomplete']),
         ...mapState(['done_orders']),
         ...mapState(['onRevision']),
         order () {
             const orderId = this.$route.params.id;
-            const clientOrders = this.clientOrders.find(order => order.id === orderId);
-            const incomplete = this.incomplete.find(order => order.id === orderId);
-            const done_orders = this.done_orders.find(order => order.id === orderId);
-            const onRevision = this.onRevision.find(order => order.id === orderId);
-            if (clientOrders) {
-                return clientOrders;
-            } else if (incomplete) {
-                return incomplete;
-            } else if (done_orders) {
-                return done_orders;
-            } else if (onRevision) {
-                return onRevision;
-            } 
-        
+            return this.orders.find(order => order.id === orderId);
         }
-        }
+    },
+    created() {
+    this.getOrders();
     }
+}
 </script>
 
 <style scoped>

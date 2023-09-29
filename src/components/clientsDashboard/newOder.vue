@@ -206,21 +206,20 @@ export default {
 
                   const auth = getAuth();
                   let orderID = 1000;
-                  const querySnapshot = await getDocs(collection(db, "orders"), orderBy("orderID", "desc"), limit(1));
-                  if (!querySnapshot.empty) {
-                        // Sort the querySnapshot by date in descending order
-                        const sortedOrders = querySnapshot.docs.sort((a, b) => {
-                            const dateA = a.data().date;
-                            const dateB = b.data().date;
-                            return dateB - dateA;
-                        });
-                        
-                        // Get the most recent order
-                        const mostRecentOrder = sortedOrders[0].data();
+                  const querySnapshot = await getDocs(collection(db, "orders"), orderBy("date", "desc"), limit(1));
+                    if (!querySnapshot.empty) {
+                        const mostRecentOrder = querySnapshot.docs[0].data();
+                        // Get the maximum orderID in the database
+                        const maxOrderID = mostRecentOrder.id;
 
                         // Calculate the new orderID
-                        orderID = parseInt(mostRecentOrder.id) + 1;
-                    };
+                        orderID = maxOrderID + 1;
+                    } else {
+                        // If there are no existing orders, start with a default value
+                        orderID = 1000; // or any other starting value you prefer
+                    }
+
+
 
 
                 const userRef = doc(db, 'users', auth.currentUser.uid);
@@ -278,22 +277,21 @@ export default {
                 const timestamp = await Date.now();
                 let orderID = 1000;
                 
-                const querySnapshot = await getDocs(collection(db, "orders"), orderBy("orderID", "desc"), limit(1));
-                
+                const querySnapshot = await getDocs(collection(db, "orders"), orderBy("date", "desc"), limit(1));
+                console.log(querySnapshot)
                 if (!querySnapshot.empty) {
-                    // Sort the querySnapshot by date in descending order
-                    const sortedOrders = querySnapshot.docs.sort((a, b) => {
-                        const dateA = a.data().date;
-                        const dateB = b.data().date;
-                        return dateB - dateA;
-                    });
-                    
-                    // Get the most recent order
-                    const mostRecentOrder = sortedOrders[0].data();
+                    const mostRecentOrder = querySnapshot.docs[0].data();
+                    // Get the maximum orderID in the database
+                    const maxOrderID = mostRecentOrder.id;
 
                     // Calculate the new orderID
-                    orderID = parseInt(mostRecentOrder.id) + 1;
-                };
+                    orderID = maxOrderID + 1;
+                } else {
+                    // If there are no existing orders, start with a default value
+                    orderID = 1000; // or any other starting value you prefer
+                }
+
+
 
 
                 

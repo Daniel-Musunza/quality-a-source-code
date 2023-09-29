@@ -26,7 +26,7 @@
                                     :key="client.id"
                                     >
                                         <td>{{index +1}}</td>
-                                        <td><img v-if="client.profileCoverFile" :src="client.profileCoverFile" class="img" alt=''/>
+                                        <td><img v-if="client.profileCoverFile" :src="client.profileCoverFile" class="img" alt='' height="30px"/>
                                     <i v-if="!client.profileCoverFile" style="font-size: 40px;" class="fa-solid fa-user"></i></td>
                                
                                         <td>
