@@ -81,7 +81,7 @@
         </div>
         <!-- <input type="submit"  @click='pay' :disabled='!complete' value="submit" class=""> -->
         <button @click='pay' :disabled='!complete' class="submit-btn">
-         Pay
+         Verify
         </button>
     </form>
 </div>
