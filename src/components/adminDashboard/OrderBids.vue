@@ -13,7 +13,7 @@
                         <div class="card" v-for="bid in bids" :key="bid.id">
                             <router-link :to="{ name: 'client-view', params: {id: bid.userData.id, orderId: orderId}}">
                                 <div class="head">
-                                <div class="image"></div>
+                                <div ><img class="image" v-if="bid.userData.profileCoverFile" :src="bid.userData.profileCoverFile" alt='' style="border-radius: 50%;"  /></div>
                                 <div>
                                     <div class="stars">
                                     <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -91,6 +91,7 @@
             firstName: userData.firstName,
             lastName: userData.lastName,
             phoneNumber: userData.phoneNumber,
+            profileCoverFile :userData.profileCoverFile,
             email: userData.email,
             id: userData.id,
             };

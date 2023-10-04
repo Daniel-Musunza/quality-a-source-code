@@ -206,30 +206,30 @@ export default {
 
                   const auth = getAuth();
                   let orderID = 1000;
-                  const querySnapshot = await getDocs(collection(db, "orders"), orderBy("date", "desc"), limit(1));
-                    if (!querySnapshot.empty) {
-                        const mostRecentOrder = querySnapshot.docs[0].data();
-                        // Get the maximum orderID in the database
-                        const maxOrderID = mostRecentOrder.id;
 
-                        // Calculate the new orderID
-                        orderID = maxOrderID + 1;
-                    } else {
-                        // If there are no existing orders, start with a default value
-                        orderID = 1000; // or any other starting value you prefer
+                    const querySnapshot = await getDocs(collection(db, "orders"), orderBy("id", "desc"), limit(1));
+                    
+                    if (!querySnapshot.empty) {
+
+                        const mostRecentOrder = querySnapshot.docs[querySnapshot.docs.length - 1].data();
+                            // Get the maximum orderID in the database and parse it as an integer
+                        const maxOrderID = parseInt(mostRecentOrder.id);
+                        orderID = maxOrderID + 1; 
                     }
 
 
 
 
                 const userRef = doc(db, 'users', auth.currentUser.uid);
+                const client = auth.currentUser.uid;
+
                 const ordersCollectionRef = collection(db, "orders");
                 const orderRef = doc(ordersCollectionRef, orderID.toString());
                 await setDoc( orderRef,{
                      orderCoverFile: downloadURL,
                      orderCoverFileName: this.$store.state.orderFileName,
-                        client: userRef,
-                        id: orderRef.id,
+                        client: client,
+                        id: orderID.toString(),
                         orderHTML: this.orderHTML,
                         orderTitle: this.orderTitle,
                         orderCategory: this.orderCategory,
@@ -245,9 +245,10 @@ export default {
 
                  
                   const ordersRef = collection(userRef, 'orders');
-                  const newOrderRef = doc(ordersRef, orderRef.id);
+                  const newOrderRef = doc(ordersRef, orderID.toString());
                     await setDoc(newOrderRef, {
-                        id: newOrderRef.id,
+                        // id: newOrderRef.id,
+                        id: orderID.toString(),
                         orderCoverFile: downloadURL,
                         orderCoverFileName: this.$store.state.orderFileName,
                         orderHTML: this.orderHTML,
@@ -271,71 +272,68 @@ export default {
               );
               return;
             }
-             else {
-                const db = getFirestore();
-                const auth = getAuth();
-                const timestamp = await Date.now();
-                let orderID = 1000;
-                
-                const querySnapshot = await getDocs(collection(db, "orders"), orderBy("date", "desc"), limit(1));
-                console.log(querySnapshot)
-                if (!querySnapshot.empty) {
-                    const mostRecentOrder = querySnapshot.docs[0].data();
-                    // Get the maximum orderID in the database
-                    const maxOrderID = mostRecentOrder.id;
+            else {
+            const db = getFirestore();
+            const auth = getAuth();
+            const timestamp = Date.now(); // Removed "await" since Date.now() is synchronous
 
-                    // Calculate the new orderID
-                    orderID = maxOrderID + 1;
-                } else {
-                    // If there are no existing orders, start with a default value
-                    orderID = 1000; // or any other starting value you prefer
-                }
+            // Declare orderID outside of the if-else block
 
+            // ...
+            let orderID = 1000;
 
+            const querySnapshot = await getDocs(collection(db, "orders"), orderBy("id", "desc"), limit(1));
 
+            if (!querySnapshot.empty) {
 
-                
-                const userRef = doc(db, "users", auth.currentUser.uid);
-                const client = auth.currentUser.uid;
-                const ordersCollectionRef = collection(db, "orders");
-                const orderRef = doc(ordersCollectionRef, orderID.toString());
-                
-                await setDoc(orderRef, {
-                    client: client,
-                    id: orderRef.id,
-                    orderHTML: this.orderHTML,
-                    orderTitle: this.orderTitle,
-                    orderCategory: this.orderCategory,
-                    experienceNeeded: this.experienceNeeded,
-                    status: "pending",
-                    budget: this.budget,
-                    dueTime: this.dueTime,
-                    dueDate: this.dueDate,
-                    date: timestamp,
-                });
-                
-                const ordersRef = collection(userRef, "orders");
-                const newOrderRef = doc(ordersRef, orderRef.id);
-                
-                await setDoc(newOrderRef, {
-                    id: newOrderRef.id,
-                    orderHTML: this.orderHTML,
-                    orderTitle: this.orderTitle,
-                    orderCategory: this.orderCategory,
-                    experienceNeeded: this.experienceNeeded,
-                    status: "pending",
-                    budget: this.budget,
-                    dueTime: this.dueTime,
-                    dueDate: this.dueDate,
-                    date: timestamp,
-                });
-                
-                await this.$store.dispatch("getClientOrders");
-                this.loading = false;
-                this.$router.push("/client/all-orders");
-                
-                return;
+                const mostRecentOrder = querySnapshot.docs[querySnapshot.docs.length - 1].data();
+                    // Get the maximum orderID in the database and parse it as an integer
+                const maxOrderID = parseInt(mostRecentOrder.id);
+                orderID = maxOrderID + 1; 
             }
+
+            const userRef = doc(db, "users", auth.currentUser.uid);
+            const client = auth.currentUser.uid;
+            const ordersCollectionRef = collection(db, "orders");
+            const orderRef = doc(ordersCollectionRef, orderID.toString());
+
+            await setDoc(orderRef, {
+                client: client,
+                id: orderID.toString(),
+                orderHTML: this.orderHTML,
+                orderTitle: this.orderTitle,
+                orderCategory: this.orderCategory,
+                experienceNeeded: this.experienceNeeded,
+                status: "pending",
+                budget: this.budget,
+                dueTime: this.dueTime,
+                dueDate: this.dueDate,
+                date: timestamp,
+            });
+
+            const ordersRef = collection(userRef, "orders");
+            const newOrderRef = doc(ordersRef, orderID.toString());
+
+            await setDoc(newOrderRef, {
+                id: orderID.toString(),
+                orderHTML: this.orderHTML,
+                orderTitle: this.orderTitle,
+                orderCategory: this.orderCategory,
+                experienceNeeded: this.experienceNeeded,
+                status: "pending",
+                budget: this.budget,
+                dueTime: this.dueTime,
+                dueDate: this.dueDate,
+                date: timestamp,
+            });
+
+            await this.$store.dispatch("getClientOrders");
+            this.loading = false;
+            this.$router.push("/client/all-orders");
+
+            return;
+            }
+
 
             
           }
